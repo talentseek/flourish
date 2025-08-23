@@ -1,0 +1,12 @@
+# Title: Clerk auth + roles
+# Scope: project
+You MUST:
+- Use Clerk for auth in Next.js (App Router).
+- Store app-specific roles in Clerk user public metadata (e.g., { role: "user" | "admin" }).
+- Mirror essential auth data in our Prisma User table (id, email, role).
+- Gate routes and UI using server-side checks (middleware or server components).
+- Use webhooks to sync user.created / user.updated from Clerk to our DB.
+
+Docs to follow:
+- Clerk basic RBAC: https://clerk.com/docs/references/nextjs/basic-rbac
+- Clerk webhooks: https://clerk.com/docs/webhooks/sync-data
