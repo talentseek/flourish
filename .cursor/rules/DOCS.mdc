@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+- shadcn install: https://ui.shadcn.com/docs/installation/next
+- Tailwind + Next.js: https://tailwindcss.com/docs/guides/nextjs
+- Next.js env vars: https://nextjs.org/docs/app/guides/environment-variables
+- Vercel envs: https://vercel.com/docs/environment-variables
+- Prisma URIs: https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris
+- Clerk RBAC: https://clerk.com/docs/references/nextjs/basic-rbac
+- Clerk webhooks: https://clerk.com/docs/webhooks/sync-data
+- shadcn install: https://ui.shadcn.com/docs/installation/next
+- Tailwind + Next.js: https://tailwindcss.com/docs/guides/nextjs
+- Next.js env vars: https://nextjs.org/docs/app/guides/environment-variables
+- Vercel envs: https://vercel.com/docs/environment-variables
+- Prisma URIs: https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris
+- Clerk RBAC: https://clerk.com/docs/references/nextjs/basic-rbac
+- Clerk webhooks: https://clerk.com/docs/webhooks/sync-data

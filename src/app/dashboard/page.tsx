@@ -1,119 +1,52 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
-import SignOutButton from "@/components/sign-out-button";
+import { auth, currentUser } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import { AppSidebar } from "@/components/app-sidebar"
+import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+import { DataTable } from "@/components/data-table"
+import { SectionCards } from "@/components/section-cards"
+import { SiteHeader } from "@/components/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-export default async function DashboardPage() {
-  const { userId } = auth();
+import data from "./data.json"
+
+export default async function Page() {
+  const { userId } = auth()
   
   if (!userId) {
-    redirect("/");
+    redirect("/")
   }
 
-  const user = await currentUser();
-  const role = (user?.publicMetadata?.role as string)?.toUpperCase() || "USER";
+  const user = await currentUser()
+  
+  if (!user) {
+    redirect("/")
+  }
+
+  const userData = {
+    name: user?.firstName && user?.lastName 
+      ? `${user.firstName} ${user.lastName}` 
+      : user?.firstName || "User",
+    email: user?.emailAddresses[0]?.emailAddress || "user@example.com",
+    avatar: user?.imageUrl,
+  }
 
   return (
-    <main className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">
-              Welcome back, {user?.firstName || "User"}
-            </p>
-          </div>
-          <SignOutButton />
-        </div>
-
-        <Separator />
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>
-                Your account details and preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Email</p>
-                <p className="text-sm text-muted-foreground">{user?.emailAddresses[0]?.emailAddress}</p>
+    <SidebarProvider>
+      <AppSidebar variant="inset" user={userData} />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
               </div>
-              <Separator />
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Role</p>
-                <p className="text-sm text-muted-foreground">{role}</p>
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <p className="text-sm font-medium">User ID</p>
-                <p className="text-sm text-muted-foreground font-mono">{userId}</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
-                Navigate to different sections
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button asChild className="w-full">
-                <Link href="/dashboard/profile">
-                  View Profile
-                </Link>
-              </Button>
-              {role === "ADMIN" && (
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="/dashboard/admin">
-                    Admin Panel
-                  </Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Getting Started</CardTitle>
-            <CardDescription>
-              Learn how to use this application
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-medium">Authentication</h4>
-                <p className="text-sm text-muted-foreground">
-                  This app uses Clerk for authentication. Users are automatically synced to the database via webhooks.
-                </p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="font-medium">Role-Based Access</h4>
-                <p className="text-sm text-muted-foreground">
-                  Set user roles in Clerk public metadata: <code className="bg-muted px-1 rounded text-xs">{"{ \"role\": \"admin\" }"}</code>
-                </p>
-              </div>
-              <Separator />
-              <div>
-                <h4 className="font-medium">Database</h4>
-                <p className="text-sm text-muted-foreground">
-                  User data is stored in PostgreSQL using Prisma ORM.
-                </p>
-              </div>
+              <DataTable data={data} />
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
-  );
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }

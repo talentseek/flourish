@@ -1,0 +1,24 @@
+---
+alwaysApply: true
+---
+
+# Title: Prisma + Postgres conventions
+# Scope: project
+You MUST:
+- Use Prisma as the ORM. Datasource URL comes from env var DATABASE_URL.
+- Never hardcode credentials. Read from process.env.DATABASE_URL.
+- Prefer `prisma migrate dev` locally; `prisma migrate deploy` in CI/CD.
+- Add seed scripts under prisma/seed.ts when needed.
+
+Docs to follow:
+- Prisma Postgres connection strings: https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris
+# Title: Prisma + Postgres conventions
+# Scope: project
+You MUST:
+- Use Prisma as the ORM. Datasource URL comes from env var DATABASE_URL.
+- Never hardcode credentials. Read from process.env.DATABASE_URL.
+- Prefer `prisma migrate dev` locally; `prisma migrate deploy` in CI/CD.
+- Add seed scripts under prisma/seed.ts when needed.
+
+Docs to follow:
+- Prisma Postgres connection strings: https://www.prisma.io/dataguide/postgresql/short-guides/connection-uris

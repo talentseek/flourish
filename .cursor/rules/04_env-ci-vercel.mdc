@@ -1,0 +1,24 @@
+---
+alwaysApply: true
+---
+
+# Title: Env vars & deploy
+# Scope: project
+You MUST:
+- Keep .env.example up to date.
+- Use NEXT_PUBLIC_* only for values that must be in the browser.
+- In Vercel, define Environment Variables (Production/Preview/Development) and never commit secrets.
+
+Docs to follow:
+- Next.js environment variables: https://nextjs.org/docs/app/guides/environment-variables
+- Vercel environment variables: https://vercel.com/docs/environment-variables
+# Title: Env vars & deploy
+# Scope: project
+You MUST:
+- Keep .env.example up to date.
+- Use NEXT_PUBLIC_* only for values that must be in the browser.
+- In Vercel, define Environment Variables (Production/Preview/Development) and never commit secrets.
+
+Docs to follow:
+- Next.js environment variables: https://nextjs.org/docs/app/guides/environment-variables
+- Vercel environment variables: https://vercel.com/docs/environment-variables

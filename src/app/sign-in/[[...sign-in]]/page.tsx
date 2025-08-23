@@ -4,28 +4,27 @@ import { useState } from "react";
 import { useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
 export default function SignInPage() {
+  const { isLoaded, signIn } = useSignIn();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  
-  const { signIn, isLoaded } = useSignIn();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    if (!isLoaded) {
-      setError("Clerk is not loaded yet. Please try again.");
+    if (!email || !password) {
+      setError("Please fill in all fields.");
       setIsLoading(false);
       return;
     }
@@ -37,7 +36,6 @@ export default function SignInPage() {
       });
 
       if (result?.status === "complete") {
-        // Don't call setActive here - let Clerk handle the session automatically
         router.push("/dashboard");
       } else {
         setError("Something went wrong. Please try again.");
