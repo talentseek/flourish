@@ -48,6 +48,31 @@ model Location {
   retailSpace     Int?     // retail space in sqft
   evCharging      Boolean? @default(false)
   evChargingSpaces Int?
+
+  // CSV KPIs (optional, sourced from canonical CSV)
+  healthIndex                    Decimal? @db.Decimal(5, 2)
+  largestCategory                String?
+  largestCategoryPercent         Decimal? @db.Decimal(8, 4)
+  vacancy                        Decimal? @db.Decimal(8, 4)
+  vacancyGrowth                  Decimal? @db.Decimal(8, 4)
+  persistentVacancy              Decimal? @db.Decimal(8, 4)
+  vacantUnits                    Int?
+  vacantUnitGrowth               Int?
+  averageTenancyLengthYears      Decimal? @db.Decimal(8, 2)
+  percentMultiple                Decimal? @db.Decimal(8, 4)
+  percentIndependent             Decimal? @db.Decimal(8, 4)
+  qualityOfferMass               Decimal? @db.Decimal(8, 4)
+  qualityOfferPremium            Decimal? @db.Decimal(8, 4)
+  qualityOfferValue              Decimal? @db.Decimal(8, 4)
+  vacantFloorspace               Int?
+  vacantFloorspaceGrowth         Decimal? @db.Decimal(8, 4)
+  floorspaceVacancy              Decimal? @db.Decimal(8, 4)
+  floorspaceVacancyGrowth        Decimal? @db.Decimal(8, 4)
+  floorspaceVacancyLeisure       Decimal? @db.Decimal(8, 4)
+  floorspaceVacancyLeisureGrowth Decimal? @db.Decimal(8, 4)
+  floorspaceVacancyRetail        Decimal? @db.Decimal(8, 4)
+  floorspaceVacancyRetailGrowth  Decimal? @db.Decimal(8, 4)
+  floorspacePersistentVacancy    Decimal? @db.Decimal(8, 4)
   
   // Social media links
   instagram       String?
@@ -125,4 +150,6 @@ enum Role {
 enum LocationType {
   SHOPPING_CENTRE
   RETAIL_PARK
+  OUTLET_CENTRE
+  HIGH_STREET
 }

@@ -31,64 +31,7 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 
-interface Location {
-  id: string
-  name: string
-  type: 'SHOPPING_CENTRE' | 'RETAIL_PARK'
-  address: string
-  city: string
-  county: string
-  postcode: string
-  latitude: number
-  longitude: number
-  phone?: string
-  website?: string
-  numberOfStores?: number
-  parkingSpaces?: number
-  totalFloorArea?: number
-  numberOfFloors?: number
-  anchorTenants?: number
-  openedYear?: number
-  publicTransit?: string
-  
-  // Enhanced details
-  footfall?: number
-  retailers?: number
-  carParkPrice?: number
-  retailSpace?: number
-  evCharging?: boolean
-  evChargingSpaces?: number
-  
-  // Social media links
-  instagram?: string
-  facebook?: string
-  youtube?: string
-  tiktok?: string
-  
-  // Online reviews
-  googleRating?: number
-  googleReviews?: number
-  googleVotes?: number
-  facebookRating?: number
-  facebookReviews?: number
-  facebookVotes?: number
-  
-  // SEO data
-  seoKeywords?: any[]
-  topPages?: any[]
-  
-  // Demographics
-  population?: number
-  medianAge?: number
-  familiesPercent?: number
-  seniorsPercent?: number
-  avgHouseholdIncome?: number
-  incomeVsNational?: number
-  homeownership?: number
-  homeownershipVsNational?: number
-  carOwnership?: number
-  carOwnershipVsNational?: number
-}
+import { Location } from "@/types/location"
 
 interface LocationDetailsProps {
   location: Location

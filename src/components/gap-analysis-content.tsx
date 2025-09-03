@@ -15,76 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ShoppingCentreSearch } from "@/components/shopping-centre-search"
 import { LocationDetails } from "@/components/location-details"
-
-// Types for database data
-interface Location {
-  id: string
-  name: string
-  type: 'SHOPPING_CENTRE' | 'RETAIL_PARK'
-  address: string
-  city: string
-  county: string
-  postcode: string
-  latitude: number
-  longitude: number
-  phone?: string
-  website?: string
-  numberOfStores?: number
-  parkingSpaces?: number
-  totalFloorArea?: number
-  numberOfFloors?: number
-  anchorTenants?: number
-  openedYear?: number
-  tenants: Tenant[]
-  
-  // Enhanced details
-  footfall?: number
-  retailers?: number
-  carParkPrice?: number
-  retailSpace?: number
-  evCharging?: boolean
-  evChargingSpaces?: number
-  
-  // Social media links
-  instagram?: string
-  facebook?: string
-  youtube?: string
-  tiktok?: string
-  
-  // Online reviews
-  googleRating?: number
-  googleReviews?: number
-  googleVotes?: number
-  facebookRating?: number
-  facebookReviews?: number
-  facebookVotes?: number
-  
-  // SEO data
-  seoKeywords?: any[]
-  topPages?: any[]
-  
-  // Demographics
-  population?: number
-  medianAge?: number
-  familiesPercent?: number
-  seniorsPercent?: number
-  avgHouseholdIncome?: number
-  incomeVsNational?: number
-  homeownership?: number
-  homeownershipVsNational?: number
-  carOwnership?: number
-  carOwnershipVsNational?: number
-}
-
-interface Tenant {
-  id: string
-  name: string
-  category: string
-  subcategory?: string
-  unitNumber?: string
-  floor?: number
-  isAnchorTenant: boolean
-}
+import { Location, Tenant } from "@/types/location"
 
 // Map placeholder component
 function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: { 
@@ -154,12 +85,21 @@ function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: {
                 const x = Math.cos(angle) * radius
                 const y = Math.sin(angle) * radius
                 
+                // Get color based on location type
+                const getLocationColor = (type: string) => {
+                  switch (type) {
+                    case 'SHOPPING_CENTRE': return 'bg-secondary'
+                    case 'RETAIL_PARK': return 'bg-orange-500'
+                    case 'OUTLET_CENTRE': return 'bg-purple-500'
+                    case 'HIGH_STREET': return 'bg-green-500'
+                    default: return 'bg-gray-500'
+                  }
+                }
+                
                 return (
                   <div key={centre.id} className="absolute -translate-x-1/2 -translate-y-1/2">
                     <div 
-                      className={`w-3 h-3 rounded-full border-2 border-white shadow-md ${
-                        centre.type === 'SHOPPING_CENTRE' ? 'bg-secondary' : 'bg-orange-500'
-                      }`}
+                      className={`w-3 h-3 rounded-full border-2 border-white shadow-md ${getLocationColor(centre.type)}`}
                       style={{ 
                         transform: `translate(${x}px, ${y}px)` 
                       }}
@@ -180,9 +120,17 @@ function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: {
               <div className="w-3 h-3 bg-secondary rounded-full"></div>
               <span>Shopping Centre</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-1">
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
               <span>Retail Park</span>
+            </div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+              <span>Outlet Centre</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span>High Street</span>
             </div>
           </div>
         </div>
@@ -252,6 +200,10 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       filtered = filtered.filter(location => location.type === 'SHOPPING_CENTRE')
     } else if (locationTypeFilter === "retail-parks") {
       filtered = filtered.filter(location => location.type === 'RETAIL_PARK')
+    } else if (locationTypeFilter === "outlet-centres") {
+      filtered = filtered.filter(location => location.type === 'OUTLET_CENTRE')
+    } else if (locationTypeFilter === "high-streets") {
+      filtered = filtered.filter(location => location.type === 'HIGH_STREET')
     }
 
     // Sort by distance
@@ -261,15 +213,19 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const summaryStats = useMemo(() => {
     if (nearbyCentres.length === 0) return null
     
-    const totalTenants = nearbyCentres.reduce((sum, centre) => sum + (centre.tenants?.length || 0), 0)
+    const totalTenants = nearbyCentres.filter(centre => centre.tenants?.length || 0).reduce((sum, centre) => sum + (centre.tenants?.length || 0), 0)
     const shoppingCentres = nearbyCentres.filter(centre => centre.type === 'SHOPPING_CENTRE').length
     const retailParks = nearbyCentres.filter(centre => centre.type === 'RETAIL_PARK').length
+    const outletCentres = nearbyCentres.filter(centre => centre.type === 'OUTLET_CENTRE').length
+    const highStreets = nearbyCentres.filter(centre => centre.type === 'HIGH_STREET').length
     
     return {
       totalCentres: nearbyCentres.length,
       totalTenants,
       shoppingCentres,
-      retailParks
+      retailParks,
+      outletCentres,
+      highStreets
     }
   }, [nearbyCentres])
 
@@ -279,7 +235,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Gap Analysis</h1>
         <p className="text-muted-foreground">
-          Compare shopping centres and retail parks to identify tenant mix opportunities
+          Compare shopping centres, retail parks, outlet centres, and high streets to identify tenant mix opportunities
         </p>
       </div>
 
@@ -326,7 +282,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                 <SelectItem value="both">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4" />
-                    <span>Shopping Centres & Retail Parks</span>
+                    <span>All Property Types</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="shopping-centres">
@@ -339,6 +295,18 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                   <div className="flex items-center gap-2">
                     <Store className="h-4 w-4" />
                     <span>Retail Parks Only</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="outlet-centres">
+                  <div className="flex items-center gap-2">
+                    <Store className="h-4 w-4" />
+                    <span>Outlet Centres Only</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="high-streets">
+                  <div className="flex items-center gap-2">
+                    <Store className="h-4 w-4" />
+                    <span>High Streets Only</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -404,6 +372,14 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                     <div className="text-lg font-semibold text-orange-600">{summaryStats.retailParks}</div>
                     <p className="text-xs text-muted-foreground">Retail Parks</p>
                   </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-purple-600">{summaryStats.outletCentres}</div>
+                    <p className="text-xs text-muted-foreground">Outlet Centres</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-green-600">{summaryStats.highStreets}</div>
+                    <p className="text-xs text-muted-foreground">High Streets</p>
+                  </div>
                 </div>
                 <div className="text-center text-sm text-muted-foreground">
                   Within {distance[0]} miles of {selectedCentre?.name}
@@ -443,8 +419,12 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold">{centre.name}</h3>
                         <Badge variant="secondary">{centre.distance.toFixed(1)} miles</Badge>
-                        <Badge variant={centre.type === 'SHOPPING_CENTRE' ? "default" : "outline"}>
-                          {centre.type === 'SHOPPING_CENTRE' ? "Shopping Centre" : "Retail Park"}
+                        <Badge variant={centre.type === 'SHOPPING_CENTRE' ? "default" : 
+                                       centre.type === 'RETAIL_PARK' ? "secondary" :
+                                       centre.type === 'OUTLET_CENTRE' ? "destructive" : "outline"}>
+                          {centre.type === 'SHOPPING_CENTRE' ? "Shopping Centre" : 
+                           centre.type === 'RETAIL_PARK' ? "Retail Park" :
+                           centre.type === 'OUTLET_CENTRE' ? "Outlet Centre" : "High Street"}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-1">

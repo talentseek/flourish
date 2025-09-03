@@ -18,7 +18,7 @@ export default async function HomePage() {
           {/* Main Headline */}
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-              AI-powered deep research and gap analysis for shopping centres to unlock{" "}
+              AI-powered deep research and gap analysis for retail properties to unlock{" "}
               <span className="text-primary">new revenue streams</span>
             </h1>
           </div>

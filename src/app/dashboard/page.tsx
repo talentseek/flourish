@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                   <CardContent>
                     <div className="text-2xl font-bold">13</div>
                     <p className="text-xs text-muted-foreground">
-                      Shopping centres & retail parks
+                      Shopping centres, retail parks, outlet centres & high streets
                     </p>
                   </CardContent>
                 </Card>
@@ -113,7 +113,7 @@ export default async function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Compare shopping centres to identify missing tenant categories and revenue opportunities.
+                      Compare all location types to identify missing tenant categories and revenue opportunities.
                     </p>
                     <Button asChild className="w-full">
                       <Link href="/gap-analysis">
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Search through our database of UK shopping centres and retail parks.
+                      Search through our database of UK retail properties.
                     </p>
                     <Button variant="outline" asChild className="w-full">
                       <Link href="/gap-analysis">

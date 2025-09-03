@@ -151,6 +151,107 @@ export default async function ReportsPage() {
                   </CardContent>
                 </Card>
 
+                {/* Queensgate 50-Mile Catchment Analysis */}
+                <Card className="hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-500/10 rounded-full">
+                          <Users className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg">Queensgate 50-Mile Catchment Analysis</CardTitle>
+                          <CardDescription>
+                            Comprehensive analysis of 126+ properties in the catchment area
+                          </CardDescription>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="ml-2">New</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Key Metrics Preview */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">126</div>
+                          <p className="text-xs text-muted-foreground">Properties</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">82</div>
+                          <p className="text-xs text-muted-foreground">Retail Parks</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">41</div>
+                          <p className="text-xs text-muted-foreground">Shopping Centres</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-lg font-bold text-green-600">3</div>
+                          <p className="text-xs text-muted-foreground">High Streets</p>
+                        </div>
+                      </div>
+
+                      {/* Report Features */}
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span>CSV KPI Data</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span>Health Index</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          <span>Vacancy Rates</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                          <span>Category Mix</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          <span>Distance Analysis</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                          <span>Property Types</span>
+                        </div>
+                      </div>
+
+                      {/* Report Details */}
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            <span>Generated: {new Date().toLocaleDateString('en-GB')}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <FileText className="h-3 w-3" />
+                            <span>Live Data</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3 w-3" />
+                            <span>2,648 Properties</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            CSV Export
+                          </Button>
+                          <Button size="sm" asChild>
+                            <Link href="/reports/queensgate-50-mile">
+                              View Analysis
+                              <ArrowRight className="h-4 w-4 ml-2" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Empty State for Future Reports */}
                 <Card className="border-dashed">
                   <CardContent className="p-8 text-center">

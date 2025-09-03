@@ -7,26 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-interface Location {
-  id: string
-  name: string
-  type: 'SHOPPING_CENTRE' | 'RETAIL_PARK'
-  address: string
-  city: string
-  county: string
-  postcode: string
-  latitude: number
-  longitude: number
-  phone?: string
-  website?: string
-  numberOfStores?: number
-  parkingSpaces?: number
-  totalFloorArea?: number
-  numberOfFloors?: number
-  anchorTenants?: number
-  openedYear?: number
-  tenants: any[]
-}
+import { Location } from "@/types/location"
 
 interface ShoppingCentreSearchProps {
   onCentreSelect: (centre: Location) => void
@@ -53,16 +34,16 @@ export function ShoppingCentreSearch({ onCentreSelect, selectedCentre, locations
               <span className="text-xs text-muted-foreground">{selectedCentre.city}, {selectedCentre.county}</span>
             </div>
           ) : (
-            <span className="text-muted-foreground">Search for a shopping centre...</span>
+            <span className="text-muted-foreground">Search for a location...</span>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command>
-          <CommandInput placeholder="Search shopping centres..." />
+                      <CommandInput placeholder="Search locations..." />
           <CommandList>
-            <CommandEmpty>No shopping centre found.</CommandEmpty>
+            <CommandEmpty>No location found.</CommandEmpty>
             <CommandGroup>
               {locations.map((centre) => (
                 <CommandItem
