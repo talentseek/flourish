@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,7 +18,111 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model Location {
+  id              String   @id @default(cuid())
+  name            String
+  type            LocationType
+  address         String
+  city            String
+  county          String
+  postcode        String
+  latitude        Decimal  @db.Decimal(10, 8)
+  longitude       Decimal  @db.Decimal(11, 8)
+  phone           String?
+  website         String?
+  openingHours    Json?
+  parkingSpaces   Int?
+  totalFloorArea  Int?     // in square feet
+  numberOfStores  Int?
+  numberOfFloors  Int?
+  anchorTenants   Int?
+  publicTransit   String?
+  owner           String?
+  management      String?
+  openedYear      Int?
+  
+  // Enhanced details
+  footfall        Int?     // annual footfall
+  retailers       Int?     // number of retailers
+  carParkPrice    Decimal? @db.Decimal(5, 2) // 0-2 hours parking price
+  retailSpace     Int?     // retail space in sqft
+  evCharging      Boolean? @default(false)
+  evChargingSpaces Int?
+  
+  // Social media links
+  instagram       String?
+  facebook        String?
+  youtube         String?
+  tiktok          String?
+  
+  // Online reviews
+  googleRating    Decimal? @db.Decimal(2, 1)
+  googleReviews   Int?
+  googleVotes     Int?
+  facebookRating  Decimal? @db.Decimal(2, 1)
+  facebookReviews Int?
+  facebookVotes   Int?
+  
+  // SEO data
+  seoKeywords     Json?    // array of keyword objects
+  topPages        Json?    // array of page objects
+  
+  // Demographics
+  population      Int?
+  medianAge       Int?
+  familiesPercent Decimal? @db.Decimal(4, 1)
+  seniorsPercent  Decimal? @db.Decimal(4, 1)
+  avgHouseholdIncome Decimal? @db.Decimal(8, 2)
+  incomeVsNational Decimal? @db.Decimal(6, 2)
+  homeownership   Decimal? @db.Decimal(4, 1)
+  homeownershipVsNational Decimal? @db.Decimal(4, 1)
+  carOwnership    Decimal? @db.Decimal(4, 1)
+  carOwnershipVsNational Decimal? @db.Decimal(4, 1)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  tenants Tenant[]
+
+  @@map("locations")
+}
+
+model Tenant {
+  id             String   @id @default(cuid())
+  locationId     String
+  name           String
+  category       String
+  subcategory    String?
+  unitNumber     String?
+  floor          Int?
+  isAnchorTenant Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  location       Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@map("tenants")
+}
+
+model Category {
+  id               String     @id @default(cuid())
+  name             String     @unique
+  description      String?
+  parentCategoryId String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  parentCategory   Category?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id])
+  subcategories    Category[] @relation("CategoryHierarchy")
+
+  @@map("categories")
+}
+
 enum Role {
   USER
   ADMIN
+}
+
+enum LocationType {
+  SHOPPING_CENTRE
+  RETAIL_PARK
 }

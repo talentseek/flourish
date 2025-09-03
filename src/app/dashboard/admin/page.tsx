@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminActions from "./admin-actions";
-import SignOutButton from "@/components/sign-out-button";
 
 export default async function AdminPage() {
   const user = await getSessionUser();
@@ -38,7 +37,6 @@ export default async function AdminPage() {
               Welcome, {user.id}. You have admin privileges.
             </p>
           </div>
-          <SignOutButton />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
