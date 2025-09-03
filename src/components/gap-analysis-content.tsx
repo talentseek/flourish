@@ -213,7 +213,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const summaryStats = useMemo(() => {
     if (nearbyCentres.length === 0) return null
     
-    const totalTenants = nearbyCentres.filter(centre => centre.tenants?.length || 0).reduce((sum, centre) => sum + (centre.tenants?.length || 0), 0)
+    const totalStores = nearbyCentres.reduce((sum, centre) => sum + (centre.numberOfStores || 0), 0)
     const shoppingCentres = nearbyCentres.filter(centre => centre.type === 'SHOPPING_CENTRE').length
     const retailParks = nearbyCentres.filter(centre => centre.type === 'RETAIL_PARK').length
     const outletCentres = nearbyCentres.filter(centre => centre.type === 'OUTLET_CENTRE').length
@@ -221,7 +221,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
     
     return {
       totalCentres: nearbyCentres.length,
-      totalTenants,
+      totalStores,
       shoppingCentres,
       retailParks,
       outletCentres,
@@ -358,9 +358,9 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold">
-                      {summaryStats.totalTenants.toLocaleString()}
+                      {summaryStats.totalStores.toLocaleString()}
                     </div>
-                    <p className="text-xs text-muted-foreground">Total Tenants</p>
+                    <p className="text-xs text-muted-foreground">Total Stores</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t">
@@ -432,8 +432,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                         {centre.city}, {centre.county}
                       </p>
                       <div className="flex gap-4 mt-2 text-sm">
-                        <span>{centre.tenants?.length || 0} tenants</span>
-                        {centre.numberOfStores && <span>{centre.numberOfStores} stores</span>}
+                        <span>{centre.numberOfStores || 0} stores</span>
                       </div>
                     </div>
                     <Dialog>

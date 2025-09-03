@@ -80,7 +80,7 @@ export default async function Queensgate50MileReport() {
 
   // Calculate summary statistics
   const totalProperties = catchmentProperties.length
-  const totalTenants = catchmentProperties.reduce((sum, prop) => sum + prop.tenants.length, 0)
+  const totalStores = catchmentProperties.reduce((sum, prop) => sum + (prop.numberOfStores || 0), 0)
   const avgHealthIndex = catchmentProperties.reduce((sum, prop) => 
     sum + (prop.healthIndex ? Number(prop.healthIndex) : 0), 0) / totalProperties
   const avgVacancy = catchmentProperties.reduce((sum, prop) => 
@@ -120,8 +120,8 @@ export default async function Queensgate50MileReport() {
               <p className="text-sm text-muted-foreground">Total Properties</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{totalTenants}</div>
-              <p className="text-sm text-muted-foreground">Total Tenants</p>
+              <div className="text-3xl font-bold text-green-600">{totalStores}</div>
+              <p className="text-sm text-muted-foreground">Total Stores</p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600">{avgHealthIndex.toFixed(2)}</div>
