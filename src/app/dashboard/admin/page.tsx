@@ -81,7 +81,7 @@ export default async function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
-                {dbUsers.filter(u => u.role === 'USER').length}
+                {dbUsers.filter((u: { role: string }) => u.role === 'USER').length}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Standard accounts
