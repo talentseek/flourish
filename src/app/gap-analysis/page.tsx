@@ -24,7 +24,7 @@ export default async function GapAnalysisPage() {
   })
 
   // Convert Decimal objects to numbers and nulls to undefined for client serialization
-  const serializedLocations = locations.map((location) => ({
+  const serializedLocations = locations.map((location: any) => ({
     id: location.id,
     name: location.name,
     type: location.type,
@@ -98,7 +98,7 @@ export default async function GapAnalysisPage() {
     floorspaceVacancyRetail: location.floorspaceVacancyRetail != null ? Number(location.floorspaceVacancyRetail) : undefined,
     floorspaceVacancyRetailGrowth: location.floorspaceVacancyRetailGrowth != null ? Number(location.floorspaceVacancyRetailGrowth) : undefined,
     floorspacePersistentVacancy: location.floorspacePersistentVacancy != null ? Number(location.floorspacePersistentVacancy) : undefined,
-    tenants: location.tenants.map((tenant) => ({
+    tenants: location.tenants.map((tenant: any) => ({
       id: tenant.id,
       name: tenant.name,
       category: tenant.category,

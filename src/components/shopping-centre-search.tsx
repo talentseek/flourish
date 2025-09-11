@@ -45,7 +45,7 @@ export function ShoppingCentreSearch({ onCentreSelect, selectedCentre, locations
           <CommandList>
             <CommandEmpty>No location found.</CommandEmpty>
             <CommandGroup>
-              {locations.map((centre) => (
+              {locations.map((centre: any) => (
                 <CommandItem
                   key={centre.id}
                   value={`${centre.name} ${centre.city} ${centre.county} ${centre.type}`}

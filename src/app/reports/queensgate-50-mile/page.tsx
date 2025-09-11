@@ -143,7 +143,7 @@ export default async function Queensgate50MileReport() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {Object.entries(byType).map(([type, properties]) => (
+            {Object.entries(byType).map(([type, properties]: [string, any]) => (
               <div key={type} className="text-center p-4 border rounded-lg">
                 <div className="flex justify-center mb-2">
                   {getPropertyTypeIcon(type)}
@@ -159,7 +159,7 @@ export default async function Queensgate50MileReport() {
       </Card>
 
       {/* Properties by Type */}
-      {Object.entries(byType).map(([type, properties]) => (
+      {Object.entries(byType).map(([type, properties]: [string, any]) => (
         <Card key={type}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -172,7 +172,7 @@ export default async function Queensgate50MileReport() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
-              {properties.map((property) => {
+              {properties.map((property: any) => {
                 const distance = calculateDistance(
                   QUEENSGATE_LAT, QUEENSGATE_LON,
                   Number(property.latitude), Number(property.longitude)

@@ -79,7 +79,7 @@ function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: {
               ></div>
               
               {/* Nearby centres */}
-              {nearbyCentres.slice(0, 8).map((centre, index) => {
+              {nearbyCentres.slice(0, 8).map((centre: any, index: number) => {
                 const angle = (index * 45) * (Math.PI / 180)
                 const radius = Math.min(distance * 4, 100)
                 const x = Math.cos(angle) * radius
@@ -452,7 +452,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                 {!catLoading && !catError && (!catData || catData.length === 0) && (
                   <div className="text-sm text-muted-foreground">No category data</div>
                 )}
-                {!catLoading && !catError && catData && catData.slice(0, 10).map((row, idx) => {
+                {!catLoading && !catError && catData && catData.slice(0, 10).map((row: any, idx: number) => {
                   const share = catTotalLocations > 0 ? (row.locations / catTotalLocations) * 100 : 0
                   return (
                     <div key={idx} className="space-y-1">
@@ -488,7 +488,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {nearbyCentres.map((centre) => (
+                {nearbyCentres.map((centre: any) => (
                   <div key={centre.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                     <Checkbox
                       id={`centre-${centre.id}`}
@@ -542,7 +542,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                             <div>
                               <h4 className="font-semibold">Sample Tenants</h4>
                               <div className="flex flex-wrap gap-1 mt-2">
-                                {centre.tenants.slice(0, 10).map((tenant, index) => (
+                                {centre.tenants.slice(0, 10).map((tenant: any, index: number) => (
                                   <Badge key={index} variant="outline">{tenant.name}</Badge>
                                 ))}
                                 {centre.tenants.length > 10 && (
