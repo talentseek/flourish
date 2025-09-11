@@ -107,7 +107,7 @@ export default async function AdminPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {dbUsers.map((dbUser) => (
+                {dbUsers.map((dbUser: { id: string; email: string; role: string; createdAt: Date }) => (
                   <div key={dbUser.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                     <div>
                       <div className="font-medium">{dbUser.email}</div>
