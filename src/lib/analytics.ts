@@ -38,10 +38,10 @@ export async function getCategoryDistributionWithinRadius(locationId: string, ra
   });
 
   const nearbyIds = all
-    .filter(l => l.latitude != null && l.longitude != null)
-    .filter(l => Number(l.latitude) !== 0 && Number(l.longitude) !== 0)
-    .filter(l => haversineKm(lat, lon, Number(l.latitude), Number(l.longitude)) <= radiusKm)
-    .map(l => l.id);
+    .filter((l: any) => l.latitude != null && l.longitude != null)
+    .filter((l: any) => Number(l.latitude) !== 0 && Number(l.longitude) !== 0)
+    .filter((l: any) => haversineKm(lat, lon, Number(l.latitude), Number(l.longitude)) <= radiusKm)
+    .map((l: any) => l.id);
 
   if (nearbyIds.length === 0) return [];
 
@@ -81,10 +81,10 @@ export async function getLargestCategoryAggregationWithinRadius(locationId: stri
     select: { id: true, latitude: true, longitude: true, largestCategory: true, largestCategoryPercent: true },
   });
 
-  const within = all.filter(l => l.latitude != null && l.longitude != null)
-    .filter(l => Number(l.latitude) !== 0 && Number(l.longitude) !== 0)
-    .filter(l => haversineKm(lat, lon, Number(l.latitude), Number(l.longitude)) <= radiusKm)
-    .filter(l => l.largestCategory);
+  const within = all.filter((l: any) => l.latitude != null && l.longitude != null)
+    .filter((l: any) => Number(l.latitude) !== 0 && Number(l.longitude) !== 0)
+    .filter((l: any) => haversineKm(lat, lon, Number(l.latitude), Number(l.longitude)) <= radiusKm)
+    .filter((l: any) => l.largestCategory);
 
   const byCat = new Map<string, { count: number; percentSum: number; percentCount: number }>();
   for (const l of within) {

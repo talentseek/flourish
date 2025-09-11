@@ -156,7 +156,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const handleCentreToggle = (centreId: string) => {
     setSelectedCentres(prev => 
       prev.includes(centreId) 
-        ? prev.filter(id => id !== centreId)
+        ? prev.filter((id: string) => id !== centreId)
         : [...prev, centreId]
     )
   }
@@ -193,20 +193,20 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       )
     }))
 
-    let filtered = locationsWithDistance.filter(location => 
+    let filtered = locationsWithDistance.filter((location: any) => 
       location.id !== selectedCentre.id && 
       location.distance <= distance[0]
     )
 
     // Apply type filter
     if (locationTypeFilter === "shopping-centres") {
-      filtered = filtered.filter(location => location.type === 'SHOPPING_CENTRE')
+      filtered = filtered.filter((location: any) => location.type === 'SHOPPING_CENTRE')
     } else if (locationTypeFilter === "retail-parks") {
-      filtered = filtered.filter(location => location.type === 'RETAIL_PARK')
+      filtered = filtered.filter((location: any) => location.type === 'RETAIL_PARK')
     } else if (locationTypeFilter === "outlet-centres") {
-      filtered = filtered.filter(location => location.type === 'OUTLET_CENTRE')
+      filtered = filtered.filter((location: any) => location.type === 'OUTLET_CENTRE')
     } else if (locationTypeFilter === "high-streets") {
-      filtered = filtered.filter(location => location.type === 'HIGH_STREET')
+      filtered = filtered.filter((location: any) => location.type === 'HIGH_STREET')
     }
 
     // Sort by distance
@@ -217,10 +217,10 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
     if (nearbyCentres.length === 0) return null
     
     const totalStores = nearbyCentres.reduce((sum: number, centre: any) => sum + (centre.numberOfStores || 0), 0)
-    const shoppingCentres = nearbyCentres.filter(centre => centre.type === 'SHOPPING_CENTRE').length
-    const retailParks = nearbyCentres.filter(centre => centre.type === 'RETAIL_PARK').length
-    const outletCentres = nearbyCentres.filter(centre => centre.type === 'OUTLET_CENTRE').length
-    const highStreets = nearbyCentres.filter(centre => centre.type === 'HIGH_STREET').length
+    const shoppingCentres = nearbyCentres.filter((centre: any) => centre.type === 'SHOPPING_CENTRE').length
+    const retailParks = nearbyCentres.filter((centre: any) => centre.type === 'RETAIL_PARK').length
+    const outletCentres = nearbyCentres.filter((centre: any) => centre.type === 'OUTLET_CENTRE').length
+    const highStreets = nearbyCentres.filter((centre: any) => centre.type === 'HIGH_STREET').length
     
     return {
       totalCentres: nearbyCentres.length,
