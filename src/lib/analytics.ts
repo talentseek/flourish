@@ -58,7 +58,7 @@ export async function getCategoryDistributionWithinRadius(locationId: string, ra
 
   const total = tenants.length || 1;
   const result: CategoryDistribution[] = Array.from(countByCategory.entries())
-    .map(([categoryName, count]) => ({ categoryName, count, percentage: (count / total) * 100 }))
+    .map(([categoryName, count]: [string, number]) => ({ categoryName, count, percentage: (count / total) * 100 }))
     .sort((a, b) => b.count - a.count);
 
   return result;
@@ -98,7 +98,7 @@ export async function getLargestCategoryAggregationWithinRadius(locationId: stri
     byCat.set(name, entry);
   }
 
-  const result: LargestCategoryAggregate[] = Array.from(byCat.entries()).map(([largestCategory, v]) => ({
+  const result: LargestCategoryAggregate[] = Array.from(byCat.entries()).map(([largestCategory, v]: [string, any]) => ({
     largestCategory,
     locations: v.count,
     avgPercent: v.percentCount ? v.percentSum / v.percentCount : 0,

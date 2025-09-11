@@ -72,7 +72,7 @@ export default async function Queensgate50MileReport() {
   })
 
   // Group by property type
-  const byType = catchmentProperties.reduce((acc, prop) => {
+  const byType = catchmentProperties.reduce((acc: any, prop: any) => {
     if (!acc[prop.type]) acc[prop.type] = []
     acc[prop.type].push(prop)
     return acc
@@ -80,10 +80,10 @@ export default async function Queensgate50MileReport() {
 
   // Calculate summary statistics
   const totalProperties = catchmentProperties.length
-  const totalStores = catchmentProperties.reduce((sum, prop) => sum + (prop.numberOfStores || 0), 0)
-  const avgHealthIndex = catchmentProperties.reduce((sum, prop) => 
+  const totalStores = catchmentProperties.reduce((sum: number, prop: any) => sum + (prop.numberOfStores || 0), 0)
+  const avgHealthIndex = catchmentProperties.reduce((sum: number, prop: any) => 
     sum + (prop.healthIndex ? Number(prop.healthIndex) : 0), 0) / totalProperties
-  const avgVacancy = catchmentProperties.reduce((sum, prop) => 
+  const avgVacancy = catchmentProperties.reduce((sum: number, prop: any) => 
     sum + (prop.vacancy ? Number(prop.vacancy) : 0), 0) / totalProperties
 
   return (

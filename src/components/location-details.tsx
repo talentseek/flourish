@@ -60,7 +60,7 @@ export function LocationDetails({ location, onClose }: LocationDetailsProps) {
   const renderStars = (rating: number) => {
     return (
       <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map((star: number) => (
           <Star
             key={star}
             className={`h-4 w-4 ${

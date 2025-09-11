@@ -216,7 +216,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const summaryStats = useMemo(() => {
     if (nearbyCentres.length === 0) return null
     
-    const totalStores = nearbyCentres.reduce((sum, centre) => sum + (centre.numberOfStores || 0), 0)
+    const totalStores = nearbyCentres.reduce((sum: number, centre: any) => sum + (centre.numberOfStores || 0), 0)
     const shoppingCentres = nearbyCentres.filter(centre => centre.type === 'SHOPPING_CENTRE').length
     const retailParks = nearbyCentres.filter(centre => centre.type === 'RETAIL_PARK').length
     const outletCentres = nearbyCentres.filter(centre => centre.type === 'OUTLET_CENTRE').length
@@ -264,7 +264,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
 
   const catTotalLocations = useMemo(() => {
     if (!catData) return 0
-    return catData.reduce((sum, row) => sum + (row.locations || 0), 0)
+    return catData.reduce((sum: number, row: any) => sum + (row.locations || 0), 0)
   }, [catData])
 
   return (
