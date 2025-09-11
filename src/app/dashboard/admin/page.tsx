@@ -64,7 +64,7 @@ export default async function AdminPage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">
-                {dbUsers.filter(u => u.role === 'ADMIN').length}
+                {dbUsers.filter((u: { role: string }) => u.role === 'ADMIN').length}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Out of {dbUsers.length} total
