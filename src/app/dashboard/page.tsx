@@ -18,6 +18,7 @@ import {
   BarChart3
 } from "lucide-react"
 import Link from "next/link"
+import { prisma } from "@/lib/db"
 
 export default async function DashboardPage() {
   const { userId } = auth()
@@ -25,6 +26,12 @@ export default async function DashboardPage() {
   if (!userId) {
     redirect("/")
   }
+
+  // Live metrics
+  const [totalLocations, totalTenants] = await Promise.all([
+    prisma.location.count(),
+    prisma.tenant.count(),
+  ])
 
   return (
     <SidebarProvider>
@@ -52,7 +59,7 @@ export default async function DashboardPage() {
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">13</div>
+                    <div className="text-2xl font-bold">{totalLocations.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       Shopping centres, retail parks, outlet centres & high streets
                     </p>
@@ -65,7 +72,7 @@ export default async function DashboardPage() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">1,247</div>
+                    <div className="text-2xl font-bold">{totalTenants.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       Across all locations
                     </p>

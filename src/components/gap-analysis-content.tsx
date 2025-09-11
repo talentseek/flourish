@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Search, MapPin, Building2, Users, Target, Map, Store } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -149,6 +149,9 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const [selectedCentres, setSelectedCentres] = useState<string[]>([])
   const [locationTypeFilter, setLocationTypeFilter] = useState<string>("both")
   const [showLocationDetails, setShowLocationDetails] = useState(false)
+  const [catLoading, setCatLoading] = useState(false)
+  const [catError, setCatError] = useState<string | null>(null)
+  const [catData, setCatData] = useState<{ largestCategory: string; locations: number; avgPercent: number }[] | null>(null)
 
   const handleCentreToggle = (centreId: string) => {
     setSelectedCentres(prev => 
@@ -228,6 +231,41 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       highStreets
     }
   }, [nearbyCentres])
+
+  const selectedHasInvalidCoords = useMemo(() => {
+    if (!selectedCentre) return false
+    return !selectedCentre.latitude || !selectedCentre.longitude || selectedCentre.latitude === 0 || selectedCentre.longitude === 0
+  }, [selectedCentre])
+
+  // Load category aggregation when selection/radius changes
+  useEffect(() => {
+    const run = async () => {
+      if (!selectedCentre) {
+        setCatData(null)
+        return
+      }
+      try {
+        setCatLoading(true)
+        setCatError(null)
+        const radiusKm = distance[0] * 1.60934
+        const res = await fetch(`/api/analytics/largest-category-within-radius?locationId=${selectedCentre.id}&radiusKm=${radiusKm.toFixed(2)}`)
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+        const json = await res.json()
+        setCatData(json.data || [])
+      } catch (e: any) {
+        setCatError(e?.message || 'Failed to load category data')
+        setCatData(null)
+      } finally {
+        setCatLoading(false)
+      }
+    }
+    run()
+  }, [selectedCentre, distance])
+
+  const catTotalLocations = useMemo(() => {
+    if (!catData) return 0
+    return catData.reduce((sum, row) => sum + (row.locations || 0), 0)
+  }, [catData])
 
   return (
     <div className="space-y-6">
@@ -351,6 +389,11 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {selectedHasInvalidCoords && (
+                  <div className="text-xs text-muted-foreground">
+                    Coordinates for this location are approximate or missing. Radius results may be limited.
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold">{summaryStats.totalCentres}</div>
@@ -384,6 +427,43 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                 <div className="text-center text-sm text-muted-foreground">
                   Within {distance[0]} miles of {selectedCentre?.name}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Top Categories within Radius */}
+        {selectedCentre && (
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Top Categories in Radius</CardTitle>
+                <CardDescription>
+                  Share of locations by largest category within {distance[0]} miles
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {catLoading && (
+                  <div className="text-sm text-muted-foreground">Loading categories…</div>
+                )}
+                {catError && (
+                  <div className="text-sm text-destructive">{catError}</div>
+                )}
+                {!catLoading && !catError && (!catData || catData.length === 0) && (
+                  <div className="text-sm text-muted-foreground">No category data</div>
+                )}
+                {!catLoading && !catError && catData && catData.slice(0, 10).map((row, idx) => {
+                  const share = catTotalLocations > 0 ? (row.locations / catTotalLocations) * 100 : 0
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <div className="font-medium">{row.largestCategory}</div>
+                        <div className="text-muted-foreground">{row.locations} locs • avg {row.avgPercent.toFixed(1)}%</div>
+                      </div>
+                      <Progress value={Math.max(0, Math.min(100, share))} />
+                    </div>
+                  )
+                })}
               </CardContent>
             </Card>
           </div>

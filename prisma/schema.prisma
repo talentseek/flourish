@@ -126,6 +126,10 @@ model Tenant {
   updatedAt      DateTime @updatedAt
   location       Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
+  // Normalized category reference
+  categoryId     String?
+  categoryRef    Category? @relation(fields: [categoryId], references: [id])
+
   @@map("tenants")
 }
 
@@ -138,6 +142,7 @@ model Category {
   updatedAt        DateTime   @updatedAt
   parentCategory   Category?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id])
   subcategories    Category[] @relation("CategoryHierarchy")
+  tenants          Tenant[]
 
   @@map("categories")
 }
