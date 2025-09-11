@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLargestCategoryAggregationWithinRadius } from "@/lib/analytics";
 
+export const runtime = 'nodejs';
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const locationId = searchParams.get("locationId");

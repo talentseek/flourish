@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncUserToDatabase } from "@/lib/sync-user";
 
+export const runtime = 'nodejs';
+
 export async function POST(req: NextRequest) {
   // Only allow in development
   if (process.env.NODE_ENV !== "development") {

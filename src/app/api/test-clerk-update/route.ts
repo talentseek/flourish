@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const user = await currentUser();
