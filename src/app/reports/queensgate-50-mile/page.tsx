@@ -63,7 +63,7 @@ export default async function Queensgate50MileReport() {
   })
 
   // Filter to Queensgate catchment area
-  const catchmentProperties = allProperties.filter(prop => {
+  const catchmentProperties = allProperties.filter((prop: any) => {
     const distance = calculateDistance(
       QUEENSGATE_LAT, QUEENSGATE_LON,
       Number(prop.latitude), Number(prop.longitude)
