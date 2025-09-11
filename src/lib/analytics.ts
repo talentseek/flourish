@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/db";
 
+export const runtime = 'nodejs';
+
 function toRadians(degrees: number): number {
   return (degrees * Math.PI) / 180;
 }

@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/db"
+
+export const runtime = 'nodejs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
