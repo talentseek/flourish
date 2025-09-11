@@ -1,12 +1,9 @@
 {
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
   "functions": {
     "src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    },
-    "src/app/**/page.tsx": {
-      "runtime": "nodejs18.x"
-    },
-    "src/lib/**/*.ts": {
       "runtime": "nodejs18.x"
     }
   }
