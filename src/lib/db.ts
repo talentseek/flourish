@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
+// Force Node.js runtime for Prisma client
+export const runtime = 'nodejs';
+
 const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 
 export const prisma =

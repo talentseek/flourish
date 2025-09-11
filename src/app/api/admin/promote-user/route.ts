@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     // Check if current user is admin

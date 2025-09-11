@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+
+export const runtime = 'nodejs';
 import { clerkClient } from "@clerk/nextjs/server";
 
 export async function POST(request: NextRequest) {

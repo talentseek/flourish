@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { prisma } from "@/lib/db";
 
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   const payload = await req.text();
   const h = headers();
