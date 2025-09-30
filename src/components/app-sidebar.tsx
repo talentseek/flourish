@@ -57,6 +57,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             icon: TargetIcon,
           },
           {
+            title: "Gap Fulfillment",
+            url: "/gap-fulfillment",
+            icon: TargetIcon,
+          },
+          {
+            title: "Outreach Analytics",
+            url: "/gap-fulfillment/analytics",
+            icon: TargetIcon,
+          },
+          {
             title: "Reports",
             url: "/reports",
             icon: FileTextIcon,

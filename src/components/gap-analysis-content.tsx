@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Search, MapPin, Building2, Users, Target, Map, Store } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,10 +16,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ShoppingCentreSearch } from "@/components/shopping-centre-search"
 import { LocationDetails } from "@/components/location-details"
+import { GoogleMaps } from "@/components/google-maps"
 import { Location, Tenant } from "@/types/location"
 
-// Map placeholder component
-function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: { 
+// Map component with Google Maps integration
+function MapView({ selectedCentre, distance, nearbyCentres }: { 
   selectedCentre: Location | null
   distance: number
   nearbyCentres: Location[]
@@ -59,78 +61,40 @@ function MapPlaceholder({ selectedCentre, distance, nearbyCentres }: {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-64 bg-muted rounded-lg relative overflow-hidden">
-          {/* Map placeholder with visual representation */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
-              {/* Target centre */}
-              <div className="absolute -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg z-10"></div>
-              <div className="absolute -translate-x-1/2 -translate-y-1/2 mt-6 text-xs font-medium bg-primary text-primary-foreground px-2 py-1 rounded">
-                {selectedCentre.name}
-              </div>
-              
-              {/* Search radius circle */}
-              <div 
-                className="absolute -translate-x-1/2 -translate-y-1/2 border-2 border-primary/30 rounded-full"
-                style={{ 
-                  width: `${Math.min(distance * 8, 200)}px`, 
-                  height: `${Math.min(distance * 8, 200)}px` 
-                }}
-              ></div>
-              
-              {/* Nearby centres */}
-              {nearbyCentres.slice(0, 8).map((centre: any, index: number) => {
-                const angle = (index * 45) * (Math.PI / 180)
-                const radius = Math.min(distance * 4, 100)
-                const x = Math.cos(angle) * radius
-                const y = Math.sin(angle) * radius
-                
-                // Get color based on location type
-                const getLocationColor = (type: string) => {
-                  switch (type) {
-                    case 'SHOPPING_CENTRE': return 'bg-secondary'
-                    case 'RETAIL_PARK': return 'bg-orange-500'
-                    case 'OUTLET_CENTRE': return 'bg-purple-500'
-                    case 'HIGH_STREET': return 'bg-green-500'
-                    default: return 'bg-gray-500'
-                  }
-                }
-                
-                return (
-                  <div key={centre.id} className="absolute -translate-x-1/2 -translate-y-1/2">
-                    <div 
-                      className={`w-3 h-3 rounded-full border-2 border-white shadow-md ${getLocationColor(centre.type)}`}
-                      style={{ 
-                        transform: `translate(${x}px, ${y}px)` 
-                      }}
-                    ></div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          
-          {/* Legend */}
-          <div className="absolute bottom-2 left-2 bg-background/90 backdrop-blur-sm rounded-lg p-2 text-xs">
-            <div className="flex items-center gap-2 mb-1">
+        <GoogleMaps 
+          selectedCentre={selectedCentre}
+          distance={distance}
+          nearbyCentres={nearbyCentres}
+          className="h-64"
+        />
+        
+        {/* Legend */}
+        <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+          <h4 className="text-sm font-medium mb-2">Legend</h4>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-primary rounded-full"></div>
-              <span>Target</span>
+              <span>Target Location</span>
             </div>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-3 h-3 bg-secondary rounded-full"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-slate-500 rounded-full"></div>
               <span>Shopping Centre</span>
             </div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
               <span>Retail Park</span>
             </div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
               <span>Outlet Centre</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span>High Street</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 border-2 border-primary rounded-full bg-transparent"></div>
+              <span>Search Radius</span>
             </div>
           </div>
         </div>
@@ -144,6 +108,7 @@ interface GapAnalysisContentProps {
 }
 
 export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
+  const router = useRouter()
   const [selectedCentre, setSelectedCentre] = useState<Location | null>(null)
   const [distance, setDistance] = useState([25])
   const [selectedCentres, setSelectedCentres] = useState<string[]>([])
@@ -352,8 +317,28 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
           </div>
 
                            {/* Action Buttons */}
-                 <div className="flex gap-2">
-                   <Button disabled={!selectedCentre || selectedCentres.length === 0}>
+                <div className="flex gap-2">
+                  <Button
+                    disabled={!selectedCentre || selectedCentres.length === 0}
+                    onClick={() => {
+                      if (!selectedCentre || selectedCentres.length === 0) return
+                      // Store current selection for demo/report context (optional)
+                      try {
+                        sessionStorage.setItem(
+                          "gap-analysis-selection",
+                          JSON.stringify({
+                            targetId: selectedCentre.id,
+                            nearbyIds: selectedCentres,
+                            radiusMiles: distance[0],
+                          })
+                        )
+                      } catch {}
+                      // Navigate to a dynamic report route with context
+                      const nearbyParam = encodeURIComponent(selectedCentres.join(","))
+                      const radiusParam = distance[0]
+                      router.push(`/reports/run/${selectedCentre.id}?nearby=${nearbyParam}&radius=${radiusParam}`)
+                    }}
+                  >
                      <Target className="h-4 w-4 mr-2" />
                      Analyze Gaps ({selectedCentres.length} selected)
                    </Button>
@@ -371,8 +356,8 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
 
       {/* Map and Summary Stats */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Map Placeholder */}
-        <MapPlaceholder
+        {/* Map View */}
+        <MapView
           selectedCentre={selectedCentre}
           distance={distance[0]}
           nearbyCentres={nearbyCentres}
@@ -408,7 +393,7 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-secondary">{summaryStats.shoppingCentres}</div>
+                    <div className="text-lg font-semibold text-foreground">{summaryStats.shoppingCentres}</div>
                     <p className="text-xs text-muted-foreground">Shopping Centres</p>
                   </div>
                   <div className="text-center">
@@ -474,10 +459,32 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       {selectedCentre && (
         <Card>
           <CardHeader>
-            <CardTitle>Nearby Locations</CardTitle>
-            <CardDescription>
-              Select locations within {distance[0]} miles to include in your gap analysis
-            </CardDescription>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <CardTitle>Nearby Locations</CardTitle>
+                <CardDescription>
+                  Select locations within {distance[0]} miles to include in your gap analysis
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedCentres(nearbyCentres.map((c: any) => c.id))}
+                  disabled={nearbyCentres.length === 0}
+                >
+                  Select All ({nearbyCentres.length})
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedCentres([])}
+                  disabled={selectedCentres.length === 0}
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             {nearbyCentres.length === 0 ? (

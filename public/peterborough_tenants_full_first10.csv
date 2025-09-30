@@ -1,0 +1,54 @@
+centre_name,store_name,category_raw,normalized_category,isAnchorTenant,unit,brand_url,source_url,last_verified
+Hereward Cross Shopping Centre,Tesco Express,Supermarket,Grocery,True,,https://www.tesco.com/store-locator/,https://www.tesco.com/store-locator/peterborough/tesco-stores-ltd,2025-09-29
+Hereward Cross Shopping Centre,Poundland (Units 7-9),Discount Variety,Discount,False,Units 7-9,,https://poundland-3898160.wheree.com/,2025-09-29
+Hereward Cross Shopping Centre,Timpson,Shoe Repairs / Key Cutting (Services),Services,False,,https://www.timpson.co.uk/,https://peterborough.cylex-uk.co.uk/map/hereward%20cross.html,2025-09-29
+Hereward Cross Shopping Centre,William Hill,Betting (Services),Services,False,,https://www.williamhill.com/,https://peterborough.cylex-uk.co.uk/map/hereward%20cross.html,2025-09-29
+Boongate Retail Park,The Range (with Iceland),General Merchandise / Variety,Discount,True,Unit 2,https://www.therange.co.uk/stores/peterborough/,https://www.therange.co.uk/stores/peterborough/,2025-09-29
+Boongate Retail Park,B&M,Discount Variety,Discount,False,,https://www.bmstores.co.uk/,https://www.bmstores.co.uk/stores/peterborough-boongate-50,2025-09-29
+Maskew Avenue Retail Park,Aldi,Supermarket,Grocery,True,,,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29
+Maskew Avenue Retail Park,B&Q,DIY & Garden,DIY,True,,,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29
+Maskew Avenue Retail Park,Currys,Electronics,Electronics,False,,,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29
+Maskew Avenue Retail Park,Dunelm,Homewares,Home,False,,,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29
+Maskew Avenue Retail Park,Matalan,Fashion & Home,Apparel,False,,,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29
+Fengate Retail Park,Screwfix (St David's Sq),Trade / DIY,DIY,True,,https://www.screwfix.com/stores/DT5/peterborough-fengate,https://www.screwfix.com/stores/DT5/peterborough-fengate,2025-09-29
+Fengate Retail Park,Wickes,DIY & Home Improvement,DIY,True,,https://www.wickes.co.uk/store/8209,https://www.wickes.co.uk/store/8209,2025-09-29
+Fengate Retail Park,Toolstation,Trade Counter / DIY,DIY,False,Unit 2 Whitehead Drove,https://www.toolstation.com/branches/peterborough,https://www.toolstation.com/branches/peterborough,2025-09-29
+Boulevard Retail Park,DFS,Furniture,Furniture,False,,,https://www.dfs.co.uk/store-directory/peterborough-furniture-store,2025-09-29
+Boulevard Retail Park,Furniture Village,Furniture,Furniture,False,,,https://www.furniturevillage.co.uk/stores/peterborough.html,2025-09-29
+Boulevard Retail Park,Wren Kitchens,Kitchens & Bedrooms,Furniture,False,,,https://www.wrenkitchens.com/showrooms/peterborough,2025-09-29
+Boulevard Retail Park,Sofology,Sofas & Furniture,Furniture,False,,,https://stockfordanderson.com/portfolio/peterborough-boulevard-retail-park/,2025-09-29
+Boulevard Retail Park,Carpetright,Flooring,Home,False,,,https://stockfordanderson.com/portfolio/peterborough-boulevard-retail-park/,2025-09-29
+Boulevard Retail Park,Dunelm,Homewares,Home,False,,,https://stockfordanderson.com/portfolio/peterborough-boulevard-retail-park/,2025-09-29
+Boulevard Retail Park,Dreams,Beds & Mattresses,Furniture,False,,,https://stockfordanderson.com/portfolio/peterborough-boulevard-retail-park/,2025-09-29
+Brotherhood Retail Park,Asda Living,Anchor / General Merchandise,Specialty,True,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Bensons for Beds,Furniture,Furniture,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Card Factory,Cards & Gifts,Specialty,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Costa Coffee,Coffee Shop,F&B,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Hobbycraft,Specialty / Fashion & Home,Apparel,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Mamas & Papas,Nursery / Baby,Specialty,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Marks & Spencer,Anchor / General Merchandise,Specialty,True,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Next,Anchor / General Merchandise,Specialty,True,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Nine Nails Beauty,Nail Salon,HealthBeauty,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Oak Furnitureland,Furniture,Furniture,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Poundland,Discount Variety,Discount,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,PureGym,Gym,Leisure,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,Tapi Carpets,Flooring,Home,False,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Brotherhood Retail Park,TK Maxx,Anchor / General Merchandise,Specialty,True,,,https://brotherhoodshopping.co.uk/stores/,2025-09-29
+Bretton Centre,Sainsbury's,Supermarket,Grocery,True,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Aldi,Supermarket,Grocery,True,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Sports Direct,Sportswear,Specialty,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Pets at Home,Pet Store,Home,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Poundland,Discount Variety,Discount,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Costa Coffee,Coffee Shop,F&B,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Boots,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Domino's,Takeaway Pizza,F&B,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Greggs,Bakery / Takeaway,F&B,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Subway,Sandwiches / Fast Food,F&B,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Iceland,Supermarket,Grocery,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Post Office,Post Office (Services),Services,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Bretton Centre,Timpson,Shoe Repairs / Key Cutting (Services),Services,False,,,https://welovepeterborough.co.uk/shopping-in-peterborough/,2025-09-29
+Peterborough One Retail Park,Blue Diamond: Peterborough Home & Garden (ex Van Hage),Garden Centre & Home,Home,True,,https://www.bluediamond.gg/our-locations/peterborough-home-garden,https://www.bluediamond.gg/our-locations/peterborough-home-garden,2025-09-29
+Peterborough One Retail Park,Pavers,Footwear,Footwear,False,,,https://www.space-rpc.com/property/unit-20-garden-retail-park-peterborough/,2025-09-29
+Peterborough One Retail Park,Pets Corner,Pet Store,Home,False,,,https://www.space-rpc.com/property/unit-20-garden-retail-park-peterborough/,2025-09-29
+Peterborough One Retail Park,Roman,Fashion,Apparel,False,,,https://www.space-rpc.com/property/unit-20-garden-retail-park-peterborough/,2025-09-29
+Peterborough One Retail Park,ES Hairdressers,Hairdressers / Services,Services,False,,,https://www.space-rpc.com/property/unit-20-garden-retail-park-peterborough/,2025-09-29

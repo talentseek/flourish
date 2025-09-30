@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server"
+import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
@@ -38,12 +39,89 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { GoogleMaps } from "@/components/google-maps"
+import { PrintButtons } from "@/components/print-buttons"
+
+function toRadians(degrees: number) { return (degrees * Math.PI) / 180 }
+function haversineMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 3959
+  const dLat = toRadians(lat2 - lat1)
+  const dLon = toRadians(lon2 - lon1)
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
 
 export default async function QueensgateReportPage() {
   const { userId } = auth()
   
   if (!userId) {
     redirect("/")
+  }
+
+  // Map data: target is Queensgate; show nearby within 25 miles
+  // Prefer exact postcode match for Queensgate to avoid wrong cities
+  let target = await prisma.location.findFirst({
+    where: { postcode: { equals: "PE1 1NT", mode: "insensitive" } },
+    include: { tenants: true }
+  })
+  if (!target) {
+    target = await prisma.location.findFirst({
+      where: { name: { contains: "Queensgate", mode: "insensitive" } },
+      include: { tenants: true }
+    })
+  }
+  let selectedCentre: any = null
+  let nearbyCentres: any[] = []
+  const radiusMiles = 10
+  if (target) {
+    // Known Queensgate coordinates (PE1 1NT) fallback
+    const fallbackLat = 52.5739945664255
+    const fallbackLon = -0.24454680547662228
+    const latOk = typeof target.latitude === 'object' || typeof target.latitude === 'number'
+    const lonOk = typeof target.longitude === 'object' || typeof target.longitude === 'number'
+    const tLat = latOk ? Number(target.latitude as any) : fallbackLat
+    const tLon = lonOk ? Number(target.longitude as any) : fallbackLon
+
+    selectedCentre = {
+      id: target.id,
+      name: target.name,
+      type: target.type,
+      address: target.address,
+      city: target.city,
+      county: target.county,
+      postcode: target.postcode,
+      latitude: (tLat === 0 || !Number.isFinite(tLat)) ? fallbackLat : tLat,
+      longitude: (tLon === 0 || !Number.isFinite(tLon)) ? fallbackLon : tLon,
+      tenants: target.tenants.map(t => ({ id: t.id, name: t.name, category: t.category, isAnchorTenant: t.isAnchorTenant }))
+    }
+    const all = await prisma.location.findMany()
+    const lat = selectedCentre.latitude
+    const lon = selectedCentre.longitude
+    const seen = new Set<string>()
+    nearbyCentres = all
+      .filter(l => l.id !== target.id && l.latitude != null && l.longitude != null)
+      .map(l => ({
+        id: l.id,
+        name: l.name,
+        type: l.type,
+        address: l.address,
+        city: l.city,
+        county: l.county,
+        postcode: l.postcode,
+        numberOfStores: l.numberOfStores || 0,
+        latitude: Number(l.latitude as any),
+        longitude: Number(l.longitude as any),
+      }))
+      .map(l => ({ ...l, distance: haversineMiles(lat, lon, l.latitude, l.longitude) }))
+      .filter(l => l.distance <= radiusMiles)
+      .filter(l => {
+        const key = l.name.trim().toLowerCase()
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+      .sort((a, b) => a.distance - b.distance)
   }
 
   return (
@@ -70,17 +148,26 @@ export default async function QueensgateReportPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </Button>
-                  <Button>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Print Report
-                  </Button>
-                </div>
+                <PrintButtons />
               </div>
+
+              {/* Map Overview */}
+              {selectedCentre && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      Map Overview (within {radiusMiles} miles)
+                    </CardTitle>
+                    <CardDescription>
+                      {selectedCentre.name} and nearby locations
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <GoogleMaps selectedCentre={selectedCentre} distance={radiusMiles} nearbyCentres={nearbyCentres as any} className="h-80" />
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Table of Contents */}
               <Card className="bg-accent/50">
@@ -1175,181 +1262,190 @@ export default async function QueensgateReportPage() {
                 </Card>
               </section>
 
-              {/* 12. The Flourish Team */}
+              {/* 12. Our Team - Space to Trade */}
               <section id="team">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">
                       <Users className="h-6 w-6" />
-                      12. The Flourish Team
+                      Our Team
                     </CardTitle>
                     <CardDescription>
-                      Meet the experts behind this comprehensive analysis
+                      Highly experienced across sales, visual merchandising, finance and shopping centre management
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Team Overview */}
-                    <div className="text-center mb-8">
-                      <h3 className="text-lg font-semibold mb-2">About Flourish</h3>
-                      <p className="text-muted-foreground max-w-2xl mx-auto">
-                        Flourish is a leading retail analytics and consulting firm specializing in shopping centre 
-                        optimization. Our team combines deep retail expertise with cutting-edge data analytics to 
-                        deliver actionable insights that drive revenue growth.
-                      </p>
-                    </div>
-
-                    {/* Team Members */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {/* Paul Clifford */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <Users className="h-8 w-8 text-primary" />
-                          </div>
-                          <h4 className="font-semibold mb-1">Sarah Johnson</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Head of Retail Analytics</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            15+ years experience in retail strategy and tenant mix optimization
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/paulnew.webp" alt="Paul Clifford" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Paul Clifford</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Founder & Director</p>
+                              <p className="text-sm text-muted-foreground">
+                                Paul has over 20 years retail and property management experience. Paul has worked in some of the UK's largest retailers including Boots, DSG and IKEA and managed shopping centres in Slough, Kings Lynn, Epsom and East London. The knowledge acquired throughout this career, gives Paul unparalleled expertise in the field of mall commercialisation.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">paul@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
 
+                      {/* Michelle Clark */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <BarChart3 className="h-8 w-8 text-primary" />
-                          </div>
-                          <h4 className="font-semibold mb-1">Michael Chen</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Data Science Lead</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            Expert in predictive analytics and revenue modeling
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/michellenew.webp" alt="Michelle Clark" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Michelle Clark</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Sales Director</p>
+                              <p className="text-sm text-muted-foreground">
+                                Michelle has been in the placemaking industry for nearly 8 years and has a passion for working with small businesses. Michelle has a strong understanding of the property industry and in particular the fast pace of the shopping centre world. Michelle also has a number of small businesses herself and are still performing well today.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">michelle@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
 
+                      {/* Jemma Mills */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <Target className="h-8 w-8 text-primary" />
-                          </div>
-                          <h4 className="font-semibold mb-1">Emma Rodriguez</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Gap Analysis Specialist</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            Specialized in competitive analysis and opportunity identification
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/jemmanew.webp" alt="Jemma Mills" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Jemma Mills</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
+                              <p className="text-sm text-muted-foreground">
+                                Jemma has a wealth of experience within retail, having worked with major companies such as W H Smith and Welcome Break for 12 years. She is passionate about assisting her traders and landlords and utilises her extensive knowledge to grow the business and continue the rapport.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">jemma@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
 
+                      {/* Amanda Bishop */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <Globe className="h-8 w-8 text-primary" />
-                          </div>
-                          <h4 className="font-semibold mb-1">David Thompson</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Digital Strategy Director</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            Expert in digital presence optimization and SEO strategy
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/amandanew.webp" alt="Amanda Bishop" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Amanda Bishop</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
+                              <p className="text-sm text-muted-foreground">
+                                Amanda has worked in Sales and Marketing for most of her working life and has extensive knowledge and experience in business development, account and staff management. Amanda is adept at creating new business to deliver revenue growth across multiple territories.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">amanda@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
 
+                      {/* Callum Clifford */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <DollarSign className="h-8 w-8 text-primary" />
-                          </div>
-                          <h4 className="font-semibold mb-1">Lisa Park</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Financial Analyst</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            Specialized in revenue forecasting and financial modeling
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/callumnew.webp" alt="Callum Clifford" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Callum Clifford</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
+                              <p className="text-sm text-muted-foreground">
+                                Callum is a results driven regional manager based in the south, with extensive experience in sales, marketing, and IT, as well as a background in starting and running a business. Using this experience, Callum helps traders and landlords grow by offering exceptional service and support.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">callum@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
 
+                      {/* Giorgia Shepherd */}
                       <Card>
-                        <CardContent className="p-6 text-center">
-                          <div className="w-20 h-20 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <Award className="h-8 w-8 text-primary" />
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/giorgianew.webp" alt="Giorgia Shepherd" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Giorgia Shepherd</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
+                              <p className="text-sm text-muted-foreground">
+                                Giorgia is a passionate and enthusiastic regional manager based in the vibrant South East, with a wealth of experience in the hospitality industry. The dynamic and fast-paced environment of retail has always ignited Giorgia's enthusiasm, allowing her to thrive and develop her leadership qualities.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">giorgia@thisisflourish.co.uk</p>
+                            </div>
                           </div>
-                          <h4 className="font-semibold mb-1">James Wilson</h4>
-                          <p className="text-sm text-muted-foreground mb-2">Implementation Lead</p>
-                          <p className="text-xs text-muted-foreground mb-3">
-                            Expert in strategy execution and change management
-                          </p>
-                          <div className="flex justify-center gap-2">
-                            <Button size="sm" variant="outline">
-                              <Linkedin className="h-3 w-3" />
-                            </Button>
-                            <Button size="sm" variant="outline">
-                              <Mail className="h-3 w-3" />
-                            </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Paula Muers */}
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/paulanew.webp" alt="Paula Muers" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Paula Muers</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
+                              <p className="text-sm text-muted-foreground">
+                                Paula has extensive experience of working within sales, marketing and business development. Working with B2B and B2C blue chip companies, including Coke Cola, Gillette, Nestle, 20th Century Fox, Unilever and Asda. Paula is passionate about what she does and has also run her own small business.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">paula@thisisflourish.co.uk</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Daanyaal Tahir */}
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/daanyaalnew.webp" alt="Daanyaal Tahir" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Daanyaal Tahir</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Accounts & Team Administration</p>
+                              <p className="text-sm text-muted-foreground">
+                                Dan is the newest addition to our team, bringing a fresh perspective and a proactive approach to supporting our accounts. He plays a key role in managing day-to-day operations and overseeing team administration, ensuring everything runs like a well-oiled machine.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">dan@thisisflourish.co.uk</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Sharon O'Rourke */}
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/sharonnew.webp" alt="Sharon O'Rourke" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Sharon O'Rourke</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Regional Manager Scotland</p>
+                              <p className="text-sm text-muted-foreground">
+                                11 years ago, Sharon started her own marketing and events business which is still going strong today managing a large portfolio of clients including numerous shopping centres in Glasgow and the West and a Business Improvement District in the leafy suburb of Giffnock.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">sharon@thisisflourish.co.uk</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Suki Sall */}
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <Image src="/sukinew.webp" alt="Suki Sall" width={72} height={72} className="rounded-full object-cover" />
+                            <div>
+                              <h4 className="font-semibold">Suki Sall</h4>
+                              <p className="text-xs text-muted-foreground mb-2">Head of Accounts</p>
+                              <p className="text-sm text-muted-foreground">
+                                Suki is a Chartered Accountant with 5 years experience of accounts preparation, audit and assurance. Suki is responsible for the financial management of all aspects of the company including preparation of management and statutory accounts, taxation, cash-flows, budgets and financial planning.
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">accounts@thisisflourish.co.uk</p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     </div>
-
-                    {/* Contact Information */}
-                    <Card className="bg-accent/50">
-                      <CardContent className="p-6">
-                        <h3 className="font-semibold mb-4 text-center">Get in Touch</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                          <div>
-                            <Phone className="h-5 w-5 mx-auto mb-2 text-primary" />
-                            <p className="text-sm font-medium">+44 (0) 20 7123 4567</p>
-                            <p className="text-xs text-muted-foreground">Main Office</p>
-                          </div>
-                          <div>
-                            <Mail className="h-5 w-5 mx-auto mb-2 text-primary" />
-                            <p className="text-sm font-medium">hello@flourish.com</p>
-                            <p className="text-xs text-muted-foreground">General Inquiries</p>
-                          </div>
-                          <div>
-                            <Globe className="h-5 w-5 mx-auto mb-2 text-primary" />
-                            <p className="text-sm font-medium">flourish.com</p>
-                            <p className="text-xs text-muted-foreground">Visit Our Website</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
                   </CardContent>
                 </Card>
               </section>

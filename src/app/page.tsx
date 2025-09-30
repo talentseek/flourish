@@ -27,6 +27,21 @@ export default async function HomePage() {
           <div className="text-center">
             <SearchBox />
           </div>
+
+          {/* Demo Video */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight text-center">See Flourish in action</h2>
+            <div className="rounded-lg border border-border bg-card p-2">
+              <video
+                className="w-full h-auto rounded-md"
+                controls
+                poster="/images/logo.png"
+              >
+                <source src="/flourishai.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
         </div>
       </main>
     </>

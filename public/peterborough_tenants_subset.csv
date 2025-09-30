@@ -1,0 +1,22 @@
+centre_name,store_name,category_raw,subcategory_raw,isAnchorTenant,unit_number,floor,brand_url,source_url,last_verified,categoryId
+Serpentine Green,Tesco Extra,Supermarket,,True,,,,https://serpentine-green.com/,2025-09-29,Grocery
+Serpentine Green,H&M,Fashion,Clothing,False,,,https://www2.hm.com,https://serpentine-green.com/,2025-09-29,Apparel
+Serpentine Green,Next,Fashion & Home,,False,,,https://www.next.co.uk,https://serpentine-green.com/,2025-09-29,Apparel
+Serpentine Green,Boots,Health & Beauty,Pharmacy,False,,,https://www.boots.com,https://serpentine-green.com/,2025-09-29,HealthBeauty
+Serpentine Green,Burger King,Food & Drink,Fast Food,False,,,https://www.burgerking.co.uk,https://serpentine-green.com/,2025-09-29,F&B
+Brotherhood Retail Park,Marks & Spencer,Department Store / Food,,True,,,https://www.marksandspencer.com,https://brotherhoodshopping.co.uk/stores/,2025-09-29,DepartmentStore
+Brotherhood Retail Park,Next,Fashion & Home,,True,,,https://www.next.co.uk,https://brotherhoodshopping.co.uk/stores/,2025-09-29,Apparel
+Brotherhood Retail Park,TK Maxx,Off-price Fashion & Home,,True,,,https://www.tkmaxx.com,https://brotherhoodshopping.co.uk/stores/,2025-09-29,Apparel
+Brotherhood Retail Park,Asda Living,General Merchandise,,True,,,https://www.asda.com,https://brotherhoodshopping.co.uk/stores/,2025-09-29,Variety
+Brotherhood Retail Park,Hobbycraft,Arts & Crafts,,False,,,https://www.hobbycraft.co.uk,https://brotherhoodshopping.co.uk/stores/,2025-09-29,Specialty
+Brotherhood Retail Park,Poundland,Discount Variety,,False,,,https://www.poundland.co.uk,https://brotherhoodshopping.co.uk/stores/,2025-09-29,Discount
+Maskew Avenue Retail Park,Aldi,Supermarket,,True,,,https://www.aldi.co.uk,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29,Grocery
+Maskew Avenue Retail Park,B&Q,DIY & Garden,Home Improvement,True,,,https://www.diy.com,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29,DIY
+Maskew Avenue Retail Park,Currys,Electronics,,False,,,https://www.currys.co.uk,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29,Electronics
+Maskew Avenue Retail Park,Dunelm,Homewares,,False,,,https://www.dunelm.com,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29,Home
+Maskew Avenue Retail Park,Matalan,Fashion & Home,,False,,,https://www.matalan.co.uk,https://assets.savills.com/properties/GB0400L128562/bdd75704c1dac688a5ae5dedfe454d24.pdf,2025-09-29,Apparel
+Boulevard Retail Park,DFS,Furniture,Sofas,False,,,https://www.dfs.co.uk,https://www.dfs.co.uk/store-directory/peterborough-furniture-store,2025-09-29,Furniture
+Boulevard Retail Park,Furniture Village,Furniture,,False,,,https://www.furniturevillage.co.uk,https://www.trustpilot.com/review/www.furniturevillage.co.uk/location/peterborough,2025-09-29,Furniture
+Boongate Retail Park,The Range (with Iceland),General Merchandise,"Home, Garden, Iceland",True,Unit 2,,https://www.therange.co.uk/stores/peterborough/,https://www.therange.co.uk/stores/peterborough/,2025-09-29,Variety
+Boongate Retail Park,B&M,Discount Variety,,False,,,https://www.bmstores.co.uk/stores/peterborough-boongate-50,https://www.bmstores.co.uk/stores/peterborough-boongate-50,2025-09-29,Discount
+Stanground Retail Park,Morrisons,Supermarket,,True,,,https://my.morrisons.com/storefinder/414/stanground/,https://my.morrisons.com/storefinder/414/stanground/,2025-09-29,Grocery

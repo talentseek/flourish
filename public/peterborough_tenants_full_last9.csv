@@ -1,0 +1,37 @@
+centre_name,store_name,category_raw,normalized_category,isAnchorTenant,unit,brand_url,source_url,last_verified
+Stanground Retail Park,Morrisons,Supermarket,Grocery,True,,https://my.morrisons.com/storefinder/414/stanground/,https://my.morrisons.com/storefinder/414/stanground/,2025-09-29
+Serpentine Green Shopping Centre,Tesco Extra,Supermarket,Grocery,True,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,H&M,Fashion,Apparel,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Next,Fashion,Apparel,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Boots,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,JD Sports,Sportswear,Specialty,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,River Island,Fashion,Apparel,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Superdrug,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Card Factory,Cards & Gifts,Specialty,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Burger King,Food & Drink / Cafe / Fast Food,F&B,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Costa Coffee,Food & Drink / Cafe / Fast Food,F&B,False,,,https://serpentine-green.com/stores/,2025-09-29
+Serpentine Green Shopping Centre,Greggs,Food & Drink / Cafe / Fast Food,F&B,False,,,https://serpentine-green.com/stores/,2025-09-29
+Werrington Centre,Co-op Food,Supermarket,Grocery,True,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Boots,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Barnardo's,Charity Shop,Specialty,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Post Office,Post Office / Services,Services,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Lloyds Bank,Banking Services,Services,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Domino's,Pizza Takeaway,F&B,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Subway,Sandwiches,F&B,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Greggs,Bakery / Food,F&B,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Werrington Centre,Betfred,Betting / Services,Services,False,,,https://assets.savills.com/properties/GB211CPA12290/Werrington%20Centre%2005%2018.pdf,2025-09-29
+Ortongate Shopping Centre,Iceland,Supermarket,Grocery,True,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Boots,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Poundland,Discount Variety,Discount,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Costa Coffee,Food & Drink / Cafe,F&B,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Greggs,Food & Drink / Cafe,F&B,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,EE,Mobile Phones,Specialty,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Halifax,Banking,Specialty,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Savers,Health & Beauty,HealthBeauty,False,,,https://ortongate.co.uk/stores/,2025-09-29
+Ortongate Shopping Centre,Superdrug,Health & Beauty,HealthBeauty,False,,,https://ortongate.co.uk/stores/,2025-09-29
+The Deeping Shopping Centre,Tesco Superstore,Supermarket,Grocery,True,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29
+The Deeping Shopping Centre,Boots,Pharmacy / Health & Beauty,HealthBeauty,False,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29
+The Deeping Shopping Centre,Holland & Barrett,Health Foods,HealthBeauty,False,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29
+The Deeping Shopping Centre,Card Factory,Cards & Gifts,Specialty,False,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29
+The Deeping Shopping Centre,Savers,Discount Health & Beauty,HealthBeauty,False,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29
+The Deeping Shopping Centre,Pets Corner,Pet Store,Home,False,,,https://www.visitpeterborough.com/things-to-do/shopping/deeping-shopping-centre-p876528,2025-09-29

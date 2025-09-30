@@ -30,10 +30,13 @@ export default async function DashboardPage() {
   }
 
   // Live metrics
-  const [totalLocations, totalTenants] = await Promise.all([
+  const [totalLocations, storesAggregate] = await Promise.all([
     prisma.location.count(),
-    prisma.tenant.count(),
+    prisma.location.aggregate({
+      _sum: { numberOfStores: true },
+    }),
   ])
+  const totalStores = (storesAggregate._sum.numberOfStores ?? 0)
 
   return (
     <SidebarProvider>
@@ -70,11 +73,11 @@ export default async function DashboardPage() {
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Tenants</CardTitle>
+                    <CardTitle className="text-sm font-medium">Total Stores</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{totalTenants.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{totalStores.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       Across all locations
                     </p>
@@ -94,18 +97,7 @@ export default async function DashboardPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Revenue Opportunities</CardTitle>
-                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">£2.4M</div>
-                    <p className="text-xs text-muted-foreground">
-                      Identified potential
-                    </p>
-                  </CardContent>
-                </Card>
+                {/* Revenue Opportunities card removed until calculation is available */}
               </div>
 
               {/* Quick Actions */}
