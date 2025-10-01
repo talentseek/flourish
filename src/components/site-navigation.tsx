@@ -20,14 +20,11 @@ export function SiteNavigation() {
           />
         </Link>
 
-        {/* Right side - Theme toggle and auth buttons */}
+        {/* Right side - Theme toggle and sign in */}
         <div className="flex items-center space-x-4">
           <ThemeToggle />
           <Button variant="outline" asChild>
             <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/sign-up">Sign Up</Link>
           </Button>
         </div>
       </div>
