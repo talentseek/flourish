@@ -109,7 +109,16 @@ interface GapAnalysisContentProps {
 
 export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const router = useRouter()
-  const [selectedCentre, setSelectedCentre] = useState<Location | null>(null)
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const preSelectedId = searchParams?.get('selected')
+  
+  const [selectedCentre, setSelectedCentre] = useState<Location | null>(() => {
+    if (preSelectedId) {
+      const found = locations.find(l => l.id === preSelectedId)
+      return found || null
+    }
+    return null
+  })
   const [distance, setDistance] = useState([25])
   const [selectedCentres, setSelectedCentres] = useState<string[]>([])
   const [locationTypeFilter, setLocationTypeFilter] = useState<string>("both")

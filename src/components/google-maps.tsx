@@ -51,10 +51,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ selectedCentre, distance, n
 
     // Create radius circle
     const circle = new google.maps.Circle({
-      strokeColor: '#3b82f6',
+      strokeColor: 'hsl(var(--primary))',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#3b82f6',
+      fillColor: 'hsl(var(--primary))',
       fillOpacity: 0.1,
       map: map,
       center: {
@@ -78,24 +78,24 @@ const MapComponent: React.FC<MapComponentProps> = ({ selectedCentre, distance, n
       },
       map: map,
       title: selectedCentre.name,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: 8,
-        fillColor: '#3b82f6',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 2
-      },
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: 'hsl(var(--primary))',
+          fillOpacity: 1,
+          strokeColor: 'hsl(var(--background))',
+          strokeWeight: 2
+        },
       zIndex: 1000
     })
 
     // Add info window for target location
     const targetInfoWindow = new google.maps.InfoWindow({
       content: `
-        <div class="p-2">
-          <h3 class="font-semibold text-sm">${selectedCentre.name}</h3>
-          <p class="text-xs text-gray-600">${selectedCentre.city}, ${selectedCentre.county}</p>
-          <p class="text-xs text-gray-500">Target Location</p>
+        <div style="padding: 0.5rem;">
+          <h3 style="font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem;">${selectedCentre.name}</h3>
+          <p style="font-size: 0.75rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.125rem;">${selectedCentre.city}, ${selectedCentre.county}</p>
+          <p style="font-size: 0.75rem; color: hsl(var(--muted-foreground));">Target Location</p>
         </div>
       `
     })
@@ -130,7 +130,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ selectedCentre, distance, n
           scale: 6,
           fillColor: getLocationColor(centre.type),
           fillOpacity: 1,
-          strokeColor: '#ffffff',
+          strokeColor: 'hsl(var(--background))',
           strokeWeight: 2
         },
         zIndex: 500
@@ -139,11 +139,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ selectedCentre, distance, n
       // Add info window for nearby centres
       const infoWindow = new google.maps.InfoWindow({
         content: `
-          <div class="p-2">
-            <h3 class="font-semibold text-sm">${centre.name}</h3>
-            <p class="text-xs text-gray-600">${centre.city}, ${centre.county}</p>
-            <p class="text-xs text-gray-500">${centre.type.replace('_', ' ')}</p>
-            <p class="text-xs text-gray-500">${centre.distance?.toFixed(1)} miles away</p>
+          <div style="padding: 0.5rem;">
+            <h3 style="font-weight: 600; font-size: 0.875rem; margin-bottom: 0.25rem;">${centre.name}</h3>
+            <p style="font-size: 0.75rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.125rem;">${centre.city}, ${centre.county}</p>
+            <p style="font-size: 0.75rem; color: hsl(var(--muted-foreground)); margin-bottom: 0.125rem;">${centre.type.replace('_', ' ')}</p>
+            <p style="font-size: 0.75rem; color: hsl(var(--muted-foreground));">${centre.distance?.toFixed(1)} miles away</p>
           </div>
         `
       })
