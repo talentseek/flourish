@@ -133,7 +133,7 @@ export default async function QueensgateReportPage() {
           <div className="flex flex-1 flex-col gap-2">
             <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
               {/* Header */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between print:hidden">
                 <div className="flex items-center gap-4">
                   <Button variant="outline" size="sm" asChild>
                     <Link href="/reports">
@@ -1280,7 +1280,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/paulnew.webp" alt="Paul Clifford" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/paulnew.webp" alt="Paul Clifford" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Paul Clifford</h4>
                               <p className="text-xs text-muted-foreground mb-2">Founder & Director</p>
@@ -1297,7 +1297,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/michellenew.webp" alt="Michelle Clark" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/michellenew.webp" alt="Michelle Clark" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Michelle Clark</h4>
                               <p className="text-xs text-muted-foreground mb-2">Sales Director</p>
@@ -1314,7 +1314,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/jemmanew.webp" alt="Jemma Mills" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/jemmanew.webp" alt="Jemma Mills" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Jemma Mills</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
@@ -1331,7 +1331,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/amandanew.webp" alt="Amanda Bishop" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/amandanew.webp" alt="Amanda Bishop" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Amanda Bishop</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
@@ -1348,7 +1348,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/callumnew.webp" alt="Callum Clifford" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/callumnew.webp" alt="Callum Clifford" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Callum Clifford</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
@@ -1365,7 +1365,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/giorgianew.webp" alt="Giorgia Shepherd" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/giorgianew.webp" alt="Giorgia Shepherd" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Giorgia Shepherd</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
@@ -1382,7 +1382,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/paulanew.webp" alt="Paula Muers" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/paulanew.webp" alt="Paula Muers" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Paula Muers</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
@@ -1399,7 +1399,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/daanyaalnew.webp" alt="Daanyaal Tahir" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/daanyaalnew.webp" alt="Daanyaal Tahir" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Daanyaal Tahir</h4>
                               <p className="text-xs text-muted-foreground mb-2">Accounts & Team Administration</p>
@@ -1416,7 +1416,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/sharonnew.webp" alt="Sharon O'Rourke" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/sharonnew.webp" alt="Sharon O'Rourke" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Sharon O'Rourke</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager Scotland</p>
@@ -1433,7 +1433,7 @@ export default async function QueensgateReportPage() {
                       <Card>
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
-                            <Image src="/sukinew.webp" alt="Suki Sall" width={72} height={72} className="rounded-full object-cover" />
+                            <Image src="/sukinew.webp" alt="Suki Sall" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
                               <h4 className="font-semibold">Suki Sall</h4>
                               <p className="text-xs text-muted-foreground mb-2">Head of Accounts</p>

@@ -108,3 +108,88 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles for PDF export */
+@media print {
+  /* Hide navigation and non-essential elements */
+  .print\\:hidden,
+  [data-sidebar],
+  header,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure full page width */
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Optimize page breaks */
+  section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Prevent breaking inside cards */
+  [class*="card"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Add page breaks before major sections */
+  section[id] {
+    page-break-before: auto;
+  }
+
+  /* Ensure images print correctly */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+    display: block !important;
+  }
+
+  /* Force Next.js images to show in print */
+  img[src] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Ensure team member images are visible */
+  .team-member-image {
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  /* Remove box shadows for cleaner print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Optimize colors for print */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure proper margins */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+
+  /* Make sure content is visible */
+  .sidebar-inset,
+  main {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+}

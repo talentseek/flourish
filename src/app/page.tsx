@@ -35,9 +35,9 @@ export default async function HomePage() {
               <video
                 className="w-full h-auto rounded-md"
                 controls
-                poster="/images/logo.png"
+                poster="/screenshot.png"
               >
-                <source src="/flourishai.mp4" type="video/mp4" />
+                <source src="/flourish.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
