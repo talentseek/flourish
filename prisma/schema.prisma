@@ -79,6 +79,7 @@ model Location {
   facebook        String?
   youtube         String?
   tiktok          String?
+  twitter         String?
   
   // Online reviews
   googleRating    Decimal? @db.Decimal(2, 1)
@@ -145,6 +146,27 @@ model Category {
   tenants          Tenant[]
 
   @@map("categories")
+}
+
+model EnrichmentSnapshot {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  
+  // Overall stats
+  totalLocations  Int
+  
+  // Tier-level counts (locations that meet tier requirements)
+  coreComplete    Int
+  geoComplete     Int
+  operationalComplete Int
+  commercialComplete  Int
+  digitalComplete     Int
+  demographicComplete Int
+  
+  // Field-level completeness (JSON for flexibility)
+  fieldStats      Json     // { fieldName: { filled: 123, empty: 456 }, ... }
+  
+  @@map("enrichment_snapshots")
 }
 
 enum Role {
