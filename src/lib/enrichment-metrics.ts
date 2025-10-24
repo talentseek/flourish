@@ -31,7 +31,7 @@ export interface EnrichmentStats {
 }
 
 // Check if location meets tier requirements
-export function checkTierComplete(location: Location, tier: TierName): boolean {
+export function checkTierComplete(location: Partial<Location>, tier: TierName): boolean {
   const fields = ENRICHMENT_TIERS[tier];
   
   // Special handling for geo tier - latitude/longitude must be non-zero
@@ -43,9 +43,9 @@ export function checkTierComplete(location: Location, tier: TierName): boolean {
   
   // Special handling for digital tier - at least ONE social media platform
   if (tier === 'digital') {
-    const socialFields = ['instagram', 'facebook', 'tiktok', 'youtube', 'twitter'];
+    const socialFields = ['instagram', 'facebook', 'tiktok', 'youtube', 'twitter'] as const;
     return socialFields.some(field => {
-      const value = location[field as keyof Location];
+      const value = location[field];
       return value !== null && value !== undefined && value !== '';
     });
   }
@@ -190,8 +190,18 @@ export async function getLocationsWithEnrichmentStatus() {
       facebook: true,
       tiktok: true,
       youtube: true,
+      twitter: true,
+      website: true,
+      phone: true,
+      openingHours: true,
       googleRating: true,
       googleReviews: true,
+      facebookRating: true,
+      facebookReviews: true,
+      googleVotes: true,
+      facebookVotes: true,
+      seoKeywords: true,
+      topPages: true,
       population: true,
       medianAge: true,
       avgHouseholdIncome: true,

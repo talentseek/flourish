@@ -29,7 +29,9 @@ type LocationWithEnrichment = Pick<Location,
   'latitude' | 'longitude' | 'parkingSpaces' | 'numberOfStores' | 
   'totalFloorArea' | 'anchorTenants' | 'healthIndex' | 'vacancy' | 
   'largestCategory' | 'largestCategoryPercent' | 'population' | 'medianAge' | 
-  'avgHouseholdIncome' | 'homeownership' | 'instagram' | 'facebook' | 'tiktok' | 'youtube'
+  'avgHouseholdIncome' | 'homeownership' | 'instagram' | 'facebook' | 'tiktok' | 'youtube' |
+  'twitter' | 'website' | 'phone' | 'openingHours' | 'googleRating' | 'googleReviews' |
+  'facebookRating' | 'facebookReviews' | 'googleVotes' | 'facebookVotes' | 'seoKeywords' | 'topPages'
 >;
 
 interface EnrichmentLocationsTableProps {
@@ -60,7 +62,7 @@ export function EnrichmentLocationsTable({ locations }: EnrichmentLocationsTable
   });
 
   // Calculate tier status for each location
-  const getLocationTierStatus = (loc: Location) => ({
+  const getLocationTierStatus = (loc: LocationWithEnrichment) => ({
     core: checkTierComplete(loc, "core"),
     geo: checkTierComplete(loc, "geo"),
     operational: checkTierComplete(loc, "operational"),

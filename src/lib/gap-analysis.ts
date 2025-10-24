@@ -31,12 +31,12 @@ export interface GapAnalysisResult {
 }
 
 // Define what "relevant" means for each field
-function getRelevantLocations(field: string, allLocations: Location[]): Location[] {
+function getRelevantLocations<T extends Partial<Location>>(field: string, allLocations: T[]): T[] {
   const shoppingCentresRetailParks = allLocations.filter(loc => 
     loc.type === 'SHOPPING_CENTRE' || loc.type === 'RETAIL_PARK'
   );
   
-  const locationsWithWebsites = allLocations.filter(loc => loc.website !== null);
+  const locationsWithWebsites = allLocations.filter(loc => loc.website !== null && loc.website !== undefined);
   
   switch (field) {
     // Social media & digital fields: only count locations WITH websites
@@ -400,7 +400,7 @@ export async function getLocationsMissingField(field: string, limit = 100) {
     },
   });
   
-  const relevantLocations = getRelevantLocations(field, allLocations as Location[]);
+  const relevantLocations = getRelevantLocations(field, allLocations);
   
   const missing = relevantLocations.filter(loc => {
     const value = (loc as any)[field];
@@ -415,7 +415,11 @@ export async function getLocationsMissingField(field: string, limit = 100) {
   });
   
   // Sort by priority: larger locations first
-  missing.sort((a, b) => (b.numberOfStores ?? 0) - (a.numberOfStores ?? 0));
+  missing.sort((a, b) => {
+    const aStores = typeof a.numberOfStores === 'number' ? a.numberOfStores : 0;
+    const bStores = typeof b.numberOfStores === 'number' ? b.numberOfStores : 0;
+    return bStores - aStores;
+  });
   
   return missing.slice(0, limit);
 }
