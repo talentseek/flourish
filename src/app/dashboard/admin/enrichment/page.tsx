@@ -44,18 +44,21 @@ export default async function EnrichmentDashboardPage() {
     snapshot = await computeEnrichmentStats();
   }
 
+  // Cast snapshot to proper type
+  const typedSnapshot = {
+    ...snapshot,
+    fieldStats: snapshot.fieldStats as Record<string, { filled: number; empty: number }>
+  };
+
   // Calculate percentages
-  const percentages = calculateTierPercentages(snapshot);
-  const overallPercentage = calculateOverallEnrichment(snapshot);
+  const percentages = calculateTierPercentages(typedSnapshot);
+  const overallPercentage = calculateOverallEnrichment(typedSnapshot);
 
   // Get locations with enrichment status
   const locations = await getLocationsWithEnrichmentStatus();
 
   // Parse field stats
-  const fieldStats = snapshot.fieldStats as Record<
-    string,
-    { filled: number; empty: number }
-  >;
+  const fieldStats = typedSnapshot.fieldStats;
 
   return (
     <div className="min-h-screen bg-background p-8">
@@ -73,7 +76,7 @@ export default async function EnrichmentDashboardPage() {
             </div>
             <h1 className="text-3xl font-bold">Data Enrichment Dashboard</h1>
             <p className="text-muted-foreground mt-2">
-              Track enrichment progress across {snapshot.totalLocations.toLocaleString()}{" "}
+              Track enrichment progress across {typedSnapshot.totalLocations.toLocaleString()}{" "}
               locations
             </p>
           </div>
@@ -86,7 +89,7 @@ export default async function EnrichmentDashboardPage() {
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Last updated</p>
               <p className="text-sm font-medium">
-                {new Date(snapshot.createdAt).toLocaleString()}
+                {new Date(typedSnapshot.createdAt).toLocaleString()}
               </p>
             </div>
             <RefreshMetricsButton />
@@ -114,9 +117,9 @@ export default async function EnrichmentDashboardPage() {
               </div>
               <p className="text-sm text-muted-foreground">
                 {Math.round(
-                  (overallPercentage / 100) * snapshot.totalLocations
+                  (overallPercentage / 100) * typedSnapshot.totalLocations
                 ).toLocaleString()}{" "}
-                of {snapshot.totalLocations.toLocaleString()} locations fully enriched
+                of {typedSnapshot.totalLocations.toLocaleString()} locations fully enriched
               </p>
             </div>
           </CardContent>
@@ -137,7 +140,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.core}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.coreComplete.toLocaleString()}/
+                    {typedSnapshot.coreComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
@@ -157,7 +160,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.geo}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.geoComplete.toLocaleString()}/
+                    {typedSnapshot.geoComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
@@ -179,7 +182,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.operational}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.operationalComplete.toLocaleString()}/
+                    {typedSnapshot.operationalComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
@@ -201,7 +204,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.commercial}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.commercialComplete.toLocaleString()}/
+                    {typedSnapshot.commercialComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
@@ -221,7 +224,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.digital}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.digitalComplete.toLocaleString()}/
+                    {typedSnapshot.digitalComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
@@ -243,7 +246,7 @@ export default async function EnrichmentDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-3xl font-bold">{percentages.demographic}%</span>
                   <span className="text-sm text-muted-foreground">
-                    {snapshot.demographicComplete.toLocaleString()}/
+                    {typedSnapshot.demographicComplete.toLocaleString()}/
                     {snapshot.totalLocations.toLocaleString()}
                   </span>
                 </div>
