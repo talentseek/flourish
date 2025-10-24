@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export const runtime = 'nodejs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import AdminActions from "./admin-actions";
 
 export default async function AdminPage() {
@@ -91,6 +93,22 @@ export default async function AdminPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="border-2 border-primary/20">
+          <CardHeader>
+            <CardTitle>Data Enrichment</CardTitle>
+            <CardDescription>
+              Track location enrichment progress and data completeness
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild className="w-full">
+              <Link href="/dashboard/admin/enrichment">
+                View Enrichment Dashboard
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

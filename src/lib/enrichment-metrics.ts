@@ -188,6 +188,8 @@ export async function getLocationsWithEnrichmentStatus() {
       largestCategoryPercent: true,
       instagram: true,
       facebook: true,
+      tiktok: true,
+      youtube: true,
       googleRating: true,
       googleReviews: true,
       population: true,

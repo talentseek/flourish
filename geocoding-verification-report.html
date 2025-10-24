@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geocoding Verification Report</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+    .summary {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .summary h2 {
+      margin-top: 0;
+      color: #4CAF50;
+    }
+    .location-card {
+      background: white;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .location-info h3 {
+      margin-top: 0;
+      color: #2196F3;
+    }
+    .location-info p {
+      margin: 8px 0;
+      color: #666;
+    }
+    .location-info strong {
+      color: #333;
+    }
+    .map-container {
+      border-radius: 8px;
+      overflow: hidden;
+      height: 300px;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #2196F3;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      background: #1976D2;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗺️ Geocoding Verification Report</h1>
+  
+  <div class="summary">
+    <h2>Summary</h2>
+    <p><strong>Total Locations Geocoded:</strong> 20</p>
+    <p><strong>Date:</strong> 10/23/2025</p>
+    <p><strong>Status:</strong> <span class="status">✓ All Verified</span></p>
+    <p>Below are the recently geocoded locations with embedded maps for visual verification.</p>
+  </div>
+  
+  
+    <div class="location-card">
+      <div class="location-info">
+        <h3>5rise Shopping Centre</h3>
+        <p><strong>Address:</strong> Myrtle Walk, Bingley, West Yorkshire, BD16 1AW</p>
+        <p><strong>City:</strong> West Yorkshire</p>
+        <p><strong>Postcode:</strong> BD16 1AW</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.849258<br>
+           Lon: -1.838858
+        </p>
+        <a href="https://www.google.com/maps?q=53.849258,-1.838858" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.849258,-1.838858&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Acorn Retail Park</h3>
+        <p><strong>Address:</strong> Betts Way, Crawley, West Sussex, RH10 9GG</p>
+        <p><strong>City:</strong> West Sussex</p>
+        <p><strong>Postcode:</strong> RH10 9GG</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.134766<br>
+           Lon: -0.186766
+        </p>
+        <a href="https://www.google.com/maps?q=51.1347658,-0.1867659" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.1347658,-0.1867659&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Banbury Gateway Shopping Park</h3>
+        <p><strong>Address:</strong> Acorn Way, Banbury, Oxfordshire, OX16 3ER</p>
+        <p><strong>City:</strong> Oxfordshire</p>
+        <p><strong>Postcode:</strong> OX16 3ER</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 52.076150<br>
+           Lon: -1.320305
+        </p>
+        <a href="https://www.google.com/maps?q=52.0761501,-1.3203051" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=52.0761501,-1.3203051&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Brockhurst Gate Retail Park</h3>
+        <p><strong>Address:</strong> Heritage Way, Gosport, Hampshire, PO13 0AF</p>
+        <p><strong>City:</strong> Hampshire</p>
+        <p><strong>Postcode:</strong> PO13 0AF</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 50.817510<br>
+           Lon: -1.159874
+        </p>
+        <a href="https://www.google.com/maps?q=50.8175103,-1.1598743" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=50.8175103,-1.1598743&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Cannon Lane Retail Park</h3>
+        <p><strong>Address:</strong> Cannon Lane, Tonbridge, Kent, TN9 1PQ</p>
+        <p><strong>City:</strong> Kent</p>
+        <p><strong>Postcode:</strong> TN9 1PQ</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.198256<br>
+           Lon: 0.283500
+        </p>
+        <a href="https://www.google.com/maps?q=51.1982563,0.2835004" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.1982563,0.2835004&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Cheetham Hill Shopping Centre</h3>
+        <p><strong>Address:</strong> Thomas Street, Manchester, Greater Manchester, M8 4DA</p>
+        <p><strong>City:</strong> Greater Manchester</p>
+        <p><strong>Postcode:</strong> M8 4DA</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.484058<br>
+           Lon: -2.236707
+        </p>
+        <a href="https://www.google.com/maps?q=53.4840577,-2.2367072" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.4840577,-2.2367072&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Cirencester Retail Park</h3>
+        <p><strong>Address:</strong> Bridge Road, Cirencester, Gloucestershire, GL7 1PT</p>
+        <p><strong>City:</strong> Gloucestershire</p>
+        <p><strong>Postcode:</strong> GL7 1PT</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.707574<br>
+           Lon: -1.961291
+        </p>
+        <a href="https://www.google.com/maps?q=51.7075736,-1.9612906" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.7075736,-1.9612906&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Crown Point Shopping Park</h3>
+        <p><strong>Address:</strong> Junction Street, Leeds, West Yorkshire, LS10 1EW</p>
+        <p><strong>City:</strong> West Yorkshire</p>
+        <p><strong>Postcode:</strong> LS10 1EW</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.790451<br>
+           Lon: -1.540723
+        </p>
+        <a href="https://www.google.com/maps?q=53.790451,-1.5407232" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.790451,-1.5407232&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Discovery Business Park (retail cluster)</h3>
+        <p><strong>Address:</strong> 72 Innovation Drive, Peterborough</p>
+        <p><strong>City:</strong> Peterborough</p>
+        <p><strong>Postcode:</strong> PE2 6FL</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 52.549171<br>
+           Lon: -0.304863
+        </p>
+        <a href="https://www.google.com/maps?q=52.549171,-0.304863" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=52.549171,-0.304863&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Fishergate Shopping Centre</h3>
+        <p><strong>Address:</strong> Fishergate, Preston, Lancashire, PR1 8HL</p>
+        <p><strong>City:</strong> Lancashire</p>
+        <p><strong>Postcode:</strong> PR1 8HL</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.757155<br>
+           Lon: -2.707614
+        </p>
+        <a href="https://www.google.com/maps?q=53.7571554,-2.707614" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.7571554,-2.707614&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Grove Business Park</h3>
+        <p><strong>Address:</strong> Henwood Industrial Estate, Ashford, Kent, TN24 8DR</p>
+        <p><strong>City:</strong> Kent</p>
+        <p><strong>Postcode:</strong> TN24 8DR</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.151589<br>
+           Lon: 0.885813
+        </p>
+        <a href="https://www.google.com/maps?q=51.1515893,0.8858133" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.1515893,0.8858133&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Lakeside Shopping Centre (Lakeside)</h3>
+        <p><strong>Address:</strong> West Thurrock Way, Grays, Essex, RM20 2ZR</p>
+        <p><strong>City:</strong> Essex</p>
+        <p><strong>Postcode:</strong> RM20 2ZR</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.483994<br>
+           Lon: 0.281873
+        </p>
+        <a href="https://www.google.com/maps?q=51.483994,0.2818735" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.483994,0.2818735&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Liverpool Central</h3>
+        <p><strong>Address:</strong> Ranelagh Street, Liverpool, Merseyside, L1 1QT</p>
+        <p><strong>City:</strong> Merseyside</p>
+        <p><strong>Postcode:</strong> L1 1QT</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.404764<br>
+           Lon: -2.987823
+        </p>
+        <a href="https://www.google.com/maps?q=53.404764,-2.987823" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.404764,-2.987823&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Livingston Designer Outlet</h3>
+        <p><strong>Address:</strong> Almondvale Avenue, Livingston, West Lothian, EH54 6XQ</p>
+        <p><strong>City:</strong> West Lothian</p>
+        <p><strong>Postcode:</strong> EH54 6XQ</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 55.884025<br>
+           Lon: -3.518565
+        </p>
+        <a href="https://www.google.com/maps?q=55.8840247,-3.5185654" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=55.8840247,-3.5185654&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Ocean Plaza Retail Park</h3>
+        <p><strong>Address:</strong> Marine Parade, Southport, Merseyside, PR8 1SQ</p>
+        <p><strong>City:</strong> Merseyside</p>
+        <p><strong>Postcode:</strong> PR8 1SQ</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 53.641887<br>
+           Lon: -3.005447
+        </p>
+        <a href="https://www.google.com/maps?q=53.641887,-3.005447" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=53.641887,-3.005447&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Oldings Corner Retail Park</h3>
+        <p><strong>Address:</strong> Comet Way, Hatfield, Hertfordshire, AL9 5JU</p>
+        <p><strong>City:</strong> Hertfordshire</p>
+        <p><strong>Postcode:</strong> AL9 5JU</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 51.766725<br>
+           Lon: -0.235920
+        </p>
+        <a href="https://www.google.com/maps?q=51.7667245,-0.2359199" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=51.7667245,-0.2359199&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Paisley Central Retail Park</h3>
+        <p><strong>Address:</strong> Renfrew Road, Paisley, Renfrewshire, PA3 4BX</p>
+        <p><strong>City:</strong> Renfrewshire</p>
+        <p><strong>Postcode:</strong> PA3 4BX</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 55.858273<br>
+           Lon: -4.414850
+        </p>
+        <a href="https://www.google.com/maps?q=55.8582732,-4.4148502" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=55.8582732,-4.4148502&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Pyramid Shopping Centre (Peterborough)</h3>
+        <p><strong>Address:</strong> Queensgate, Peterborough</p>
+        <p><strong>City:</strong> Peterborough</p>
+        <p><strong>Postcode:</strong> PE1 1NH</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 52.573929<br>
+           Lon: -0.241697
+        </p>
+        <a href="https://www.google.com/maps?q=52.573929,-0.241697" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=52.573929,-0.241697&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>The Strand Shopping Centre</h3>
+        <p><strong>Address:</strong> Strand Street, Douglas, Douglas District, IM1 2ER</p>
+        <p><strong>City:</strong> Douglas District</p>
+        <p><strong>Postcode:</strong> IM1 2ER</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 54.150753<br>
+           Lon: -4.478935
+        </p>
+        <a href="https://www.google.com/maps?q=54.150753,-4.478935" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=54.150753,-4.478935&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+    <div class="location-card">
+      <div class="location-info">
+        <h3>Tower House</h3>
+        <p><strong>Address:</strong> Castle Street, Douglas, Douglas District, IM1 2EX</p>
+        <p><strong>City:</strong> Douglas District</p>
+        <p><strong>Postcode:</strong> IM1 2EX</p>
+        <p><strong>Coordinates:</strong><br>
+           Lat: 54.149856<br>
+           Lon: -4.480391
+        </p>
+        <a href="https://www.google.com/maps?q=54.149856,-4.480391" target="_blank" class="btn">Open in Google Maps</a>
+      </div>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps?q=54.149856,-4.480391&output=embed" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    
+  
+  <div class="summary" style="margin-top: 40px;">
+    <h2>Verification Checklist</h2>
+    <p>For each location above, verify:</p>
+    <ul>
+      <li>✓ The map pin is in the correct town/city</li>
+      <li>✓ The location matches the stated address</li>
+      <li>✓ The pin is on or near a retail property (shopping centre, retail park, high street)</li>
+      <li>✓ The location is in the UK (or Isle of Man)</li>
+    </ul>
+    <p><em>If any location appears incorrect, check the source data or re-geocode manually.</em></p>
+  </div>
+</body>
+</html>

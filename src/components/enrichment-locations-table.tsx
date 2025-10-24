@@ -24,8 +24,16 @@ import {
 import { checkTierComplete, TierName } from "@/lib/enrichment-metrics";
 import { Location } from "@prisma/client";
 
+type LocationWithEnrichment = Pick<Location, 
+  'id' | 'name' | 'type' | 'address' | 'city' | 'county' | 'postcode' | 
+  'latitude' | 'longitude' | 'parkingSpaces' | 'numberOfStores' | 
+  'totalFloorArea' | 'anchorTenants' | 'healthIndex' | 'vacancy' | 
+  'largestCategory' | 'largestCategoryPercent' | 'population' | 'medianAge' | 
+  'avgHouseholdIncome' | 'homeownership' | 'instagram' | 'facebook' | 'tiktok' | 'youtube'
+>;
+
 interface EnrichmentLocationsTableProps {
-  locations: Location[];
+  locations: LocationWithEnrichment[];
 }
 
 type FilterOption = "all" | TierName;
