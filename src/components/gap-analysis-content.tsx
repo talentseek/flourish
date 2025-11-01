@@ -17,7 +17,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ShoppingCentreSearch } from "@/components/shopping-centre-search"
 import { LocationDetails } from "@/components/location-details"
 import { GoogleMaps } from "@/components/google-maps"
+import { TenantComparisonView } from "@/components/tenant-comparison-view"
+import { GapPriorityCards } from "@/components/gap-priority-cards"
+import { MissingBrandsSection } from "@/components/missing-brands-section"
 import { Location, Tenant } from "@/types/location"
+import { GapAnalysis } from "@/lib/tenant-comparison"
 
 // Map component with Google Maps integration
 function MapView({ selectedCentre, distance, nearbyCentres }: { 
@@ -126,6 +130,9 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
   const [catLoading, setCatLoading] = useState(false)
   const [catError, setCatError] = useState<string | null>(null)
   const [catData, setCatData] = useState<{ largestCategory: string; locations: number; avgPercent: number }[] | null>(null)
+  const [gapAnalysisLoading, setGapAnalysisLoading] = useState(false)
+  const [gapAnalysisError, setGapAnalysisError] = useState<string | null>(null)
+  const [gapAnalysis, setGapAnalysis] = useState<GapAnalysis | null>(null)
 
   const handleCentreToggle = (centreId: string) => {
     setSelectedCentres(prev => 
@@ -235,6 +242,35 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
     }
     run()
   }, [selectedCentre, distance])
+
+  // Load gap analysis when competitors are selected
+  useEffect(() => {
+    const run = async () => {
+      if (!selectedCentre || selectedCentres.length === 0) {
+        setGapAnalysis(null)
+        return
+      }
+      try {
+        setGapAnalysisLoading(true)
+        setGapAnalysisError(null)
+        const competitorIds = selectedCentres.join(',')
+        const res = await fetch(`/api/analytics/gap-analysis?targetId=${selectedCentre.id}&competitorIds=${competitorIds}&includeBrands=true`)
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+        const json = await res.json()
+        if (json.success && json.data) {
+          setGapAnalysis(json.data)
+        } else {
+          throw new Error(json.error || 'Failed to load gap analysis')
+        }
+      } catch (e: any) {
+        setGapAnalysisError(e?.message || 'Failed to load gap analysis')
+        setGapAnalysis(null)
+      } finally {
+        setGapAnalysisLoading(false)
+      }
+    }
+    run()
+  }, [selectedCentre, selectedCentres])
 
   const catTotalLocations = useMemo(() => {
     if (!catData) return 0
@@ -576,6 +612,69 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Gap Analysis Results */}
+      {selectedCentre && selectedCentres.length > 0 && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tenant Comparison & Gap Analysis</CardTitle>
+              <CardDescription>
+                Comparing {selectedCentre.name} with {selectedCentres.length} competitor{selectedCentres.length !== 1 ? 's' : ''}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {gapAnalysisLoading && (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading gap analysis...
+                </div>
+              )}
+              {gapAnalysisError && (
+                <div className="text-center py-8 text-destructive">
+                  Error: {gapAnalysisError}
+                </div>
+              )}
+              {!gapAnalysisLoading && !gapAnalysisError && gapAnalysis && (
+                <div className="space-y-6">
+                  {/* Comparison View */}
+                  <TenantComparisonView comparison={gapAnalysis.comparison} />
+                  
+                  {/* Gap Priorities */}
+                  <GapPriorityCards analysis={gapAnalysis} />
+                  
+                  {/* Missing Brands */}
+                  <MissingBrandsSection 
+                    missingBrands={gapAnalysis.missingBrands}
+                    targetLocationName={gapAnalysis.comparison.target.locationName}
+                  />
+                  
+                  {/* Insights */}
+                  {gapAnalysis.insights.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Key Insights</CardTitle>
+                        <CardDescription>
+                          Intelligent analysis of tenant mix gaps
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-2">
+                          {gapAnalysis.insights.map((insight, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-primary mt-1">•</span>
+                              <span className="text-sm">{insight}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Location Details Dialog */}

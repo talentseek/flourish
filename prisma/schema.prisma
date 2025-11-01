@@ -131,6 +131,7 @@ model Tenant {
   categoryId     String?
   categoryRef    Category? @relation(fields: [categoryId], references: [id])
 
+  @@unique([locationId, name])
   @@map("tenants")
 }
 

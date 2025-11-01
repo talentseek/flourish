@@ -7,6 +7,10 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { performGapAnalysis } from "@/lib/tenant-comparison";
+import { GapPriorityCards } from "@/components/gap-priority-cards";
+import { MissingBrandsSection } from "@/components/missing-brands-section";
+import { Badge } from "@/components/ui/badge";
 
 export const runtime = 'nodejs';
 
@@ -47,6 +51,17 @@ export default async function RunReportPage({ params, searchParams }: { params: 
     importedByLocation.set(t.locationId, (importedByLocation.get(t.locationId) ?? 0) + 1)
   }
   const categoriesSorted = Array.from(byCategory.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10)
+
+  // Perform gap analysis if competitors are selected
+  let gapAnalysis = null
+  if (nearbyIds.length > 0) {
+    try {
+      gapAnalysis = await performGapAnalysis(targetId, nearbyIds, true)
+    } catch (error) {
+      console.error('Failed to perform gap analysis:', error)
+      // Continue without gap analysis
+    }
+  }
 
   return (
     <SidebarProvider>
@@ -144,6 +159,74 @@ export default async function RunReportPage({ params, searchParams }: { params: 
                   )}
                 </CardContent>
               </Card>
+
+              {/* Gap Analysis Results */}
+              {gapAnalysis && (
+                <>
+                  <Separator />
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Gap Analysis Results</CardTitle>
+                      <CardDescription>
+                        Tenant mix comparison between {target.name} and {nearby.length} competitor{nearby.length !== 1 ? 's' : ''}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Summary Stats */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center p-4 border rounded-lg">
+                          <div className="text-2xl font-bold text-red-500">{gapAnalysis.comparison.gaps.missingCategories.length}</div>
+                          <div className="text-xs text-muted-foreground">Missing Categories</div>
+                        </div>
+                        <div className="text-center p-4 border rounded-lg">
+                          <div className="text-2xl font-bold text-orange-500">{gapAnalysis.comparison.gaps.underRepresented.length}</div>
+                          <div className="text-xs text-muted-foreground">Under-represented</div>
+                        </div>
+                        <div className="text-center p-4 border rounded-lg">
+                          <div className="text-2xl font-bold text-blue-500">{gapAnalysis.missingBrands.length}</div>
+                          <div className="text-xs text-muted-foreground">Missing Brands</div>
+                        </div>
+                        <div className="text-center p-4 border rounded-lg">
+                          <div className="text-2xl font-bold text-purple-500">{gapAnalysis.priorities.filter(p => p.priority === 'high').length}</div>
+                          <div className="text-xs text-muted-foreground">High Priority</div>
+                        </div>
+                      </div>
+
+                      {/* Gap Priorities */}
+                      <GapPriorityCards analysis={gapAnalysis} />
+
+                      {/* Missing Brands */}
+                      <MissingBrandsSection 
+                        missingBrands={gapAnalysis.missingBrands}
+                        targetLocationName={gapAnalysis.comparison.target.locationName}
+                      />
+
+                      {/* Key Insights */}
+                      {gapAnalysis.insights.length > 0 && (
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>Key Insights</CardTitle>
+                            <CardDescription>
+                              Intelligent analysis of tenant mix gaps
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <ul className="space-y-2">
+                              {gapAnalysis.insights.map((insight, idx) => (
+                                <li key={idx} className="flex items-start gap-2">
+                                  <span className="text-primary mt-1">•</span>
+                                  <span className="text-sm">{insight}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
+              )}
 
               <Separator />
 
