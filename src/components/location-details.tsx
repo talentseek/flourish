@@ -41,7 +41,10 @@ interface LocationDetailsProps {
 export function LocationDetails({ location, onClose }: LocationDetailsProps) {
   const [activeTab, setActiveTab] = useState("overview")
 
-  const formatNumber = (num: number) => {
+  const formatNumber = (num: number | undefined | null) => {
+    if (num === undefined || num === null || isNaN(num)) {
+      return 'N/A'
+    }
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M'
     } else if (num >= 1000) {
@@ -50,14 +53,20 @@ export function LocationDetails({ location, onClose }: LocationDetailsProps) {
     return num.toLocaleString()
   }
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | undefined | null) => {
+    if (amount === undefined || amount === null || isNaN(amount)) {
+      return 'N/A'
+    }
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
       currency: 'GBP'
     }).format(amount)
   }
 
-  const renderStars = (rating: number) => {
+  const renderStars = (rating: number | undefined | null) => {
+    if (rating === undefined || rating === null || isNaN(rating)) {
+      return <span className="text-sm text-muted-foreground">No rating available</span>
+    }
     return (
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star: number) => (
@@ -262,7 +271,7 @@ export function LocationDetails({ location, onClose }: LocationDetailsProps) {
                 {location.evCharging && (
                   <div className="flex items-center gap-2">
                     <Zap className="h-4 w-4 text-muted-foreground" />
-                    <span>EV Charging: {location.evChargingSpaces} spaces</span>
+                    <span>EV Charging: {location.evChargingSpaces || 'Available'} spaces</span>
                   </div>
                 )}
                 {location.publicTransit && (
@@ -352,11 +361,11 @@ export function LocationDetails({ location, onClose }: LocationDetailsProps) {
                 <CardContent className="space-y-4">
                   {renderStars(location.googleRating)}
                   <div className="text-2xl font-bold">
-                    {location.googleReviews?.toLocaleString()} reviews
+                    {location.googleReviews ? location.googleReviews.toLocaleString() : 'N/A'} reviews
                   </div>
-                  <Progress value={location.googleRating * 20} className="w-full" />
+                  <Progress value={(location.googleRating || 0) * 20} className="w-full" />
                   <p className="text-sm text-muted-foreground">
-                    Based on {location.googleVotes?.toLocaleString()} votes
+                    Based on {location.googleVotes ? location.googleVotes.toLocaleString() : 'N/A'} votes
                   </p>
                 </CardContent>
               </Card>
@@ -373,11 +382,11 @@ export function LocationDetails({ location, onClose }: LocationDetailsProps) {
                 <CardContent className="space-y-4">
                   {renderStars(location.facebookRating)}
                   <div className="text-2xl font-bold">
-                    {location.facebookReviews?.toLocaleString()} reviews
+                    {location.facebookReviews ? location.facebookReviews.toLocaleString() : 'N/A'} reviews
                   </div>
-                  <Progress value={location.facebookRating * 20} className="w-full" />
+                  <Progress value={(location.facebookRating || 0) * 20} className="w-full" />
                   <p className="text-sm text-muted-foreground">
-                    Based on {location.facebookVotes?.toLocaleString()} votes
+                    Based on {location.facebookVotes ? location.facebookVotes.toLocaleString() : 'N/A'} votes
                   </p>
                 </CardContent>
               </Card>

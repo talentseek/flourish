@@ -681,6 +681,12 @@ export function GapAnalysisContent({ locations }: GapAnalysisContentProps) {
       {selectedCentre && (
         <Dialog open={showLocationDetails} onOpenChange={setShowLocationDetails}>
           <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedCentre.name}</DialogTitle>
+              <DialogDescription>
+                Detailed information about {selectedCentre.name}
+              </DialogDescription>
+            </DialogHeader>
             <LocationDetails 
               location={selectedCentre} 
               onClose={() => setShowLocationDetails(false)}
