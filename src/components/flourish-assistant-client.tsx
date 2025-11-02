@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,8 +13,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
  */
 export function FlourishAssistantClient() {
   const [mounted, setMounted] = useState(false);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [widgetReady, setWidgetReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const widgetContainerRef = useRef<HTMLDivElement>(null);
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
   const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
@@ -23,59 +24,83 @@ export function FlourishAssistantClient() {
     setMounted(true);
   }, []);
 
-  // Load script directly in the document (like the docs recommend)
+  // Load script and initialize widget
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !widgetContainerRef.current || widgetReady) return;
 
     // Check if script already exists
-    const existingScript = document.querySelector('script[src*="widget.umd.js"]');
-    if (existingScript) {
-      console.log("Widget script already loaded");
-      setScriptLoaded(true);
-      return;
+    let script = document.querySelector('script[src*="widget.umd.js"]') as HTMLScriptElement;
+    
+    if (!script) {
+      // Create and inject script tag directly
+      script = document.createElement('script');
+      script.src = 'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js';
+      script.async = true;
+      script.type = 'text/javascript';
+      document.body.appendChild(script);
     }
 
-    // Create and inject script tag directly
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js';
-    script.async = true;
-    script.type = 'text/javascript';
-    
-    script.onload = () => {
-      console.log("Flourish Assistant script loaded");
-      // Wait for custom element to be registered
-      let attempts = 0;
-      const maxAttempts = 20;
-      
-      const checkRegistration = setInterval(() => {
-        attempts++;
-        if (customElements.get('vapi-widget')) {
-          console.log("vapi-widget custom element registered successfully");
-          clearInterval(checkRegistration);
-          setScriptLoaded(true);
-        } else if (attempts >= maxAttempts) {
-          console.warn("Custom element not registered after script load, injecting anyway");
-          clearInterval(checkRegistration);
-          setScriptLoaded(true);
-        }
-      }, 200);
+    const initWidget = () => {
+      if (!widgetContainerRef.current || widgetReady) return;
+
+      // Check if custom element is registered
+      if (customElements.get('vapi-widget')) {
+        // Clear container
+        widgetContainerRef.current.innerHTML = '';
+        
+        // Create widget element
+        const widget = document.createElement('vapi-widget');
+        widget.setAttribute('assistant-id', assistantId);
+        widget.setAttribute('public-key', publicKey);
+        widget.setAttribute('mode', 'voice');
+        widget.setAttribute('theme', 'light');
+        widget.setAttribute('position', 'bottom-right');
+        widget.setAttribute('size', 'full');
+        widget.setAttribute('border-radius', 'medium');
+        widget.setAttribute('button-base-color', 'hsl(var(--primary))');
+        widget.setAttribute('button-accent-color', 'hsl(var(--primary-foreground))');
+        widget.setAttribute('main-label', 'Flourish Assistant');
+        widget.setAttribute('start-button-text', 'Start Conversation');
+        widget.setAttribute('end-button-text', 'End Conversation');
+        widget.setAttribute('require-consent', 'false');
+        widget.setAttribute('show-transcript', 'true');
+
+        widgetContainerRef.current.appendChild(widget);
+        setWidgetReady(true);
+        console.log("Flourish Assistant widget initialized");
+      }
     };
-    
+
+    // If script already loaded, try to init immediately
+    if (script.complete || script.readyState === 'complete') {
+      setTimeout(initWidget, 100);
+    } else {
+      script.onload = () => {
+        console.log("Flourish Assistant script loaded");
+        // Wait for custom element registration
+        let attempts = 0;
+        const maxAttempts = 30;
+        
+        const checkRegistration = setInterval(() => {
+          attempts++;
+          if (customElements.get('vapi-widget')) {
+            console.log("vapi-widget custom element registered");
+            clearInterval(checkRegistration);
+            initWidget();
+          } else if (attempts >= maxAttempts) {
+            console.error("Custom element not registered after script load");
+            clearInterval(checkRegistration);
+            setError("Widget failed to initialize. Please refresh the page.");
+          }
+        }, 200);
+      };
+    }
+
     script.onerror = () => {
       console.error("Failed to load Flourish Assistant script");
       setError("Failed to load widget script. Please check your internet connection and try again.");
     };
-
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup
-      const scriptToRemove = document.querySelector('script[src*="widget.umd.js"]');
-      if (scriptToRemove && scriptToRemove.parentNode) {
-        scriptToRemove.parentNode.removeChild(scriptToRemove);
-      }
-    };
-  }, [mounted]);
+  }, [mounted, assistantId, publicKey, widgetReady]);
 
   if (!mounted) {
     return (
@@ -96,33 +121,10 @@ export function FlourishAssistantClient() {
 
       {/* Voice Assistant Widget */}
       <div 
+        ref={widgetContainerRef}
         className="relative min-h-[500px] rounded-lg border bg-card"
-        dangerouslySetInnerHTML={
-          scriptLoaded
-            ? {
-                __html: `
-                  <vapi-widget
-                    assistant-id="${assistantId}"
-                    public-key="${publicKey}"
-                    mode="voice"
-                    theme="light"
-                    position="bottom-right"
-                    size="full"
-                    border-radius="medium"
-                    button-base-color="hsl(var(--primary))"
-                    button-accent-color="hsl(var(--primary-foreground))"
-                    main-label="Flourish Assistant"
-                    start-button-text="Start Conversation"
-                    end-button-text="End Conversation"
-                    require-consent="false"
-                    show-transcript="true"
-                  ></vapi-widget>
-                `,
-              }
-            : undefined
-        }
       >
-        {!scriptLoaded && (
+        {!widgetReady && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <p className="text-muted-foreground">Loading Flourish Assistant...</p>
           </div>
