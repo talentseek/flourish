@@ -30,18 +30,7 @@ async function createVapiAssistant() {
   console.log(`📡 App URL: ${APP_URL}`);
   console.log(`🔑 Using Vapi Private Key: ${VAPI_PRIVATE_KEY.substring(0, 10)}...`);
 
-  // Build server functions configuration (Vapi uses "tools" array)
-  const serverFunctions = flourishAssistantFunctions.map((func) => ({
-    type: "function",
-    function: {
-      name: func.name,
-      description: func.description,
-      parameters: func.parameters,
-    },
-    serverUrl: `${APP_URL}/api/vapi/${func.name}`,
-  }));
-
-  // Assistant configuration (removed invalid properties)
+  // Assistant configuration (create assistant first, then add functions separately)
   const assistantConfig = {
     name: "Flourish Assistant",
     firstMessage: "Hello! I'm your Flourish Assistant. I can help you analyze shopping centres, compare tenant mixes, and provide recommendations to improve footfall and sales. What would you like to know?",
@@ -58,12 +47,12 @@ async function createVapiAssistant() {
       similarityBoost: 0.75,
     },
     language: "en",
-    tools: serverFunctions,
   };
 
   try {
-    // Create assistant via Vapi API
-    const response = await fetch(`${VAPI_API_URL}/assistant`, {
+    // Create assistant via Vapi API (without functions first)
+    console.log("📝 Creating assistant...");
+    const createResponse = await fetch(`${VAPI_API_URL}/assistant`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -72,13 +61,12 @@ async function createVapiAssistant() {
       body: JSON.stringify(assistantConfig),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (!createResponse.ok) {
+      const errorText = await createResponse.text();
       console.error("❌ Failed to create assistant:");
-      console.error(`Status: ${response.status} ${response.statusText}`);
+      console.error(`Status: ${createResponse.status} ${createResponse.statusText}`);
       console.error(`Error: ${errorText}`);
       
-      // Try to parse as JSON for better error messages
       try {
         const errorJson = JSON.parse(errorText);
         console.error("Error details:", JSON.stringify(errorJson, null, 2));
@@ -89,25 +77,69 @@ async function createVapiAssistant() {
       process.exit(1);
     }
 
-    const assistant = await response.json();
+    const assistant = await createResponse.json();
+    const assistantId = assistant.id;
     
     console.log("✅ Assistant created successfully!");
-    console.log("\n📋 Assistant Details:");
-    console.log(`   ID: ${assistant.id}`);
+    console.log(`   ID: ${assistantId}`);
     console.log(`   Name: ${assistant.name}`);
-    console.log(`   Status: ${assistant.status || "active"}`);
     
-    if (assistant.phoneNumberId) {
-      console.log(`   Phone Number ID: ${assistant.phoneNumberId}`);
+    // Now add server functions one by one
+    console.log("\n🔧 Adding server functions...");
+    const addedFunctions = [];
+    const errors = [];
+
+    for (const func of flourishAssistantFunctions) {
+      try {
+        const functionConfig = {
+          type: "function",
+          function: {
+            name: func.name,
+            description: func.description,
+            parameters: func.parameters,
+          },
+          serverUrl: `${APP_URL}/api/vapi/${func.name}`,
+        };
+
+        const functionResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}/function`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
+          },
+          body: JSON.stringify(functionConfig),
+        });
+
+        if (functionResponse.ok) {
+          const addedFunction = await functionResponse.json();
+          addedFunctions.push({ name: func.name, id: addedFunction.id });
+          console.log(`   ✅ Added: ${func.name}`);
+        } else {
+          const errorText = await functionResponse.text();
+          errors.push({ name: func.name, error: errorText });
+          console.error(`   ❌ Failed to add ${func.name}: ${errorText}`);
+        }
+      } catch (error) {
+        errors.push({ name: func.name, error: error instanceof Error ? error.message : String(error) });
+        console.error(`   ❌ Error adding ${func.name}:`, error);
+      }
+    }
+    
+    console.log(`\n📊 Summary: ${addedFunctions.length}/${flourishAssistantFunctions.length} functions added`);
+    
+    if (errors.length > 0) {
+      console.log("\n⚠️  Errors:");
+      errors.forEach((err) => {
+        console.log(`   - ${err.name}: ${err.error}`);
+      });
     }
     
     console.log("\n🔗 Next Steps:");
     console.log("1. Your assistant is ready to use!");
     console.log("2. You can test it in the Vapi dashboard");
     console.log("3. To get a phone number, configure one in the Vapi dashboard");
-    console.log("4. Update your .env with the assistant ID if needed");
     
-    return assistant;
+    return { ...assistant, functions: { added: addedFunctions, errors } };
   } catch (error) {
     console.error("❌ Error creating assistant:", error);
     if (error instanceof Error) {

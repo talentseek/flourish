@@ -43,18 +43,7 @@ export async function POST(req: NextRequest) {
       process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
       req.headers.get("origin") || "https://your-app-url.com";
 
-    // Build server functions configuration (Vapi uses "serverUrl" for functions)
-    const serverFunctions = flourishAssistantFunctions.map((func) => ({
-      type: "function",
-      function: {
-        name: func.name,
-        description: func.description,
-        parameters: func.parameters,
-      },
-      serverUrl: `${appUrl}/api/vapi/${func.name}`,
-    }));
-
-    // Assistant configuration (removed invalid properties)
+    // Assistant configuration (create assistant first, then add functions separately)
     const assistantConfig = {
       name: "Flourish Assistant",
       firstMessage: "Hello! I'm your Flourish Assistant. I can help you analyze shopping centres, compare tenant mixes, and provide recommendations to improve footfall and sales. What would you like to know?",
@@ -71,11 +60,10 @@ export async function POST(req: NextRequest) {
         similarityBoost: 0.75,
       },
       language: "en",
-      tools: serverFunctions,
     };
 
-    // Create assistant via Vapi API
-    const response = await fetch(`${VAPI_API_URL}/assistant`, {
+    // Create assistant via Vapi API (without functions first)
+    const createResponse = await fetch(`${VAPI_API_URL}/assistant`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,25 +72,69 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(assistantConfig),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Vapi API error:", errorText);
+    if (!createResponse.ok) {
+      const errorText = await createResponse.text();
+      console.error("Vapi API error creating assistant:", errorText);
       return NextResponse.json(
         {
           success: false,
-          error: `Vapi API error: ${response.status} ${response.statusText}`,
+          error: `Vapi API error: ${createResponse.status} ${createResponse.statusText}`,
           details: errorText,
         },
-        { status: response.status }
+        { status: createResponse.status }
       );
     }
 
-    const assistant = await response.json();
+    const assistant = await createResponse.json();
+    const assistantId = assistant.id;
+
+    // Now add server functions one by one
+    const addedFunctions = [];
+    const errors = [];
+
+    for (const func of flourishAssistantFunctions) {
+      try {
+        const functionConfig = {
+          type: "function",
+          function: {
+            name: func.name,
+            description: func.description,
+            parameters: func.parameters,
+          },
+          serverUrl: `${appUrl}/api/vapi/${func.name}`,
+        };
+
+        const functionResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}/function`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
+          },
+          body: JSON.stringify(functionConfig),
+        });
+
+        if (functionResponse.ok) {
+          const addedFunction = await functionResponse.json();
+          addedFunctions.push({ name: func.name, id: addedFunction.id });
+        } else {
+          const errorText = await functionResponse.text();
+          errors.push({ name: func.name, error: errorText });
+          console.error(`Failed to add function ${func.name}:`, errorText);
+        }
+      } catch (error) {
+        errors.push({ name: func.name, error: error instanceof Error ? error.message : String(error) });
+        console.error(`Error adding function ${func.name}:`, error);
+      }
+    }
 
     return NextResponse.json({
       success: true,
       assistant,
-      message: "Flourish Assistant created successfully in Vapi",
+      functions: {
+        added: addedFunctions,
+        errors: errors.length > 0 ? errors : undefined,
+      },
+      message: `Flourish Assistant created successfully. ${addedFunctions.length}/${flourishAssistantFunctions.length} functions added.`,
     });
   } catch (error) {
     console.error("create-assistant error", error);
