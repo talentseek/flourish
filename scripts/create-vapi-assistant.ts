@@ -20,17 +20,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
   "https://your-app-url.com";
 
-interface ServerFunction {
-  name: string;
-  description: string;
-  parameters: {
-    type: string;
-    properties: Record<string, any>;
-    required?: string[];
-  };
-  serverUrl: string;
-  serverUrlSecret?: string;
-}
+// ServerFunction type is now inline in the mapping
 
 /**
  * Create the Flourish Assistant in Vapi
@@ -40,15 +30,18 @@ async function createVapiAssistant() {
   console.log(`📡 App URL: ${APP_URL}`);
   console.log(`🔑 Using Vapi Private Key: ${VAPI_PRIVATE_KEY.substring(0, 10)}...`);
 
-  // Build server functions configuration
-  const serverFunctions: ServerFunction[] = flourishAssistantFunctions.map((func) => ({
-    name: func.name,
-    description: func.description,
-    parameters: func.parameters,
+  // Build server functions configuration (Vapi uses "tools" array)
+  const serverFunctions = flourishAssistantFunctions.map((func) => ({
+    type: "function",
+    function: {
+      name: func.name,
+      description: func.description,
+      parameters: func.parameters,
+    },
     serverUrl: `${APP_URL}/api/vapi/${func.name}`,
   }));
 
-  // Assistant configuration
+  // Assistant configuration (removed invalid properties)
   const assistantConfig = {
     name: "Flourish Assistant",
     firstMessage: "Hello! I'm your Flourish Assistant. I can help you analyze shopping centres, compare tenant mixes, and provide recommendations to improve footfall and sales. What would you like to know?",
@@ -65,8 +58,7 @@ async function createVapiAssistant() {
       similarityBoost: 0.75,
     },
     language: "en",
-    interruptionThreshold: 3000,
-    serverFunctions,
+    tools: serverFunctions,
   };
 
   try {

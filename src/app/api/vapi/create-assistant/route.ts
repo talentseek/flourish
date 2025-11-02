@@ -43,15 +43,18 @@ export async function POST(req: NextRequest) {
       process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
       req.headers.get("origin") || "https://your-app-url.com";
 
-    // Build server functions configuration
+    // Build server functions configuration (Vapi uses "serverUrl" for functions)
     const serverFunctions = flourishAssistantFunctions.map((func) => ({
-      name: func.name,
-      description: func.description,
-      parameters: func.parameters,
+      type: "function",
+      function: {
+        name: func.name,
+        description: func.description,
+        parameters: func.parameters,
+      },
       serverUrl: `${appUrl}/api/vapi/${func.name}`,
     }));
 
-    // Assistant configuration
+    // Assistant configuration (removed invalid properties)
     const assistantConfig = {
       name: "Flourish Assistant",
       firstMessage: "Hello! I'm your Flourish Assistant. I can help you analyze shopping centres, compare tenant mixes, and provide recommendations to improve footfall and sales. What would you like to know?",
@@ -68,8 +71,7 @@ export async function POST(req: NextRequest) {
         similarityBoost: 0.75,
       },
       language: "en",
-      interruptionThreshold: 3000,
-      serverFunctions,
+      tools: serverFunctions,
     };
 
     // Create assistant via Vapi API
