@@ -88,12 +88,42 @@ export async function POST(req: NextRequest) {
     const assistant = await createResponse.json();
     const assistantId = assistant.id;
 
-    // Now add server functions one by one
-    const addedFunctions = [];
-    const errors = [];
+    // Build all server functions configuration
+    const serverFunctions = flourishAssistantFunctions.map((func) => ({
+      type: "function",
+      function: {
+        name: func.name,
+        description: func.description,
+        parameters: func.parameters,
+      },
+      serverUrl: `${appUrl}/api/vapi/${func.name}`,
+    }));
 
-    for (const func of flourishAssistantFunctions) {
-      try {
+    // Try to update assistant with all functions at once via PATCH
+    const updateResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
+      },
+      body: JSON.stringify({
+        serverFunctions: serverFunctions,
+      }),
+    });
+
+    let addedFunctions = [];
+    let errors = [];
+
+    if (updateResponse.ok) {
+      const updatedAssistant = await updateResponse.json();
+      addedFunctions = serverFunctions.map((f) => ({ name: f.function.name, method: "PATCH" }));
+      console.log(`Successfully added ${serverFunctions.length} functions via PATCH`);
+    } else {
+      const errorText = await updateResponse.text();
+      console.error("Failed to add functions via PATCH:", errorText);
+      
+      // Fallback: Try adding functions one by one via different endpoints
+      for (const func of flourishAssistantFunctions) {
         const functionConfig = {
           type: "function",
           function: {
@@ -104,26 +134,32 @@ export async function POST(req: NextRequest) {
           serverUrl: `${appUrl}/api/vapi/${func.name}`,
         };
 
-        const functionResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}/function`, {
+        // Try POST /server-function
+        let functionResponse = await fetch(`${VAPI_API_URL}/server-function`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
           },
-          body: JSON.stringify(functionConfig),
+          body: JSON.stringify({
+            ...functionConfig,
+            assistantId: assistantId,
+          }),
         });
 
         if (functionResponse.ok) {
           const addedFunction = await functionResponse.json();
           addedFunctions.push({ name: func.name, id: addedFunction.id });
         } else {
-          const errorText = await functionResponse.text();
-          errors.push({ name: func.name, error: errorText });
-          console.error(`Failed to add function ${func.name}:`, errorText);
+          const funcErrorText = await functionResponse.text();
+          errors.push({ 
+            name: func.name, 
+            error: funcErrorText, 
+            status: functionResponse.status,
+            note: "Functions may need to be added manually via Vapi dashboard"
+          });
+          console.error(`Failed to add function ${func.name}:`, funcErrorText);
         }
-      } catch (error) {
-        errors.push({ name: func.name, error: error instanceof Error ? error.message : String(error) });
-        console.error(`Error adding function ${func.name}:`, error);
       }
     }
 
