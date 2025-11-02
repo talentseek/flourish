@@ -71,29 +71,30 @@ export function FlourishAssistantClient() {
       }
     };
 
-    // If script already loaded, try to init immediately
-    if (script.complete || script.readyState === 'complete') {
+    // Set up load handler
+    script.onload = () => {
+      console.log("Flourish Assistant script loaded");
+      // Wait for custom element registration
+      let attempts = 0;
+      const maxAttempts = 30;
+      
+      const checkRegistration = setInterval(() => {
+        attempts++;
+        if (customElements.get('vapi-widget')) {
+          console.log("vapi-widget custom element registered");
+          clearInterval(checkRegistration);
+          initWidget();
+        } else if (attempts >= maxAttempts) {
+          console.error("Custom element not registered after script load");
+          clearInterval(checkRegistration);
+          setError("Widget failed to initialize. The script may not be compatible with this browser. Please try refreshing the page.");
+        }
+      }, 200);
+    };
+    
+    // If script was already loaded, try to init immediately
+    if (script.getAttribute('data-loaded') === 'true') {
       setTimeout(initWidget, 100);
-    } else {
-      script.onload = () => {
-        console.log("Flourish Assistant script loaded");
-        // Wait for custom element registration
-        let attempts = 0;
-        const maxAttempts = 30;
-        
-        const checkRegistration = setInterval(() => {
-          attempts++;
-          if (customElements.get('vapi-widget')) {
-            console.log("vapi-widget custom element registered");
-            clearInterval(checkRegistration);
-            initWidget();
-          } else if (attempts >= maxAttempts) {
-            console.error("Custom element not registered after script load");
-            clearInterval(checkRegistration);
-            setError("Widget failed to initialize. Please refresh the page.");
-          }
-        }, 200);
-      };
     }
 
     script.onerror = () => {
