@@ -30,50 +30,44 @@ export function FlourishAssistantClient() {
   useEffect(() => {
     if (!scriptLoaded || !mounted || !widgetRef.current || widgetReady) return;
 
-    const initWidget = () => {
-      if (!widgetRef.current) return;
-
-      // Check if custom element is registered
-      if (typeof window !== 'undefined' && customElements.get('vapi-widget')) {
-        // Clear container
-        widgetRef.current.innerHTML = '';
-        
-        // Create widget element
-        const widget = document.createElement('vapi-widget');
-        widget.setAttribute('assistant-id', assistantId);
-        widget.setAttribute('public-key', publicKey);
-        widget.setAttribute('mode', 'voice');
-        widget.setAttribute('theme', 'light');
-        widget.setAttribute('position', 'bottom-right');
-        widget.setAttribute('size', 'full');
-        widget.setAttribute('border-radius', 'medium');
-        widget.setAttribute('button-base-color', 'hsl(var(--primary))');
-        widget.setAttribute('button-accent-color', 'hsl(var(--primary-foreground))');
-        widget.setAttribute('main-label', 'Flourish Assistant');
-        widget.setAttribute('start-button-text', 'Start Conversation');
-        widget.setAttribute('end-button-text', 'End Conversation');
-        widget.setAttribute('require-consent', 'false');
-        widget.setAttribute('show-transcript', 'true');
-
-        widgetRef.current.appendChild(widget);
-        setWidgetReady(true);
-        console.log("Flourish Assistant widget initialized");
-      }
-    };
-
     // Wait for custom element to be registered (with retries)
     let attempts = 0;
-    const maxAttempts = 20; // 4 seconds total
+    const maxAttempts = 30; // 6 seconds total (longer wait)
     
     const checkInterval = setInterval(() => {
       attempts++;
-      if (customElements.get('vapi-widget')) {
+      
+      // Check if custom element is registered
+      if (typeof window !== 'undefined' && customElements.get('vapi-widget')) {
         clearInterval(checkInterval);
-        initWidget();
+        
+        // Use dangerouslySetInnerHTML to avoid React conflicts
+        if (widgetRef.current) {
+          widgetRef.current.innerHTML = `
+            <vapi-widget
+              assistant-id="${assistantId}"
+              public-key="${publicKey}"
+              mode="voice"
+              theme="light"
+              position="bottom-right"
+              size="full"
+              border-radius="medium"
+              button-base-color="hsl(var(--primary))"
+              button-accent-color="hsl(var(--primary-foreground))"
+              main-label="Flourish Assistant"
+              start-button-text="Start Conversation"
+              end-button-text="End Conversation"
+              require-consent="false"
+              show-transcript="true"
+            ></vapi-widget>
+          `;
+          setWidgetReady(true);
+          console.log("Flourish Assistant widget initialized");
+        }
       } else if (attempts >= maxAttempts) {
         clearInterval(checkInterval);
         console.error("vapi-widget custom element not found after script load");
-        setError("Widget failed to initialize. Please refresh the page.");
+        setError("Widget failed to initialize. The script may not be compatible or there may be a browser compatibility issue.");
       }
     }, 200);
 
@@ -94,10 +88,13 @@ export function FlourishAssistantClient() {
       <Script
         id="vapi-widget-script"
         src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         onLoad={() => {
           console.log("Flourish Assistant script loaded");
-          setScriptLoaded(true);
+          // Give the script a moment to register the custom element
+          setTimeout(() => {
+            setScriptLoaded(true);
+          }, 500);
         }}
         onError={(e) => {
           console.error("Failed to load Flourish Assistant script:", e);
