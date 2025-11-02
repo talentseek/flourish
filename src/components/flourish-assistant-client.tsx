@@ -43,16 +43,22 @@ export function FlourishAssistantClient() {
     
     script.onload = () => {
       console.log("Flourish Assistant script loaded");
-      // Wait a moment for custom element registration
-      setTimeout(() => {
+      // Wait for custom element to be registered
+      let attempts = 0;
+      const maxAttempts = 20;
+      
+      const checkRegistration = setInterval(() => {
+        attempts++;
         if (customElements.get('vapi-widget')) {
+          console.log("vapi-widget custom element registered successfully");
+          clearInterval(checkRegistration);
           setScriptLoaded(true);
-        } else {
-          console.warn("Script loaded but custom element not registered yet");
-          // Still set as loaded, widget element will handle it
+        } else if (attempts >= maxAttempts) {
+          console.warn("Custom element not registered after script load, injecting anyway");
+          clearInterval(checkRegistration);
           setScriptLoaded(true);
         }
-      }, 300);
+      }, 200);
     };
     
     script.onerror = () => {
