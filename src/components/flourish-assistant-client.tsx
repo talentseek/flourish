@@ -8,14 +8,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 /**
  * Flourish Assistant Client Component
  * 
- * This component embeds the Flourish Assistant voice widget.
+ * This component embeds the Flourish Assistant voice widget using Vapi's HTML Script Tag approach.
  * The assistant provides real-time analysis and recommendations for shopping centres.
  */
 export function FlourishAssistantClient() {
   const [mounted, setMounted] = useState(false);
   const [widgetReady, setWidgetReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const widgetContainerRef = useRef<HTMLDivElement>(null);
+  const vapiInstanceRef = useRef<any>(null);
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
   const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
@@ -24,83 +24,80 @@ export function FlourishAssistantClient() {
     setMounted(true);
   }, []);
 
-  // Load script and initialize widget
+  // Initialize Vapi widget using the HTML Script Tag approach from docs
   useEffect(() => {
-    if (!mounted || !widgetContainerRef.current || widgetReady) return;
+    if (!mounted || widgetReady) return;
 
     // Check if script already exists
-    let script = document.querySelector('script[src*="widget.umd.js"]') as HTMLScriptElement;
+    const existingScript = document.querySelector('script[src*="html-script-tag"]');
+    if (existingScript) {
+      console.log("Vapi script already loaded");
+      // Try to initialize if SDK is available
+      if ((window as any).vapiSDK) {
+        initVapiWidget();
+      }
+      return;
+    }
+
+    // Load the script using the exact approach from Vapi docs
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js';
+    script.defer = true;
+    script.async = true;
     
-    if (!script) {
-      // Create and inject script tag in head (more reliable for custom elements)
-      script = document.createElement('script');
-      script.src = 'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js';
-      script.async = false; // Load synchronously to ensure it executes
-      script.type = 'text/javascript';
+    script.onload = () => {
+      console.log("Vapi SDK script loaded");
+      initVapiWidget();
+    };
+    
+    script.onerror = () => {
+      console.error("Failed to load Vapi SDK script");
+      setError("Failed to load widget script. Please check your internet connection and try again.");
+    };
+
+    // Insert script before the first script tag (as per docs)
+    const firstScript = document.getElementsByTagName('script')[0];
+    if (firstScript && firstScript.parentNode) {
+      firstScript.parentNode.insertBefore(script, firstScript);
+    } else {
       document.head.appendChild(script);
     }
 
-    const initWidget = () => {
-      if (!widgetContainerRef.current || widgetReady) return;
-
-      // Check if custom element is registered
-      if (customElements.get('vapi-widget')) {
-        // Clear container
-        widgetContainerRef.current.innerHTML = '';
-        
-        // Create widget element
-        const widget = document.createElement('vapi-widget');
-        widget.setAttribute('assistant-id', assistantId);
-        widget.setAttribute('public-key', publicKey);
-        widget.setAttribute('mode', 'voice');
-        widget.setAttribute('theme', 'light');
-        widget.setAttribute('position', 'bottom-right');
-        widget.setAttribute('size', 'full');
-        widget.setAttribute('border-radius', 'medium');
-        widget.setAttribute('button-base-color', 'hsl(var(--primary))');
-        widget.setAttribute('button-accent-color', 'hsl(var(--primary-foreground))');
-        widget.setAttribute('main-label', 'Flourish Assistant');
-        widget.setAttribute('start-button-text', 'Start Conversation');
-        widget.setAttribute('end-button-text', 'End Conversation');
-        widget.setAttribute('require-consent', 'false');
-        widget.setAttribute('show-transcript', 'true');
-
-        widgetContainerRef.current.appendChild(widget);
-        setWidgetReady(true);
-        console.log("Flourish Assistant widget initialized");
-      }
-    };
-
-    // Set up load handler
-    script.onload = () => {
-      console.log("Flourish Assistant script loaded");
-      // Wait for custom element registration
+    function initVapiWidget() {
+      // Wait for vapiSDK to be available
       let attempts = 0;
-      const maxAttempts = 30;
+      const maxAttempts = 20;
       
-      const checkRegistration = setInterval(() => {
+      const checkSDK = setInterval(() => {
         attempts++;
-        if (customElements.get('vapi-widget')) {
-          console.log("vapi-widget custom element registered");
-          clearInterval(checkRegistration);
-          initWidget();
+        if ((window as any).vapiSDK) {
+          clearInterval(checkSDK);
+          try {
+            // Initialize widget using the SDK (as per docs)
+            vapiInstanceRef.current = (window as any).vapiSDK.run({
+              apiKey: publicKey,
+              assistant: assistantId,
+              config: {
+                // Customize button appearance
+                buttonStyles: {
+                  backgroundColor: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
+                },
+              },
+            });
+            setWidgetReady(true);
+            console.log("Flourish Assistant widget initialized");
+          } catch (err) {
+            console.error("Error initializing Vapi widget:", err);
+            setError("Failed to initialize widget. Please refresh the page.");
+          }
         } else if (attempts >= maxAttempts) {
-          console.error("Custom element not registered after script load");
-          clearInterval(checkRegistration);
-          setError("Widget failed to initialize. The script may not be compatible with this browser. Please try refreshing the page.");
+          clearInterval(checkSDK);
+          console.error("vapiSDK not available after script load");
+          setError("Widget SDK failed to load. Please refresh the page.");
         }
       }, 200);
-    };
-    
-    // If script was already loaded, try to init immediately
-    if (script.getAttribute('data-loaded') === 'true') {
-      setTimeout(initWidget, 100);
     }
-
-    script.onerror = () => {
-      console.error("Failed to load Flourish Assistant script");
-      setError("Failed to load widget script. Please check your internet connection and try again.");
-    };
   }, [mounted, assistantId, publicKey, widgetReady]);
 
   if (!mounted) {
@@ -121,13 +118,18 @@ export function FlourishAssistantClient() {
       )}
 
       {/* Voice Assistant Widget */}
-      <div 
-        ref={widgetContainerRef}
-        className="relative min-h-[500px] rounded-lg border bg-card"
-      >
+      {/* The widget button will be created by Vapi SDK */}
+      <div className="relative min-h-[500px] rounded-lg border bg-card">
         {!widgetReady && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+          </div>
+        )}
+        {widgetReady && (
+          <div className="flex items-center justify-center h-full min-h-[500px]">
+            <p className="text-muted-foreground text-sm">
+              The Flourish Assistant button should appear in the bottom-right corner. Click it to start a voice conversation.
+            </p>
           </div>
         )}
       </div>
