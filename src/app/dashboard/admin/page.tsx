@@ -7,6 +7,7 @@ export const runtime = 'nodejs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CreateVapiAssistantButton } from "@/components/create-vapi-assistant-button";
 import AdminActions from "./admin-actions";
 
 export default async function AdminPage() {
@@ -93,6 +94,21 @@ export default async function AdminPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="border-2 border-primary/20">
+          <CardHeader>
+            <CardTitle>Vapi Voice Assistant</CardTitle>
+            <CardDescription>
+              Create and manage the Flourish Assistant voice agent
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CreateVapiAssistantButton />
+            <p className="text-xs text-muted-foreground mt-2">
+              This will create the assistant in Vapi with all server functions configured.
+            </p>
+          </CardContent>
+        </Card>
 
         <Card className="border-2 border-primary/20">
           <CardHeader>

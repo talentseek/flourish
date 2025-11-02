@@ -1,0 +1,143 @@
+{
+  "assistant": {
+    "name": "Flourish Assistant",
+    "description": "AI voice assistant for shopping centre insights and recommendations",
+    "firstMessage": "Hello! I'm your Flourish Assistant. I can help you analyze shopping centres, compare tenant mixes, and provide recommendations to improve footfall and sales. What would you like to know?",
+    "model": {
+      "provider": "openai",
+      "model": "gpt-4",
+      "temperature": 0.7,
+      "maxTokens": 300
+    },
+    "voice": {
+      "provider": "11labs",
+      "voiceId": "default",
+      "stability": 0.5,
+      "similarityBoost": 0.75
+    },
+    "language": "en",
+    "interruptionThreshold": 3000,
+    "functions": [
+      {
+        "name": "searchLocation",
+        "description": "Search for a shopping centre or retail location by name. Use this when the user mentions a location name but you need to find it in the database.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "locationName": {
+              "type": "string",
+              "description": "The name of the shopping centre or retail location to search for (e.g., 'Manchester Arndale', 'Bluewater Shopping Centre')"
+            },
+            "city": {
+              "type": "string",
+              "description": "Optional city name to narrow down the search (e.g., 'Manchester', 'London')"
+            }
+          },
+          "required": ["locationName"]
+        },
+        "serverUrl": "https://your-app-url.com/api/vapi/location-search",
+        "method": "POST"
+      },
+      {
+        "name": "getLocationDetails",
+        "description": "Get detailed information about a specific shopping centre including number of stores, floor area, parking, ratings, and other key metrics.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "locationName": {
+              "type": "string",
+              "description": "The name of the shopping centre to get details for"
+            }
+          },
+          "required": ["locationName"]
+        },
+        "serverUrl": "https://your-app-url.com/api/vapi/location-details",
+        "method": "POST"
+      },
+      {
+        "name": "getLocalRecommendations",
+        "description": "Get recommendations for a shopping centre based on the local area analysis. This analyzes tenant categories within a radius and provides insights on what categories are popular or missing in the area. Use this when the user asks for recommendations about footfall, tenant mix, or what types of stores to add.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "locationName": {
+              "type": "string",
+              "description": "The name of the shopping centre to get recommendations for"
+            },
+            "radiusKm": {
+              "type": "number",
+              "description": "The radius in kilometers to analyze the local area (default: 5km)"
+            },
+            "detailLevel": {
+              "type": "string",
+              "description": "Level of detail: 'high' for summary or 'detailed' for comprehensive analysis (default: 'high')",
+              "enum": ["high", "detailed"]
+            }
+          },
+          "required": ["locationName"]
+        },
+        "serverUrl": "https://your-app-url.com/api/vapi/local-recommendations",
+        "method": "POST"
+      },
+      {
+        "name": "analyzeTenantGaps",
+        "description": "Compare a shopping centre's tenant mix with competitor locations to identify gaps, missing categories, and opportunities. Use this when the user wants to know how their location compares to competitors or what categories they're missing.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "targetLocationName": {
+              "type": "string",
+              "description": "The name of the shopping centre to analyze"
+            },
+            "competitorLocationNames": {
+              "type": "array",
+              "description": "Array of competitor location names to compare against",
+              "items": {
+                "type": "string"
+              }
+            },
+            "detailLevel": {
+              "type": "string",
+              "description": "Level of detail: 'high' for summary or 'detailed' for comprehensive analysis including specific brands (default: 'high')",
+              "enum": ["high", "detailed"]
+            }
+          },
+          "required": ["targetLocationName", "competitorLocationNames"]
+        },
+        "serverUrl": "https://your-app-url.com/api/vapi/tenant-gap-analysis",
+        "method": "POST"
+      },
+      {
+        "name": "findNearbyCompetitors",
+        "description": "Find shopping centres within a specified radius of a location. Use this to discover competitors in the local area.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "locationName": {
+              "type": "string",
+              "description": "The name of the shopping centre to find competitors near"
+            },
+            "radiusKm": {
+              "type": "number",
+              "description": "The radius in kilometers to search for competitors (default: 10km)"
+            },
+            "minStores": {
+              "type": "number",
+              "description": "Optional minimum number of stores to filter results (e.g., 20 to only show major competitors)"
+            }
+          },
+          "required": ["locationName"]
+        },
+        "serverUrl": "https://your-app-url.com/api/vapi/nearby-competitors",
+        "method": "POST"
+      }
+    ]
+  },
+  "notes": [
+    "Replace 'https://your-app-url.com' with your actual deployed Flourish app URL",
+    "All endpoints require Clerk authentication. Configure Vapi to pass authentication headers.",
+    "Function responses include 'summary' and 'insights' fields optimized for voice delivery.",
+    "Location names use fuzzy matching - partial names work (e.g., 'Manchester Arndale' matches 'Manchester Arndale Shopping Centre')."
+  ]
+}
+

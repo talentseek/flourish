@@ -6,6 +6,7 @@ import {
   LayoutDashboardIcon,
   TargetIcon,
   FileTextIcon,
+  MicIcon,
 } from "lucide-react"
 import { UserButton } from "@clerk/nextjs"
 import Link from "next/link"
@@ -70,6 +71,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             title: "Reports",
             url: "/reports",
             icon: FileTextIcon,
+          },
+          {
+            title: "Flourish Assistant",
+            url: "/assistant",
+            icon: MicIcon,
           },
         ]} />
       </SidebarContent>
