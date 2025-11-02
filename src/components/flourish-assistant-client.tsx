@@ -32,12 +32,12 @@ export function FlourishAssistantClient() {
     let script = document.querySelector('script[src*="widget.umd.js"]') as HTMLScriptElement;
     
     if (!script) {
-      // Create and inject script tag directly
+      // Create and inject script tag in head (more reliable for custom elements)
       script = document.createElement('script');
       script.src = 'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js';
-      script.async = true;
+      script.async = false; // Load synchronously to ensure it executes
       script.type = 'text/javascript';
-      document.body.appendChild(script);
+      document.head.appendChild(script);
     }
 
     const initWidget = () => {
