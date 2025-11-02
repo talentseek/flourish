@@ -89,26 +89,34 @@ export function FlourishAssistantClient() {
       )}
 
       {/* Voice Assistant Widget */}
-      {/* Render widget element directly - React supports custom elements */}
-      <div className="relative min-h-[500px] rounded-lg border bg-card">
-        {scriptLoaded ? (
-          <vapi-widget
-            assistant-id={assistantId}
-            public-key={publicKey}
-            mode="voice"
-            theme="light"
-            position="bottom-right"
-            size="full"
-            border-radius="medium"
-            button-base-color="hsl(var(--primary))"
-            button-accent-color="hsl(var(--primary-foreground))"
-            main-label="Flourish Assistant"
-            start-button-text="Start Conversation"
-            end-button-text="End Conversation"
-            require-consent="false"
-            show-transcript="true"
-          />
-        ) : (
+      <div 
+        className="relative min-h-[500px] rounded-lg border bg-card"
+        dangerouslySetInnerHTML={
+          scriptLoaded
+            ? {
+                __html: `
+                  <vapi-widget
+                    assistant-id="${assistantId}"
+                    public-key="${publicKey}"
+                    mode="voice"
+                    theme="light"
+                    position="bottom-right"
+                    size="full"
+                    border-radius="medium"
+                    button-base-color="hsl(var(--primary))"
+                    button-accent-color="hsl(var(--primary-foreground))"
+                    main-label="Flourish Assistant"
+                    start-button-text="Start Conversation"
+                    end-button-text="End Conversation"
+                    require-consent="false"
+                    show-transcript="true"
+                  ></vapi-widget>
+                `,
+              }
+            : undefined
+        }
+      >
+        {!scriptLoaded && (
           <div className="flex items-center justify-center h-full min-h-[500px]">
             <p className="text-muted-foreground">Loading Flourish Assistant...</p>
           </div>
