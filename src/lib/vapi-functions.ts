@@ -15,6 +15,10 @@ export interface VapiFunction {
       type: string;
       description: string;
       required?: boolean;
+      enum?: string[];
+      items?: {
+        type: string;
+      };
     }>;
     required?: string[];
   };
