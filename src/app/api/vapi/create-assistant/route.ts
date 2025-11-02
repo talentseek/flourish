@@ -88,78 +88,91 @@ export async function POST(req: NextRequest) {
     const assistant = await createResponse.json();
     const assistantId = assistant.id;
 
-    // Build all server functions configuration
-    const serverFunctions = flourishAssistantFunctions.map((func) => ({
-      type: "function",
-      function: {
-        name: func.name,
-        description: func.description,
-        parameters: func.parameters,
-      },
-      serverUrl: `${appUrl}/api/vapi/${func.name}`,
-    }));
+    // Step 1: Create each tool separately via POST /tool
+    console.log("Creating tools...");
+    const toolIds: string[] = [];
+    const addedFunctions: Array<{ name: string; id: string }> = [];
+    const errors: Array<{ name: string; error: string; status: number; note?: string }> = [];
 
-    // Try to update assistant with all functions at once via PATCH
-    const updateResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
-      },
-      body: JSON.stringify({
-        serverFunctions: serverFunctions,
-      }),
-    });
+    for (const func of flourishAssistantFunctions) {
+      const toolConfig = {
+        type: "function" as const,
+        function: {
+          name: func.name,
+          description: func.description,
+          parameters: func.parameters,
+        },
+        server: {
+          url: `${appUrl}/api/vapi/${func.name}`,
+        },
+      };
 
-    let addedFunctions = [];
-    let errors = [];
-
-    if (updateResponse.ok) {
-      const updatedAssistant = await updateResponse.json();
-      addedFunctions = serverFunctions.map((f) => ({ name: f.function.name, method: "PATCH" }));
-      console.log(`Successfully added ${serverFunctions.length} functions via PATCH`);
-    } else {
-      const errorText = await updateResponse.text();
-      console.error("Failed to add functions via PATCH:", errorText);
-      
-      // Fallback: Try adding functions one by one via different endpoints
-      for (const func of flourishAssistantFunctions) {
-        const functionConfig = {
-          type: "function",
-          function: {
-            name: func.name,
-            description: func.description,
-            parameters: func.parameters,
-          },
-          serverUrl: `${appUrl}/api/vapi/${func.name}`,
-        };
-
-        // Try POST /server-function
-        let functionResponse = await fetch(`${VAPI_API_URL}/server-function`, {
+      try {
+        const toolResponse = await fetch(`${VAPI_API_URL}/tool`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
           },
-          body: JSON.stringify({
-            ...functionConfig,
-            assistantId: assistantId,
-          }),
+          body: JSON.stringify(toolConfig),
         });
 
-        if (functionResponse.ok) {
-          const addedFunction = await functionResponse.json();
-          addedFunctions.push({ name: func.name, id: addedFunction.id });
+        if (toolResponse.ok) {
+          const createdTool = await toolResponse.json();
+          toolIds.push(createdTool.id);
+          addedFunctions.push({ name: func.name, id: createdTool.id });
+          console.log(`✅ Created tool: ${func.name} (ID: ${createdTool.id})`);
         } else {
-          const funcErrorText = await functionResponse.text();
-          errors.push({ 
-            name: func.name, 
-            error: funcErrorText, 
-            status: functionResponse.status,
-            note: "Functions may need to be added manually via Vapi dashboard"
+          const errorText = await toolResponse.text();
+          errors.push({
+            name: func.name,
+            error: errorText,
+            status: toolResponse.status,
+            note: "Tool may need to be created manually via Vapi dashboard",
           });
-          console.error(`Failed to add function ${func.name}:`, funcErrorText);
+          console.error(`❌ Failed to create tool ${func.name}:`, errorText);
         }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        errors.push({
+          name: func.name,
+          error: errorMessage,
+          status: 0,
+          note: "Network or unexpected error",
+        });
+        console.error(`❌ Error creating tool ${func.name}:`, error);
+      }
+    }
+
+    // Step 2: Update assistant with toolIds if we successfully created any tools
+    if (toolIds.length > 0) {
+      console.log(`Updating assistant with ${toolIds.length} tool IDs...`);
+      const updateResponse = await fetch(`${VAPI_API_URL}/assistant/${assistantId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${VAPI_PRIVATE_KEY}`,
+        },
+        body: JSON.stringify({
+          model: {
+            ...assistantConfig.model,
+            toolIds: toolIds,
+          },
+        }),
+      });
+
+      if (updateResponse.ok) {
+        const updatedAssistant = await updateResponse.json();
+        console.log(`✅ Successfully updated assistant with ${toolIds.length} tools`);
+      } else {
+        const errorText = await updateResponse.text();
+        console.error("❌ Failed to update assistant with toolIds:", errorText);
+        errors.push({
+          name: "Update Assistant",
+          error: errorText,
+          status: updateResponse.status,
+          note: "Tools were created but not linked to assistant. You may need to link them manually via Vapi dashboard.",
+        });
       }
     }
 
