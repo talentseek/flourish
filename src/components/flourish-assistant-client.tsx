@@ -1,10 +1,23 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import Script from "next/script";
+import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// Dynamically import the Vapi widget to avoid SSR issues
+const VapiWidget = dynamic(
+  () => import('@vapi-ai/client-sdk-react').then((mod) => mod.VapiWidget),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+      </div>
+    )
+  }
+);
 
 /**
  * Flourish Assistant Client Component
@@ -13,75 +26,23 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
  * The assistant provides real-time analysis and recommendations for shopping centres.
  */
 export function FlourishAssistantClient() {
-  const [mounted, setMounted] = useState(false);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const widgetRef = useRef<HTMLDivElement>(null);
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
   const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!scriptLoaded || !mounted || !widgetRef.current) return;
-
-    // Wait a bit for the custom element to be registered, then inject the widget
-    const timer = setTimeout(() => {
-      if (widgetRef.current && customElements.get('vapi-widget')) {
-        widgetRef.current.innerHTML = `
-          <vapi-widget
-            assistant-id="${assistantId}"
-            public-key="${publicKey}"
-            mode="voice"
-            theme="light"
-            position="bottom-right"
-            size="full"
-            border-radius="medium"
-            button-base-color="hsl(var(--primary))"
-            button-accent-color="hsl(var(--primary-foreground))"
-            main-label="Flourish Assistant"
-            start-button-text="Start Conversation"
-            end-button-text="End Conversation"
-            require-consent="false"
-            show-transcript="true"
-          ></vapi-widget>
-        `;
-      } else {
-        console.warn("vapi-widget custom element not found after script load");
-        setError("Widget failed to initialize. Please refresh the page.");
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [scriptLoaded, mounted, assistantId, publicKey]);
-
-  if (!mounted) {
+  if (!assistantId || !publicKey) {
     return (
-      <div className="flex items-center justify-center min-h-[500px]">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>
+          Assistant configuration missing. Please set NEXT_PUBLIC_VAPI_ASSISTANT_ID and NEXT_PUBLIC_VAPI_PUBLIC_KEY environment variables.
+        </AlertDescription>
+      </Alert>
     );
   }
 
   return (
     <div className="space-y-4">
-      {/* Load Widget Script */}
-      <Script
-        src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          console.log("Flourish Assistant script loaded");
-          setScriptLoaded(true);
-        }}
-        onError={(e) => {
-          console.error("Failed to load Flourish Assistant script:", e);
-          setError("Failed to load widget script. Please check your internet connection and try again.");
-        }}
-      />
-
       {/* Error Display */}
       {error && (
         <Alert variant="destructive">
@@ -90,15 +51,23 @@ export function FlourishAssistantClient() {
       )}
 
       {/* Voice Assistant Widget */}
-      <div 
-        ref={widgetRef}
-        className="relative min-h-[500px] rounded-lg border bg-card"
-      >
-        {!scriptLoaded && (
-          <div className="flex items-center justify-center h-full min-h-[500px]">
-            <p className="text-muted-foreground">Loading Flourish Assistant...</p>
-          </div>
-        )}
+      <div className="relative min-h-[500px] rounded-lg border bg-card">
+        <VapiWidget
+          publicKey={publicKey}
+          assistantId={assistantId}
+          mode="voice"
+          theme="light"
+          position="bottom-right"
+          size="full"
+          borderRadius="medium"
+          buttonBaseColor="hsl(var(--primary))"
+          buttonAccentColor="hsl(var(--primary-foreground))"
+          mainLabel="Flourish Assistant"
+          startButtonText="Start Conversation"
+          endButtonText="End Conversation"
+          requireConsent={false}
+          showTranscript={true}
+        />
       </div>
 
       {/* Example Questions */}
