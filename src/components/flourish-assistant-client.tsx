@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Script from "next/script";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 /**
  * Flourish Assistant Client Component
@@ -12,60 +13,93 @@ import { Badge } from "@/components/ui/badge";
  * The assistant provides real-time analysis and recommendations for shopping centres.
  */
 export function FlourishAssistantClient() {
-  const widgetContainerRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
   const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
 
   useEffect(() => {
-    if (!scriptLoaded || !widgetContainerRef.current) return;
+    setMounted(true);
+  }, []);
 
-    // Create the widget element programmatically after script loads
-    const container = widgetContainerRef.current;
-    
-    // Clear any existing widget
-    container.innerHTML = '';
+  useEffect(() => {
+    if (!scriptLoaded || !mounted || !widgetRef.current) return;
 
-    // Create the vapi-widget element
-    const widget = document.createElement('vapi-widget');
-    widget.setAttribute('assistant-id', assistantId);
-    widget.setAttribute('public-key', publicKey);
-    widget.setAttribute('mode', 'voice');
-    widget.setAttribute('theme', 'light');
-    widget.setAttribute('position', 'bottom-right');
-    widget.setAttribute('size', 'full');
-    widget.setAttribute('border-radius', 'medium');
-    widget.setAttribute('button-base-color', 'hsl(var(--primary))');
-    widget.setAttribute('button-accent-color', 'hsl(var(--primary-foreground))');
-    widget.setAttribute('main-label', 'Flourish Assistant');
-    widget.setAttribute('start-button-text', 'Start Conversation');
-    widget.setAttribute('end-button-text', 'End Conversation');
-    widget.setAttribute('require-consent', 'false');
-    widget.setAttribute('show-transcript', 'true');
+    // Wait a bit for the custom element to be registered, then inject the widget
+    const timer = setTimeout(() => {
+      if (widgetRef.current && customElements.get('vapi-widget')) {
+        widgetRef.current.innerHTML = `
+          <vapi-widget
+            assistant-id="${assistantId}"
+            public-key="${publicKey}"
+            mode="voice"
+            theme="light"
+            position="bottom-right"
+            size="full"
+            border-radius="medium"
+            button-base-color="hsl(var(--primary))"
+            button-accent-color="hsl(var(--primary-foreground))"
+            main-label="Flourish Assistant"
+            start-button-text="Start Conversation"
+            end-button-text="End Conversation"
+            require-consent="false"
+            show-transcript="true"
+          ></vapi-widget>
+        `;
+      } else {
+        console.warn("vapi-widget custom element not found after script load");
+        setError("Widget failed to initialize. Please refresh the page.");
+      }
+    }, 500);
 
-    container.appendChild(widget);
-  }, [scriptLoaded, assistantId, publicKey]);
+    return () => clearTimeout(timer);
+  }, [scriptLoaded, mounted, assistantId, publicKey]);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
       {/* Load Widget Script */}
       <Script
         src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={() => {
+          console.log("Flourish Assistant script loaded");
           setScriptLoaded(true);
         }}
         onError={(e) => {
           console.error("Failed to load Flourish Assistant script:", e);
+          setError("Failed to load widget script. Please check your internet connection and try again.");
         }}
       />
 
-      {/* Voice Assistant Widget Container */}
+      {/* Error Display */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/* Voice Assistant Widget */}
       <div 
-        ref={widgetContainerRef}
+        ref={widgetRef}
         className="relative min-h-[500px] rounded-lg border bg-card"
-      />
+      >
+        {!scriptLoaded && (
+          <div className="flex items-center justify-center h-full min-h-[500px]">
+            <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+          </div>
+        )}
+      </div>
 
       {/* Example Questions */}
       <Card>
