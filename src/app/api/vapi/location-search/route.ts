@@ -32,8 +32,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Extract city from locationName if it contains "in [city]" pattern
+    let searchCity = city;
+    const cityMatch = locationName.match(/\bin\s+([A-Za-z\s]+?)(?:\s+shopping|$)/i);
+    if (cityMatch && !searchCity) {
+      searchCity = cityMatch[1].trim();
+    }
+
     // Search locations
-    const matches = await searchLocationsByName(locationName, limit);
+    const matches = await searchLocationsByName(locationName, limit, searchCity);
 
     if (matches.length === 0) {
       return NextResponse.json({
