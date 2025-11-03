@@ -80,10 +80,6 @@ export async function POST(req: NextRequest) {
       where: {
         id: { not: match.locationId },
         type: { in: ["SHOPPING_CENTRE", "RETAIL_PARK"] },
-        AND: [
-          { latitude: { not: null } },
-          { longitude: { not: null } },
-        ],
         ...(minStores && { numberOfStores: { gte: minStores } }),
       },
       select: {
@@ -97,8 +93,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Filter out locations with null or zero coordinates
+    const locationsWithCoords = allLocations.filter(
+      (loc) => loc.latitude != null && loc.longitude != null && 
+               Number(loc.latitude) !== 0 && Number(loc.longitude) !== 0
+    );
+
     // Calculate distances and filter by radius
-    const competitors = allLocations
+    const competitors = locationsWithCoords
       .map((loc) => {
         const locLat = Number(loc.latitude);
         const locLon = Number(loc.longitude);

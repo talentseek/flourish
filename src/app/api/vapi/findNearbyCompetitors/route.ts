@@ -70,14 +70,11 @@ export async function POST(req: NextRequest) {
     const lat = Number(location.latitude);
     const lon = Number(location.longitude);
 
+    // Fetch all potential competitors, then filter null coordinates in memory
     const allLocations = await prisma.location.findMany({
       where: {
         id: { not: match.locationId },
         type: { in: ["SHOPPING_CENTRE", "RETAIL_PARK"] },
-        AND: [
-          { latitude: { not: null } },
-          { longitude: { not: null } },
-        ],
         ...(minStores && { numberOfStores: { gte: minStores } }),
       },
       select: {
@@ -90,6 +87,12 @@ export async function POST(req: NextRequest) {
         numberOfStores: true,
       },
     });
+
+    // Filter out locations with null or zero coordinates
+    const locationsWithCoords = allLocations.filter(
+      (loc) => loc.latitude != null && loc.longitude != null && 
+               Number(loc.latitude) !== 0 && Number(loc.longitude) !== 0
+    );
 
     const competitors = allLocations
       .map((loc) => {
