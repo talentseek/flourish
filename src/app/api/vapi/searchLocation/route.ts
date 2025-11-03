@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
     
     // Extract Vapi tool call information
     const { isVapiToolCall, toolCallId, parameters } = extractVapiToolCall(body);
+    
+    // Log for debugging
+    console.log('[searchLocation] Extracted:', { isVapiToolCall, hasToolCallId: !!toolCallId, parameters });
+    
     const { locationName, city, limit = 5 } = parameters;
 
     if (!locationName || typeof locationName !== "string") {
@@ -69,7 +73,10 @@ export async function POST(req: NextRequest) {
     // Format response for Vapi tool calls
     const vapiResponse = formatVapiResponse(toolCallId, summary);
     if (vapiResponse) {
-      return NextResponse.json(vapiResponse);
+      console.log('[searchLocation] Returning Vapi format response');
+      return NextResponse.json(vapiResponse, { status: 200 });
+    } else {
+      console.log('[searchLocation] No toolCallId, returning standard format');
     }
 
     // Standard API response format

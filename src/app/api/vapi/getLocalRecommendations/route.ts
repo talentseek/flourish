@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
     
     // Extract Vapi tool call information
     const { isVapiToolCall, toolCallId, parameters } = extractVapiToolCall(body);
+    
+    // Log for debugging
+    console.log('[getLocalRecommendations] Extracted:', { isVapiToolCall, hasToolCallId: !!toolCallId, parameters });
+    
     const { locationName, radiusKm = 5, detailLevel = "high" } = parameters;
 
     if (!locationName || typeof locationName !== "string") {
