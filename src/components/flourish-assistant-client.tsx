@@ -16,9 +16,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 export function FlourishAssistantClient() {
   const [mounted, setMounted] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [widgetAdded, setWidgetAdded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
-  const widgetAddedRef = useRef(false);
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
   const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
@@ -30,7 +30,7 @@ export function FlourishAssistantClient() {
   // CRITICAL: Add widget element to DOM IMMEDIATELY when component mounts
   // This MUST happen before the script loads
   useEffect(() => {
-    if (!mounted || widgetAddedRef.current) return;
+    if (!mounted || widgetAdded) return;
 
     // Add widget element to DOM immediately
     // Use a small delay to ensure DOM is ready
@@ -53,13 +53,13 @@ export function FlourishAssistantClient() {
         widget.setAttribute('show-transcript', 'true');
         
         widgetRef.current.appendChild(widget);
-        widgetAddedRef.current = true;
+        setWidgetAdded(true);
         console.log("✅ Widget element added to DOM before script load");
       }
     }, 100); // Small delay to ensure DOM is ready
 
     return () => clearTimeout(timer);
-  }, [mounted, assistantId, publicKey]);
+  }, [mounted, assistantId, publicKey, widgetAdded]);
 
   if (!mounted) {
     return (
@@ -73,7 +73,7 @@ export function FlourishAssistantClient() {
     <div className="space-y-4">
       {/* Load script AFTER widget element is in DOM */}
       {/* Use afterInteractive to ensure widget is added first */}
-      {mounted && widgetAddedRef.current && (
+      {mounted && widgetAdded && (
         <Script
           id="vapi-widget-script"
           src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
