@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CreateVapiAssistantButton } from "@/components/create-vapi-assistant-button";
+import { DeleteVapiAssistantButton } from "@/components/delete-vapi-assistant-button";
 import AdminActions from "./admin-actions";
 
 export default async function AdminPage() {
@@ -102,10 +103,11 @@ export default async function AdminPage() {
               Create and manage the Flourish Assistant voice agent
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <CreateVapiAssistantButton />
+            <DeleteVapiAssistantButton />
             <p className="text-xs text-muted-foreground mt-2">
-              This will create the assistant in Vapi with all server functions configured.
+              Create or delete the assistant in Vapi with all server functions configured.
             </p>
           </CardContent>
         </Card>
