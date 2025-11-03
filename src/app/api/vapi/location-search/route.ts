@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { authenticateVapiRequest } from "@/lib/auth";
 import { searchLocationsByName } from "@/lib/vapi-location-resolver";
 
 export const runtime = 'nodejs';
@@ -9,12 +9,13 @@ export const runtime = 'nodejs';
  * 
  * Search for locations by name with fuzzy matching
  * Used by Vapi voice agent to find shopping centres
+ * Accepts either Clerk authentication (web) or Vapi API key (server-to-server)
  */
 export async function POST(req: NextRequest) {
   try {
-    // Validate Clerk authentication
-    const user = await getSessionUser();
-    if (!user) {
+    // Validate authentication (Clerk for web, API key for Vapi)
+    const auth = await authenticateVapiRequest(req);
+    if (!auth) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }

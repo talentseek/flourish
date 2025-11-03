@@ -101,6 +101,11 @@ async function createVapiAssistant() {
           },
           server: {
             url: `${APP_URL}/api/vapi/${func.name}`,
+            // Add headers for authentication
+            headers: {
+              "Authorization": `Bearer ${VAPI_PRIVATE_KEY}`,
+              "Content-Type": "application/json",
+            },
           },
         };
 

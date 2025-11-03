@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { authenticateVapiRequest } from "@/lib/auth";
 import { resolveLocationName } from "@/lib/vapi-location-resolver";
 import { formatNearbyCompetitors } from "@/lib/vapi-formatters";
 import { prisma } from "@/lib/db";
@@ -33,12 +33,13 @@ function haversineKm(
  * 
  * Find nearby competitor shopping centres within a radius
  * Used by Vapi voice agent to discover competitors in the local area
+ * Accepts either Clerk authentication (web) or Vapi API key (server-to-server)
  */
 export async function POST(req: NextRequest) {
   try {
-    // Validate Clerk authentication
-    const user = await getSessionUser();
-    if (!user) {
+    // Validate authentication (Clerk for web, API key for Vapi)
+    const auth = await authenticateVapiRequest(req);
+    if (!auth) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }

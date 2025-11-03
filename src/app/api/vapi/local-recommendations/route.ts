@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { authenticateVapiRequest } from "@/lib/auth";
 import { resolveLocationName } from "@/lib/vapi-location-resolver";
 import { getCategoryDistributionWithinRadius } from "@/lib/analytics";
 import { formatLocalRecommendations } from "@/lib/vapi-formatters";
@@ -13,12 +13,13 @@ export const runtime = 'nodejs';
  * 
  * Get recommendations for a location based on local area analysis
  * Used by Vapi voice agent to provide tenant mix and footfall recommendations
+ * Accepts either Clerk authentication (web) or Vapi API key (server-to-server)
  */
 export async function POST(req: NextRequest) {
   try {
-    // Validate Clerk authentication
-    const user = await getSessionUser();
-    if (!user) {
+    // Validate authentication (Clerk for web, API key for Vapi)
+    const auth = await authenticateVapiRequest(req);
+    if (!auth) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
