@@ -220,11 +220,13 @@ export async function resolveMultipleLocationNames(
  * 
  * @param searchQuery - The search query
  * @param limit - Maximum number of results (default: 5)
- * @returns Array of LocationMatch objects sorted by confidence
+ * @param city - Optional city name to prioritize/filter results
+ * @returns Array of LocationMatch objects sorted by confidence (city matches prioritized)
  */
 export async function searchLocationsByName(
   searchQuery: string,
-  limit: number = 5
+  limit: number = 5,
+  city?: string
 ): Promise<LocationMatch[]> {
   if (!searchQuery || searchQuery.trim().length === 0) {
     return [];
@@ -242,8 +244,16 @@ export async function searchLocationsByName(
     },
   });
 
+  // Extract city from search query if it contains "in [city]" pattern
+  let searchCity = city;
+  const cityMatch = searchQuery.match(/\bin\s+([A-Za-z\s]+?)(?:\s+shopping|$)/i);
+  if (cityMatch && !searchCity) {
+    searchCity = cityMatch[1].trim();
+  }
+
   const normalizedSearch = normalizeLocationName(searchQuery);
-  const matches: Array<LocationMatch & { rawScore: number }> = [];
+  const normalizedCity = searchCity ? searchCity.toLowerCase().trim() : null;
+  const matches: Array<LocationMatch & { rawScore: number; cityMatch: boolean }> = [];
 
   for (const location of locations) {
     const normalizedLocation = normalizeLocationName(location.name);
@@ -253,9 +263,19 @@ export async function searchLocationsByName(
       normalizedLocation.includes(normalizedSearch) ||
       normalizedSearch.includes(normalizedLocation);
     
-    const boostedScore = containsMatch
+    let boostedScore = containsMatch
       ? Math.min(1.0, similarity + 0.2)
       : similarity;
+
+    // Boost score significantly if city matches
+    const locationCityNormalized = location.city?.toLowerCase().trim();
+    const cityMatches = normalizedCity && locationCityNormalized && 
+      (locationCityNormalized.includes(normalizedCity) || 
+       normalizedCity.includes(locationCityNormalized));
+    
+    if (cityMatches) {
+      boostedScore = Math.min(1.0, boostedScore + 0.3); // Strong boost for city match
+    }
 
     if (boostedScore > 0.3) {
       matches.push({
@@ -265,12 +285,19 @@ export async function searchLocationsByName(
         county: location.county,
         confidence: boostedScore,
         rawScore: similarity,
+        cityMatch: cityMatches || false,
       });
     }
   }
 
-  // Sort by confidence and return top results
-  matches.sort((a, b) => b.confidence - a.confidence);
-  return matches.slice(0, limit).map(({ rawScore, ...match }) => match);
+  // Sort by: city match first, then confidence
+  matches.sort((a, b) => {
+    if (a.cityMatch !== b.cityMatch) {
+      return a.cityMatch ? -1 : 1; // City matches first
+    }
+    return b.confidence - a.confidence; // Then by confidence
+  });
+  
+  return matches.slice(0, limit).map(({ rawScore, cityMatch, ...match }) => match);
 }
 
