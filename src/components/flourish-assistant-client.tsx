@@ -34,25 +34,35 @@ export function FlourishAssistantClient() {
 
   // CRITICAL: Add widget element to DOM IMMEDIATELY when component mounts
   // This MUST happen before the script loads
+  // Vapi widget should be added to document.body, not inside a container
   useEffect(() => {
     if (!mounted || widgetAdded || !assistantId || !publicKey) return;
 
-    // Add widget element to DOM immediately
-    // Use a small delay to ensure DOM is ready
+    // Check if widget already exists
+    if (document.querySelector('vapi-widget')) {
+      console.log("✅ Widget already exists in DOM");
+      setWidgetAdded(true);
+      return;
+    }
+
+    // Add widget element to document.body (Vapi requirement)
     const timer = setTimeout(() => {
-      if (widgetRef.current && !widgetRef.current.querySelector('vapi-widget')) {
+      const existingWidget = document.querySelector('vapi-widget');
+      if (!existingWidget) {
         const widget = document.createElement('vapi-widget');
         widget.setAttribute('assistant-id', assistantId);
         widget.setAttribute('public-key', publicKey);
-        // Simplified attributes - only essential ones
         widget.setAttribute('mode', 'voice');
         widget.setAttribute('theme', 'light');
         
-        widgetRef.current.appendChild(widget);
+        // Add to body, not container (Vapi widget needs to be at root level)
+        document.body.appendChild(widget);
         setWidgetAdded(true);
-        console.log("✅ Widget element added to DOM:", { assistantId, hasPublicKey: !!publicKey });
+        console.log("✅ Widget element added to document.body:", { assistantId, hasPublicKey: !!publicKey });
+      } else {
+        setWidgetAdded(true);
       }
-    }, 100); // Small delay to ensure DOM is ready
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [mounted, assistantId, publicKey, widgetAdded]);
@@ -81,7 +91,7 @@ export function FlourishAssistantClient() {
             
             // Wait a bit for widget to initialize
             setTimeout(() => {
-              const widget = widgetRef.current?.querySelector('vapi-widget');
+              const widget = document.querySelector('vapi-widget');
               if (widget) {
                 console.log("✅ Widget element found by script");
                 // Check if widget has any errors
@@ -89,11 +99,14 @@ export function FlourishAssistantClient() {
                 if (widgetElement.error) {
                   console.error("❌ Widget error:", widgetElement.error);
                   setError(`Widget error: ${widgetElement.error}`);
+                } else {
+                  console.log("✅ Widget initialized successfully");
                 }
               } else {
                 console.warn("⚠️ Widget element not found after script load");
+                setError("Widget element not found. Please check browser console for errors.");
               }
-            }, 500);
+            }, 1000);
           }}
           onError={(e) => {
             console.error("❌ Failed to load Vapi widget script:", e);
@@ -110,7 +123,7 @@ export function FlourishAssistantClient() {
       )}
 
       {/* Voice Assistant Widget Container */}
-      {/* Widget element is rendered BEFORE script loads (critical for Vapi) */}
+      {/* Note: Widget is added to document.body, not this container */}
       {(!assistantId || !publicKey) ? (
         <Alert variant="destructive">
           <AlertDescription>
@@ -118,13 +131,13 @@ export function FlourishAssistantClient() {
           </AlertDescription>
         </Alert>
       ) : (
-        <div 
-          ref={widgetRef}
-          className="relative min-h-[500px] rounded-lg border bg-card"
-        >
-          {!scriptLoaded && (
-            <div className="flex items-center justify-center h-full min-h-[500px]">
-              <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+        <div className="relative min-h-[500px] rounded-lg border bg-card flex items-center justify-center">
+          {!scriptLoaded ? (
+            <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+          ) : (
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">Flourish Assistant is ready!</p>
+              <p className="text-xs text-muted-foreground">Look for the widget button in the bottom-right corner.</p>
             </div>
           )}
         </div>
