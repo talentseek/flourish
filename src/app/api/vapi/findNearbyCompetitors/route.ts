@@ -74,8 +74,10 @@ export async function POST(req: NextRequest) {
       where: {
         id: { not: match.locationId },
         type: { in: ["SHOPPING_CENTRE", "RETAIL_PARK"] },
-        latitude: { not: { equals: null } },
-        longitude: { not: { equals: null } },
+        AND: [
+          { latitude: { not: null } },
+          { longitude: { not: null } },
+        ],
         ...(minStores && { numberOfStores: { gte: minStores } }),
       },
       select: {
