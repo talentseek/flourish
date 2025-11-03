@@ -94,7 +94,8 @@ export async function POST(req: NextRequest) {
                Number(loc.latitude) !== 0 && Number(loc.longitude) !== 0
     );
 
-    const competitors = allLocations
+    // Calculate distances and filter by radius
+    const competitors = locationsWithCoords
       .map((loc) => {
         const locLat = Number(loc.latitude);
         const locLon = Number(loc.longitude);
