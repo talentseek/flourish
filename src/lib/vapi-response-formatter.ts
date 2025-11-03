@@ -49,18 +49,51 @@ export function extractVapiToolCall(body: any): {
   let functionName: string | null = null;
   let parameters: Record<string, any> = body;
 
-  // Format 1: { message: { toolCallList: [{ id, name, parameters }] } }
+  // Format 1: { message: { toolCallList: [{ id, function: { name, arguments } }] } }
   if (hasToolCallList && body.message.toolCallList.length > 0) {
-    toolCallId = body.message.toolCallList[0].id;
-    functionName = body.message.toolCallList[0].name;
-    parameters = body.message.toolCallList[0].parameters || body;
+    const toolCall = body.message.toolCallList[0];
+    toolCallId = toolCall.id;
+    functionName = toolCall.function?.name || toolCall.name;
+    // Parameters are in function.arguments, not parameters
+    if (toolCall.function?.arguments) {
+      // Arguments might be a string or object
+      if (typeof toolCall.function.arguments === 'string') {
+        try {
+          parameters = JSON.parse(toolCall.function.arguments);
+        } catch {
+          parameters = body;
+        }
+      } else {
+        parameters = toolCall.function.arguments;
+      }
+    } else if (toolCall.parameters) {
+      parameters = toolCall.parameters;
+    } else {
+      parameters = body;
+    }
     console.log('[Vapi Debug] Format 1 detected - toolCallList');
   }
-  // Format 2: { message: { toolWithToolCallList: [{ name, toolCall: { id, parameters } }] } }
+  // Format 2: { message: { toolWithToolCallList: [{ name, toolCall: { id, function: { arguments } } }] } }
   else if (hasToolWithToolCallList && body.message.toolWithToolCallList.length > 0) {
-    toolCallId = body.message.toolWithToolCallList[0].toolCall.id;
-    functionName = body.message.toolWithToolCallList[0].name;
-    parameters = body.message.toolWithToolCallList[0].toolCall.parameters || body;
+    const toolWithCall = body.message.toolWithToolCallList[0];
+    toolCallId = toolWithCall.toolCall.id;
+    functionName = toolWithCall.function?.name || toolWithCall.name;
+    // Parameters are in toolCall.function.arguments
+    if (toolWithCall.toolCall.function?.arguments) {
+      if (typeof toolWithCall.toolCall.function.arguments === 'string') {
+        try {
+          parameters = JSON.parse(toolWithCall.toolCall.function.arguments);
+        } catch {
+          parameters = body;
+        }
+      } else {
+        parameters = toolWithCall.toolCall.function.arguments;
+      }
+    } else if (toolWithCall.toolCall.parameters) {
+      parameters = toolWithCall.toolCall.parameters;
+    } else {
+      parameters = body;
+    }
     console.log('[Vapi Debug] Format 2 detected - toolWithToolCallList');
   }
   // Format 3: Direct format { toolCallId: "...", ...parameters }
