@@ -20,8 +20,13 @@ export function FlourishAssistantClient() {
   const [error, setError] = useState<string | null>(null);
   const widgetRef = useRef<HTMLDivElement>(null);
 
-  const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
-  const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "7c79f8b2-bffa-46f4-b604-5f8806944a73";
+  const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+  const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+
+  // Validate required props
+  if (!assistantId || !publicKey) {
+    console.error("Missing Vapi configuration:", { assistantId: !!assistantId, publicKey: !!publicKey });
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -30,7 +35,7 @@ export function FlourishAssistantClient() {
   // CRITICAL: Add widget element to DOM IMMEDIATELY when component mounts
   // This MUST happen before the script loads
   useEffect(() => {
-    if (!mounted || widgetAdded) return;
+    if (!mounted || widgetAdded || !assistantId || !publicKey) return;
 
     // Add widget element to DOM immediately
     // Use a small delay to ensure DOM is ready
@@ -39,22 +44,13 @@ export function FlourishAssistantClient() {
         const widget = document.createElement('vapi-widget');
         widget.setAttribute('assistant-id', assistantId);
         widget.setAttribute('public-key', publicKey);
+        // Simplified attributes - only essential ones
         widget.setAttribute('mode', 'voice');
         widget.setAttribute('theme', 'light');
-        widget.setAttribute('position', 'bottom-right');
-        widget.setAttribute('size', 'full');
-        widget.setAttribute('border-radius', 'medium');
-        widget.setAttribute('button-base-color', 'hsl(var(--primary))');
-        widget.setAttribute('button-accent-color', 'hsl(var(--primary-foreground))');
-        widget.setAttribute('main-label', 'Flourish Assistant');
-        widget.setAttribute('start-button-text', 'Start Conversation');
-        widget.setAttribute('end-button-text', 'End Conversation');
-        widget.setAttribute('require-consent', 'false');
-        widget.setAttribute('show-transcript', 'true');
         
         widgetRef.current.appendChild(widget);
         setWidgetAdded(true);
-        console.log("✅ Widget element added to DOM before script load");
+        console.log("✅ Widget element added to DOM:", { assistantId, hasPublicKey: !!publicKey });
       }
     }, 100); // Small delay to ensure DOM is ready
 
@@ -80,15 +76,24 @@ export function FlourishAssistantClient() {
           strategy="afterInteractive"
           async
           onLoad={() => {
-            console.log("✅ Vapi widget script loaded and initialized");
+            console.log("✅ Vapi widget script loaded");
             setScriptLoaded(true);
-            // Check if widget was found and initialized
-            const widget = widgetRef.current?.querySelector('vapi-widget');
-            if (widget) {
-              console.log("✅ Widget element found by script");
-            } else {
-              console.warn("⚠️ Widget element not found after script load");
-            }
+            
+            // Wait a bit for widget to initialize
+            setTimeout(() => {
+              const widget = widgetRef.current?.querySelector('vapi-widget');
+              if (widget) {
+                console.log("✅ Widget element found by script");
+                // Check if widget has any errors
+                const widgetElement = widget as any;
+                if (widgetElement.error) {
+                  console.error("❌ Widget error:", widgetElement.error);
+                  setError(`Widget error: ${widgetElement.error}`);
+                }
+              } else {
+                console.warn("⚠️ Widget element not found after script load");
+              }
+            }, 500);
           }}
           onError={(e) => {
             console.error("❌ Failed to load Vapi widget script:", e);
@@ -106,16 +111,24 @@ export function FlourishAssistantClient() {
 
       {/* Voice Assistant Widget Container */}
       {/* Widget element is rendered BEFORE script loads (critical for Vapi) */}
-      <div 
-        ref={widgetRef}
-        className="relative min-h-[500px] rounded-lg border bg-card"
-      >
-        {!scriptLoaded && (
-          <div className="flex items-center justify-center h-full min-h-[500px]">
-            <p className="text-muted-foreground">Loading Flourish Assistant...</p>
-          </div>
-        )}
-      </div>
+      {(!assistantId || !publicKey) ? (
+        <Alert variant="destructive">
+          <AlertDescription>
+            Vapi configuration missing. Please set NEXT_PUBLIC_VAPI_ASSISTANT_ID and NEXT_PUBLIC_VAPI_PUBLIC_KEY environment variables.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div 
+          ref={widgetRef}
+          className="relative min-h-[500px] rounded-lg border bg-card"
+        >
+          {!scriptLoaded && (
+            <div className="flex items-center justify-center h-full min-h-[500px]">
+              <p className="text-muted-foreground">Loading Flourish Assistant...</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Example Questions */}
       <Card>
