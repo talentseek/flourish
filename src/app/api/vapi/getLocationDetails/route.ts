@@ -114,7 +114,8 @@ export async function POST(req: NextRequest) {
       const { toolCallId } = extractVapiToolCall(body);
       const vapiErrorResponse = formatVapiError(toolCallId, errorMessage);
       if (vapiErrorResponse) {
-        return NextResponse.json(vapiErrorResponse, { status: 500 });
+        // Always return HTTP 200 for Vapi, even for errors
+        return NextResponse.json(vapiErrorResponse, { status: 200 });
       }
     } catch {
       // Ignore errors in error handling

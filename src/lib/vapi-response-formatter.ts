@@ -60,21 +60,30 @@ export function extractVapiToolCall(body: any): {
 
 /**
  * Format response for Vapi tool calls
- * Vapi expects: { results: [{ toolCallId: string, result: string | object }] }
+ * Vapi expects: { results: [{ toolCallId: string, result: string }] }
+ * IMPORTANT: result must be a single-line string (no line breaks)
  */
 export function formatVapiResponse(
   toolCallId: string | null,
   result: string | object
-): { results: Array<{ toolCallId: string; result: string | object }> } | null {
+): { results: Array<{ toolCallId: string; result: string }> } | null {
   if (!toolCallId) {
     return null;
+  }
+
+  // Convert result to string and remove line breaks (replace with spaces)
+  let resultString: string;
+  if (typeof result === 'string') {
+    resultString = result.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+  } else {
+    resultString = JSON.stringify(result).replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   return {
     results: [
       {
         toolCallId,
-        result,
+        result: resultString,
       },
     ],
   };
@@ -82,20 +91,24 @@ export function formatVapiResponse(
 
 /**
  * Format error response for Vapi tool calls
+ * IMPORTANT: Must use 'error' field, not 'result' field for errors
  */
 export function formatVapiError(
   toolCallId: string | null,
   error: string
-): { results: Array<{ toolCallId: string; result: string }> } | null {
+): { results: Array<{ toolCallId: string; error: string }> } | null {
   if (!toolCallId) {
     return null;
   }
+
+  // Remove line breaks and ensure single line
+  const errorString = error.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
   return {
     results: [
       {
         toolCallId,
-        result: `Error: ${error}`,
+        error: errorString,
       },
     ],
   };

@@ -86,12 +86,14 @@ export async function POST(req: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : "Internal error";
     
     // Try to get toolCallId from request body for error response
+    // Vapi requires HTTP 200 even for errors
     try {
       const body = await req.clone().json();
       const { toolCallId } = extractVapiToolCall(body);
       const vapiErrorResponse = formatVapiError(toolCallId, errorMessage);
       if (vapiErrorResponse) {
-        return NextResponse.json(vapiErrorResponse, { status: 500 });
+        // Always return HTTP 200 for Vapi, even for errors
+        return NextResponse.json(vapiErrorResponse, { status: 200 });
       }
     } catch {
       // Ignore errors in error handling
