@@ -3,6 +3,7 @@ import { authenticateVapiRequest } from "@/lib/auth";
 import { resolveLocationName } from "@/lib/vapi-location-resolver";
 import { formatLocationDetails } from "@/lib/vapi-formatters";
 import { prisma } from "@/lib/db";
+import { extractVapiToolCall, formatVapiResponse, formatVapiError } from "@/lib/vapi-response-formatter";
 
 export const runtime = 'nodejs';
 
@@ -22,7 +23,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { locationName, detailLevel = "high" } = body;
+    
+    // Extract Vapi tool call information
+    const { toolCallId, parameters } = extractVapiToolCall(body);
+    const { locationName, detailLevel = "high" } = parameters;
 
     if (!locationName || typeof locationName !== "string") {
       return NextResponse.json(
@@ -66,6 +70,21 @@ export async function POST(req: NextRequest) {
       detailLevel as "high" | "detailed"
     );
 
+    // Combine summary, details, and insights for Vapi
+    let resultText = formatted.summary;
+    if (formatted.details) {
+      resultText += ` ${formatted.details}`;
+    }
+    if (formatted.insights && formatted.insights.length > 0) {
+      resultText += ` ${formatted.insights.join(" ")}`;
+    }
+
+    // Format response for Vapi tool calls
+    const vapiResponse = formatVapiResponse(toolCallId, resultText);
+    if (vapiResponse) {
+      return NextResponse.json(vapiResponse);
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -88,10 +107,23 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("getLocationDetails error", error);
+    const errorMessage = error instanceof Error ? error.message : "Internal error";
+    
+    try {
+      const body = await req.clone().json();
+      const { toolCallId } = extractVapiToolCall(body);
+      const vapiErrorResponse = formatVapiError(toolCallId, errorMessage);
+      if (vapiErrorResponse) {
+        return NextResponse.json(vapiErrorResponse, { status: 500 });
+      }
+    } catch {
+      // Ignore errors in error handling
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal error",
+        error: errorMessage,
       },
       { status: 500 }
     );

@@ -5,6 +5,7 @@ import { getCategoryDistributionWithinRadius } from "@/lib/analytics";
 import { formatLocalRecommendations } from "@/lib/vapi-formatters";
 import { performGapAnalysis } from "@/lib/tenant-comparison";
 import { prisma } from "@/lib/db";
+import { extractVapiToolCall, formatVapiResponse, formatVapiError } from "@/lib/vapi-response-formatter";
 
 export const runtime = 'nodejs';
 
@@ -24,7 +25,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { locationName, radiusKm = 5, detailLevel = "high" } = body;
+    
+    // Extract Vapi tool call information
+    const { isVapiToolCall, toolCallId, parameters } = extractVapiToolCall(body);
+    const { locationName, radiusKm = 5, detailLevel = "high" } = parameters;
 
     if (!locationName || typeof locationName !== "string") {
       return NextResponse.json(
@@ -94,6 +98,22 @@ export async function POST(req: NextRequest) {
       detailLevel as "high" | "detailed"
     );
 
+    // Combine summary, details, and insights into a single readable result for Vapi
+    let resultText = formatted.summary;
+    if (formatted.details) {
+      resultText += ` ${formatted.details}`;
+    }
+    if (formatted.insights && formatted.insights.length > 0) {
+      resultText += ` ${formatted.insights.join(" ")}`;
+    }
+
+    // Format response for Vapi tool calls
+    const vapiResponse = formatVapiResponse(toolCallId, resultText);
+    if (vapiResponse) {
+      return NextResponse.json(vapiResponse);
+    }
+
+    // Standard API response format
     return NextResponse.json({
       success: true,
       data: {
@@ -115,10 +135,24 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("getLocalRecommendations error", error);
+    const errorMessage = error instanceof Error ? error.message : "Internal error";
+    
+    // Try to get toolCallId from request body for error response
+    try {
+      const body = await req.clone().json();
+      const { toolCallId } = extractVapiToolCall(body);
+      const vapiErrorResponse = formatVapiError(toolCallId, errorMessage);
+      if (vapiErrorResponse) {
+        return NextResponse.json(vapiErrorResponse, { status: 500 });
+      }
+    } catch {
+      // Ignore errors in error handling
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal error",
+        error: errorMessage,
       },
       { status: 500 }
     );

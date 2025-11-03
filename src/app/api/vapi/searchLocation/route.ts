@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateVapiRequest } from "@/lib/auth";
 import { searchLocationsByName } from "@/lib/vapi-location-resolver";
+import { extractVapiToolCall, formatVapiResponse, formatVapiError } from "@/lib/vapi-response-formatter";
 
 export const runtime = 'nodejs';
 
@@ -21,7 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { locationName, city, limit = 5 } = body;
+    
+    // Extract Vapi tool call information
+    const { isVapiToolCall, toolCallId, parameters } = extractVapiToolCall(body);
+    const { locationName, city, limit = 5 } = parameters;
 
     if (!locationName || typeof locationName !== "string") {
       return NextResponse.json(
@@ -40,10 +44,18 @@ export async function POST(req: NextRequest) {
     const matches = await searchLocationsByName(locationName, limit, searchCity);
 
     if (matches.length === 0) {
+      const noMatchMessage = `I couldn't find any locations matching "${locationName}"${city ? ` in ${city}` : ""}.`;
+      
+      // Format response for Vapi tool calls
+      const vapiResponse = formatVapiResponse(toolCallId, noMatchMessage);
+      if (vapiResponse) {
+        return NextResponse.json(vapiResponse);
+      }
+      
       return NextResponse.json({
         success: true,
         data: [],
-        summary: `I couldn't find any locations matching "${locationName}"${city ? ` in ${city}` : ""}.`,
+        summary: noMatchMessage,
         insights: [],
       });
     }
@@ -54,6 +66,13 @@ export async function POST(req: NextRequest) {
         ? `Found ${topMatch.name} in ${topMatch.city}.`
         : `Found ${matches.length} locations matching "${locationName}". The closest match is ${topMatch.name} in ${topMatch.city} with ${(topMatch.confidence * 100).toFixed(0)}% confidence.`;
 
+    // Format response for Vapi tool calls
+    const vapiResponse = formatVapiResponse(toolCallId, summary);
+    if (vapiResponse) {
+      return NextResponse.json(vapiResponse);
+    }
+
+    // Standard API response format
     return NextResponse.json({
       success: true,
       data: matches,
@@ -64,10 +83,24 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("searchLocation error", error);
+    const errorMessage = error instanceof Error ? error.message : "Internal error";
+    
+    // Try to get toolCallId from request body for error response
+    try {
+      const body = await req.clone().json();
+      const { toolCallId } = extractVapiToolCall(body);
+      const vapiErrorResponse = formatVapiError(toolCallId, errorMessage);
+      if (vapiErrorResponse) {
+        return NextResponse.json(vapiErrorResponse, { status: 500 });
+      }
+    } catch {
+      // Ignore errors in error handling
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal error",
+        error: errorMessage,
       },
       { status: 500 }
     );
