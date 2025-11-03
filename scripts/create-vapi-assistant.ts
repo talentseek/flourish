@@ -17,8 +17,9 @@ dotenv.config();
 const VAPI_API_URL = "https://api.vapi.ai";
 const VAPI_PRIVATE_KEY = process.env.VAPI_PRIVATE_KEY || "3a4cda78-0d09-4a50-8833-0a6b211dde80";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 
+  (process.env.VERCEL_ENV === "production" ? "https://flourish-ai.vercel.app" : null) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-  "https://your-app-url.com";
+  "https://flourish-ai.vercel.app";
 
 // ServerFunction type is now inline in the mapping
 

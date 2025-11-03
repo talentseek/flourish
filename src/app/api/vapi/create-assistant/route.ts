@@ -38,10 +38,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get app URL from environment or request
+    // Get app URL from environment or use production domain
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
-      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-      req.headers.get("origin") || "https://your-app-url.com";
+      (process.env.VERCEL_ENV === "production" ? "https://flourish-ai.vercel.app" : null) ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+      req.headers.get("origin") || 
+      "https://flourish-ai.vercel.app";
 
     // Assistant configuration (create assistant first, then add functions separately)
     const assistantConfig = {
