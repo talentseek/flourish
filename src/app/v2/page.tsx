@@ -10,7 +10,7 @@ export default function V2HomePage() {
   return (
     <>
       <V2Navigation />
-      <main className="min-h-screen bg-background scroll-smooth">
+      <main className="min-h-screen scroll-smooth">
         {/* Hero Section with Video */}
         <V2VideoHero />
 
