@@ -98,10 +98,10 @@ export function V2VideoHero() {
       >
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-foreground drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-primary drop-shadow-lg">
               Welcome to Flourish
             </h1>
-            <p className="text-xl md:text-2xl text-foreground/90 drop-shadow-md">
+            <p className="text-xl md:text-2xl text-primary/90 drop-shadow-md">
               Transforming retail spaces into thriving destinations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

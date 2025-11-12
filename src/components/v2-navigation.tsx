@@ -37,10 +37,10 @@ export function V2Navigation() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
+        "sticky top-0 z-50 w-full transition-all duration-300",
         isScrolled
-          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-          : "bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/40"
+          ? "border-b border-border/50"
+          : "border-b border-transparent"
       )}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -62,7 +62,7 @@ export function V2Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
+              className="text-sm font-medium text-white/90 hover:text-white transition-colors drop-shadow-md"
             >
               {item.label}
             </Link>
@@ -72,14 +72,14 @@ export function V2Navigation() {
         {/* Right side - Theme toggle, Sign in, Mobile menu */}
         <div className="flex items-center space-x-4">
           <ThemeToggle />
-          <Button variant="outline" asChild className="hidden md:inline-flex">
+          <Button variant="outline" asChild className="hidden md:inline-flex bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20">
             <Link href="/sign-in">Sign In</Link>
           </Button>
 
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open menu</span>
               </Button>
