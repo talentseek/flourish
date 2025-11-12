@@ -16,13 +16,15 @@ export default function V2HomePage() {
           __html: `
             (function() {
               if (typeof document !== 'undefined') {
+                const html = document.documentElement;
                 const body = document.body;
-                if (body) {
+                if (html && body) {
+                  html.classList.add('v2-page-active');
                   body.classList.add('v2-page-active');
+                  html.style.setProperty('--background', 'transparent', 'important');
                   body.className = body.className.replace(/\\bbg-background\\b/g, '');
                   body.style.setProperty('background-color', 'transparent', 'important');
                   body.style.setProperty('background', 'transparent', 'important');
-                  body.style.setProperty('--background', 'transparent', 'important');
                 }
               }
             })();
@@ -35,13 +37,15 @@ export default function V2HomePage() {
         dangerouslySetInnerHTML={{
           __html: `
             (function() {
+              const html = document.documentElement;
               const body = document.body;
-              if (body) {
+              if (html && body) {
+                html.classList.add('v2-page-active');
                 body.classList.add('v2-page-active');
+                html.style.setProperty('--background', 'transparent', 'important');
                 body.className = body.className.replace(/\\bbg-background\\b/g, '');
                 body.style.setProperty('background-color', 'transparent', 'important');
                 body.style.setProperty('background', 'transparent', 'important');
-                body.style.setProperty('--background', 'transparent', 'important');
               }
             })();
           `,

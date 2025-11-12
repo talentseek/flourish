@@ -1,34 +1,31 @@
-/* Override CSS variable for background on V2 page */
-html body.v2-page-active,
-html body:has(.v2-page) {
+/* CRITICAL: Override CSS variable at :root level for V2 pages */
+html.v2-page-active,
+html:has(.v2-page) {
   --background: transparent !important;
-  background-color: transparent !important;
-  background: transparent !important;
 }
 
-/* Override Tailwind bg-background class - target the actual computed style */
-html body.v2-page-active,
-html body.v2-page-active.bg-background,
-html body.v2-page-active[class*="bg-background"] {
+/* Override body background - target the @layer base rule */
+html.v2-page-active body,
+html:has(.v2-page) body,
+html body.v2-page-active {
   background-color: transparent !important;
   background: transparent !important;
   background-image: none !important;
 }
 
-/* Override any oklch() background values */
-html body.v2-page-active {
+/* Override Tailwind bg-background utility class */
+html.v2-page-active body.bg-background,
+html:has(.v2-page) body.bg-background,
+html body.v2-page-active.bg-background {
+  background-color: transparent !important;
   background: transparent !important;
+  background-image: none !important;
 }
 
 /* Ensure V2 page wrapper is transparent */
 .v2-page {
   background-color: transparent !important;
   background: transparent !important;
-}
-
-/* Make sure top-level containers don't have backgrounds initially */
-.v2-page > div:first-child {
-  background-color: transparent !important;
 }
 
 .v2-page main {
