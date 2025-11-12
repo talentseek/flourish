@@ -32,3 +32,12 @@ html body.v2-page-active.bg-background {
   background-color: transparent !important;
 }
 
+/* Force navigation and header to be transparent */
+.v2-page header,
+.v2-page header > div,
+.v2-page header .container {
+  background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+

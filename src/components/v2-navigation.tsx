@@ -26,11 +26,11 @@ export function V2Navigation() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full bg-transparent transition-all duration-300 border-b border-transparent"
+        "sticky top-0 z-50 w-full transition-all duration-300 border-b border-transparent"
       )}
-      style={{ backgroundColor: 'transparent' }}
+      style={{ backgroundColor: 'transparent', background: 'transparent' }}
     >
-      <div className="container flex h-16 items-center justify-between bg-transparent">
+      <div className="container flex h-16 items-center justify-between" style={{ backgroundColor: 'transparent', background: 'transparent' }}>
         {/* Logo */}
         <Link href="/v2" className="flex items-center space-x-2">
           <Image
