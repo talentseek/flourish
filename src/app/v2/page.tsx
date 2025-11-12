@@ -5,16 +5,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Script from "next/script"
 
 export default function V2HomePage() {
   return (
-    <div className="relative" style={{ backgroundColor: 'transparent' }}>
+    <>
+      {/* Immediate inline script to fix background before React renders */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              if (typeof document !== 'undefined') {
+                const body = document.body;
+                if (body) {
+                  body.classList.add('v2-page-active');
+                  body.className = body.className.replace(/\\bbg-background\\b/g, '');
+                  body.style.setProperty('background-color', 'transparent', 'important');
+                  body.style.setProperty('background', 'transparent', 'important');
+                  body.style.setProperty('--background', 'transparent', 'important');
+                }
+              }
+            })();
+          `,
+        }}
+      />
+      <Script
+        id="v2-background-fix-immediate"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const body = document.body;
+              if (body) {
+                body.classList.add('v2-page-active');
+                body.className = body.className.replace(/\\bbg-background\\b/g, '');
+                body.style.setProperty('background-color', 'transparent', 'important');
+                body.style.setProperty('background', 'transparent', 'important');
+                body.style.setProperty('--background', 'transparent', 'important');
+              }
+            })();
+          `,
+        }}
+      />
+      <div className="relative" style={{ backgroundColor: 'transparent' }}>
       <V2Navigation />
       <main className="min-h-screen scroll-smooth relative" style={{ backgroundColor: 'transparent' }}>
-        {/* Hero Section with Video - fixed background */}
+        {/* Hero Section with Video */}
         <V2VideoHero />
-        {/* Spacer to push content below fixed video */}
-        <div className="h-screen" />
 
         {/* Gallery Section */}
         <V2Gallery />
@@ -197,6 +234,7 @@ export default function V2HomePage() {
         </footer>
       </main>
     </div>
+    </>
   )
 }
 

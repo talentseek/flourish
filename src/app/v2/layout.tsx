@@ -13,14 +13,20 @@ export default function V2Layout({
     const body = document.body
     body.classList.add('v2-page-active')
     
-    // Also remove bg-background class and set transparent background
+    // Remove bg-background class
     body.className = body.className.replace(/\bbg-background\b/g, '')
-    body.style.backgroundColor = 'transparent'
-    body.style.background = 'transparent'
+    
+    // Set transparent background with multiple methods
+    body.style.setProperty('background-color', 'transparent', 'important')
+    body.style.setProperty('background', 'transparent', 'important')
+    body.style.setProperty('--background', 'transparent', 'important')
     
     return () => {
       // Restore when leaving V2 page
       body.classList.remove('v2-page-active')
+      body.style.removeProperty('background-color')
+      body.style.removeProperty('background')
+      body.style.removeProperty('--background')
     }
   }, [])
 

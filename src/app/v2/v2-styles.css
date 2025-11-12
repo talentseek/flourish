@@ -1,14 +1,22 @@
-/* Override body background for V2 page with high specificity */
+/* Override CSS variable for background on V2 page */
 html body.v2-page-active,
 html body:has(.v2-page) {
+  --background: transparent !important;
   background-color: transparent !important;
   background: transparent !important;
 }
 
-/* Override Tailwind bg-background class */
+/* Override Tailwind bg-background class - target the actual computed style */
+html body.v2-page-active,
 html body.v2-page-active.bg-background,
 html body.v2-page-active[class*="bg-background"] {
   background-color: transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+/* Override any oklch() background values */
+html body.v2-page-active {
   background: transparent !important;
 }
 
