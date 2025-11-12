@@ -1,0 +1,29 @@
+/* Override body background for V2 page with high specificity */
+html body.v2-page-active,
+html body:has(.v2-page) {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Override Tailwind bg-background class */
+html body.v2-page-active.bg-background,
+html body.v2-page-active[class*="bg-background"] {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Ensure V2 page wrapper is transparent */
+.v2-page {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Make sure top-level containers don't have backgrounds initially */
+.v2-page > div:first-child {
+  background-color: transparent !important;
+}
+
+.v2-page main {
+  background-color: transparent !important;
+}
+

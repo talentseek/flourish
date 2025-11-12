@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import './v2-styles.css'
 
 export default function V2Layout({
   children,
@@ -8,19 +9,18 @@ export default function V2Layout({
   children: React.ReactNode
 }) {
   useEffect(() => {
-    // Override body background for V2 page
+    // Add class to body for CSS targeting
     const body = document.body
-    const originalBg = body.style.backgroundColor
-    const originalClass = body.className
+    body.classList.add('v2-page-active')
     
-    // Remove bg-background class and set transparent background
+    // Also remove bg-background class and set transparent background
     body.className = body.className.replace(/\bbg-background\b/g, '')
     body.style.backgroundColor = 'transparent'
+    body.style.background = 'transparent'
     
     return () => {
-      // Restore original background when leaving V2 page
-      body.style.backgroundColor = originalBg
-      body.className = originalClass
+      // Restore when leaving V2 page
+      body.classList.remove('v2-page-active')
     }
   }, [])
 

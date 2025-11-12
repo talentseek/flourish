@@ -11,8 +11,10 @@ export default function V2HomePage() {
     <div className="relative" style={{ backgroundColor: 'transparent' }}>
       <V2Navigation />
       <main className="min-h-screen scroll-smooth relative" style={{ backgroundColor: 'transparent' }}>
-        {/* Hero Section with Video */}
+        {/* Hero Section with Video - fixed background */}
         <V2VideoHero />
+        {/* Spacer to push content below fixed video */}
+        <div className="h-screen" />
 
         {/* Gallery Section */}
         <V2Gallery />

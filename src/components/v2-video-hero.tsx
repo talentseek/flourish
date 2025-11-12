@@ -56,8 +56,7 @@ export function V2VideoHero() {
   return (
     <div
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden"
-      style={{ marginTop: 0 }}
+      className="relative h-screen w-full overflow-hidden -z-0"
     >
       {/* Video Background */}
       <div
