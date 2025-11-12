@@ -8,9 +8,9 @@ import Link from "next/link"
 
 export default function V2HomePage() {
   return (
-    <>
+    <div className="relative" style={{ backgroundColor: 'transparent' }}>
       <V2Navigation />
-      <main className="min-h-screen scroll-smooth">
+      <main className="min-h-screen scroll-smooth relative" style={{ backgroundColor: 'transparent' }}>
         {/* Hero Section with Video */}
         <V2VideoHero />
 
@@ -194,7 +194,7 @@ export default function V2HomePage() {
           </div>
         </footer>
       </main>
-    </>
+    </div>
   )
 }
 
