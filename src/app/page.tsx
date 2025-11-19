@@ -22,7 +22,7 @@ import {
   Twitter
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { FlourishLogo } from "@/components/flourish-logo";
 
 export default async function HomePage() {
   const { userId } = auth();
@@ -278,7 +278,7 @@ export default async function HomePage() {
               {/* Brand */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Image src="/images/logo.png" alt="Flourish" width={120} height={40} className="h-8 w-auto" />
+                  <FlourishLogo />
                 </div>
                 <p className="text-sm text-muted-foreground">
                   AI-powered retail property intelligence and gap analysis platform
@@ -321,7 +321,7 @@ export default async function HomePage() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li><Link href="/gap-analysis" className="hover:text-foreground transition-colors">Gap Analysis</Link></li>
                   <li><Link href="/reports" className="hover:text-foreground transition-colors">Reports</Link></li>
-                  <li><Link href="/gap-fulfillment" className="hover:text-foreground transition-colors">Gap Fulfillment</Link></li>
+                  <li><Link href="/outreach" className="hover:text-foreground transition-colors">Outreach</Link></li>
                   <li><Link href="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link></li>
                 </ul>
               </div>

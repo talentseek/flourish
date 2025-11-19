@@ -1,14 +1,14 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
 import {
   LayoutDashboardIcon,
   TargetIcon,
   FileTextIcon,
   MicIcon,
 } from "lucide-react"
-import { UserButton } from "@clerk/nextjs"
+import { UserButtonClient } from "@/components/user-button-client"
+import { FlourishLogo } from "@/components/flourish-logo"
 import Link from "next/link"
 import {
   Sidebar,
@@ -32,14 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="/" className="flex items-center space-x-2">
-                <Image
-                  src="/images/logo.png"
-                  alt="Flourish"
-                  width={120}
-                  height={40}
-                  className="h-8 w-auto"
-                  priority
-                />
+                <FlourishLogo priority />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -49,22 +42,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={[
           {
             title: "Dashboard",
-            url: "/dashboard",
+            url: "/dashboard2",
             icon: LayoutDashboardIcon,
           },
           {
-            title: "Gap Analysis",
-            url: "/gap-analysis",
-            icon: TargetIcon,
-          },
-          {
-            title: "Gap Fulfillment",
-            url: "/gap-fulfillment",
-            icon: TargetIcon,
-          },
-          {
-            title: "Outreach Analytics",
-            url: "/gap-fulfillment/analytics",
+            title: "Outreach",
+            url: "/outreach",
             icon: TargetIcon,
           },
           {
@@ -72,16 +55,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/reports",
             icon: FileTextIcon,
           },
-          {
-            title: "Flourish Assistant",
-            url: "/assistant",
-            icon: MicIcon,
-          },
         ]} />
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-center p-4">
-          <UserButton
+          <UserButtonClient
             afterSignOutUrl="/"
             appearance={{
               elements: {

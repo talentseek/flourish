@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { FlourishLogo } from "@/components/flourish-logo"
 
 export function SiteNavigation() {
   return (
@@ -11,13 +11,7 @@ export function SiteNavigation() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <Image
-            src="/images/logo.png"
-            alt="Flourish"
-            width={120}
-            height={40}
-            className="h-8 w-auto"
-          />
+          <FlourishLogo />
         </Link>
 
         {/* Right side - Theme toggle and sign in */}

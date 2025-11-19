@@ -34,12 +34,15 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
   const $ = cheerio.load(html);
   const data: FacebookData = {};
 
-  // Method 1: Look for rating in meta tags
+  // Method 1: Look for rating in meta tags (enhanced)
   $('meta').each((_, el) => {
     const property = $(el).attr('property') || '';
+    const name = $(el).attr('name') || '';
     const content = $(el).attr('content') || '';
     
-    if (property === 'og:rating' || property === 'al:android:app_name') {
+    // Check multiple meta tag patterns
+    if (property === 'og:rating' || property === 'al:android:app_name' || 
+        name === 'rating' || property.includes('rating')) {
       const ratingMatch = content.match(/(\d+\.?\d*)/);
       if (ratingMatch && !data.rating) {
         const rating = parseFloat(ratingMatch[1]);
@@ -48,9 +51,21 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
         }
       }
     }
+    
+    // Check for review count in meta
+    if (property.includes('review') || name.includes('review')) {
+      const reviewMatch = content.match(/(\d+(?:,\d+)*)/);
+      if (reviewMatch && !data.reviews) {
+        const reviews = parseInt(reviewMatch[1].replace(/,/g, ''), 10);
+        if (reviews > 0 && reviews < 10000000) {
+          data.reviews = reviews;
+          data.votes = reviews;
+        }
+      }
+    }
   });
 
-  // Method 2: Look for rating in text content
+  // Method 2: Look for rating in text content (enhanced patterns)
   const text = $('body').text();
   
   // Pattern: "4.5 out of 5 stars" or "4.5/5" or "4.5 rating"
@@ -58,7 +73,10 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
     /(\d+\.?\d*)\s*out\s*of\s*5/i,
     /rating[:\s]*(\d+\.?\d*)[\s\/]*5/i,
     /(\d+\.?\d*)\s*\/\s*5/i,
-    /(\d+\.?\d*)\s*stars?/i
+    /(\d+\.?\d*)\s*stars?/i,
+    /rated\s+(\d+\.?\d*)\s*(?:out\s+of\s+)?5/i,
+    /(\d+\.?\d*)\s*star\s+rating/i,
+    /rating[:\s]+(\d+\.?\d*)/i
   ];
 
   for (const pattern of ratingPatterns) {
@@ -74,12 +92,16 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
     }
   }
 
-  // Method 3: Look for review count
+  // Method 3: Look for review count (enhanced patterns)
   const reviewPatterns = [
     /(\d+(?:,\d+)*)\s*reviews?/i,
     /(\d+(?:,\d+)*)\s*ratings?/i,
     /based\s*on\s*(\d+(?:,\d+)*)/i,
-    /(\d+(?:,\d+)*)\s*people\s*rated/i
+    /(\d+(?:,\d+)*)\s*people\s*rated/i,
+    /(\d+(?:,\d+)*)\s*people\s+reviewed/i,
+    /(\d+(?:,\d+)*)\s*total\s+reviews?/i,
+    /reviews?[:\s]+(\d+(?:,\d+)*)/i,
+    /(\d+(?:,\d+)*)\s*user\s+reviews?/i
   ];
 
   for (const pattern of reviewPatterns) {
@@ -96,12 +118,13 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
     }
   }
 
-  // Method 4: Look in structured data
+  // Method 4: Look in structured data (enhanced)
   $('script[type="application/ld+json"]').each((_, el) => {
     try {
       const jsonText = $(el).html() || '';
       const json = JSON.parse(jsonText);
       
+      // Check for aggregateRating
       if (json.aggregateRating) {
         if (!data.rating && json.aggregateRating.ratingValue) {
           data.rating = parseFloat(json.aggregateRating.ratingValue);
@@ -111,11 +134,72 @@ async function extractFacebookData(facebookUrl: string): Promise<FacebookData> {
           data.votes = data.reviews;
         }
       }
+      
+      // Check for rating in @graph
+      if (json['@graph']) {
+        for (const item of json['@graph']) {
+          if (item.aggregateRating) {
+            if (!data.rating && item.aggregateRating.ratingValue) {
+              data.rating = parseFloat(item.aggregateRating.ratingValue);
+            }
+            if (!data.reviews && item.aggregateRating.reviewCount) {
+              data.reviews = parseInt(item.aggregateRating.reviewCount, 10);
+              data.votes = data.reviews;
+            }
+          }
+        }
+      }
+      
+      // Check for LocalBusiness rating
+      if (json['@type'] === 'LocalBusiness' || json['@type'] === 'Place') {
+        if (json.rating && !data.rating) {
+          const rating = typeof json.rating === 'number' ? json.rating : parseFloat(json.rating);
+          if (rating >= 0 && rating <= 5) {
+            data.rating = rating;
+          }
+        }
+      }
     } catch (e) {
       // Ignore JSON parse errors
     }
   });
-
+  
+  // Method 5: Handle Facebook page redirects and mobile URLs
+  // Facebook sometimes redirects to mobile version or uses different URL patterns
+  // This is handled by following redirects in fetchHTML
+  
+  // Method 6: Look for rating in aria-labels and data attributes
+  $('[aria-label*="rating"], [data-rating], [data-review-count]').each((_, el) => {
+    const ariaLabel = $(el).attr('aria-label') || '';
+    const dataRating = $(el).attr('data-rating');
+    const dataReviewCount = $(el).attr('data-review-count');
+    
+    if (dataRating && !data.rating) {
+      const rating = parseFloat(dataRating);
+      if (rating >= 0 && rating <= 5) {
+        data.rating = rating;
+      }
+    }
+    
+    if (dataReviewCount && !data.reviews) {
+      const reviews = parseInt(dataReviewCount.replace(/,/g, ''), 10);
+      if (reviews > 0 && reviews < 10000000) {
+        data.reviews = reviews;
+        data.votes = reviews;
+      }
+    }
+    
+    if (ariaLabel && !data.rating) {
+      const ratingMatch = ariaLabel.match(/(\d+\.?\d*)\s*(?:out\s+of\s+)?5/i);
+      if (ratingMatch) {
+        const rating = parseFloat(ratingMatch[1]);
+        if (rating >= 0 && rating <= 5) {
+          data.rating = rating;
+        }
+      }
+    }
+  });
+  
   return data;
 }
 

@@ -1,9 +1,9 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/theme-toggle"
 import {
   Sheet,
   SheetContent,
@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 
 const navigationItems = [
   { label: "Locations", href: "#locations" },
+  { label: "NMTF", href: "#nmtf" },
   { label: "Looking For Space?", href: "#looking-for-space" },
   { label: "Join our portfolio", href: "#join-portfolio" },
   { label: "Trader Stories", href: "#trader-stories" },
@@ -23,14 +24,34 @@ const navigationItems = [
 ]
 
 export function V2Navigation() {
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      // Switch to dark background when scrolled past 100px
+      setIsScrolled(scrollY > 100)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll() // Initial check
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
+
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300 border-b border-transparent"
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        isScrolled
+          ? "bg-[#4D4A46] border-b border-[#D8D8D6]"
+          : "bg-transparent border-b border-transparent"
       )}
-      style={{ backgroundColor: 'transparent', background: 'transparent' }}
+      style={isScrolled ? { backgroundColor: '#4D4A46' } : { backgroundColor: 'transparent' }}
     >
-      <div className="container flex h-16 items-center justify-between" style={{ backgroundColor: 'transparent', background: 'transparent' }}>
+      <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/v2" className="flex items-center space-x-2">
           <Image
@@ -49,24 +70,41 @@ export function V2Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-white/90 hover:text-white transition-colors drop-shadow-md"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                isScrolled
+                  ? "text-white/90 hover:text-[#E6FB60]"
+                  : "text-white/90 hover:text-[#E6FB60] drop-shadow-md"
+              )}
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        {/* Right side - Theme toggle, Sign in, Mobile menu */}
+        {/* Right side - Sign in, Mobile menu */}
         <div className="flex items-center space-x-4">
-          <ThemeToggle />
-          <Button variant="outline" asChild className="hidden md:inline-flex bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20">
+          <Button 
+            variant="outline" 
+            asChild 
+            className={cn(
+              "hidden md:inline-flex transition-colors",
+              isScrolled
+                ? "bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
+                : "bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
+            )}
+          >
             <Link href="/sign-in">Sign In</Link>
           </Button>
 
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="text-white hover:bg-white/10"
+              >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open menu</span>
               </Button>

@@ -17,6 +17,9 @@ export interface Location {
   anchorTenants?: number
   openedYear?: number
   publicTransit?: string
+  owner?: string
+  management?: string
+  openingHours?: any
   tenants: Tenant[]
   
   // Enhanced details
@@ -57,6 +60,7 @@ export interface Location {
   facebook?: string
   youtube?: string
   tiktok?: string
+  twitter?: string
   
   // Online reviews
   googleRating?: number

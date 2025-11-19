@@ -128,7 +128,7 @@ export function OutreachClient({ places, clusters, locationId, gapId }: { places
               onClick={() => {
                 setSubmitting(true)
                 const namesParam = encodeURIComponent(selectedNames.join("|"))
-                window.location.href = `/gap-fulfillment/outreach/${locationId}/${gapId}/run?names=${namesParam}`
+                window.location.href = `/outreach/local/${locationId}/${gapId}/run?names=${namesParam}`
               }}
               disabled={selectedNames.length === 0 || submitting}
             >

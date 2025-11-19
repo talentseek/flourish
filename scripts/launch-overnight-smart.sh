@@ -1,0 +1,83 @@
+#!/bin/bash
+# 🌙 24-HOUR SMART OVERNIGHT ENRICHMENT
+
+clear
+echo "╔════════════════════════════════════════════════════════════════════╗"
+echo "║                                                                    ║"
+echo "║          🌙 24-HOUR SMART OVERNIGHT ENRICHMENT 🌙                 ║"
+echo "║                                                                    ║"
+echo "║              FINAL PUSH FOR CLIENT DEMO!                          ║"
+echo "║                                                                    ║"
+echo "╚════════════════════════════════════════════════════════════════════╝"
+echo ""
+echo "🧠 SMART SCRAPER FEATURES:"
+echo "  ✅ Tests URLs before scraping (no more 404s!)"
+echo "  ✅ Tries multiple URL patterns"
+echo "  ✅ Falls back to homepage"
+echo "  ✅ Resume capability"
+echo "  ✅ Only saves quality results (5+ stores)"
+echo ""
+echo "🎯 TARGET OVERNIGHT:"
+echo "  • 603 locations (Tiers 1+2+3: 10+ stores each)"
+echo "  • Expected: 150-250 successful enrichments"
+echo "  • Expected stores: 5,000-10,000 new tenants"
+echo "  • Duration: 10-14 hours"
+echo ""
+echo "📊 BY MORNING YOU'LL HAVE:"
+echo "  • 400-500 locations with tenant data (vs 276 now)"
+echo "  • 16,000-21,000 total tenants (vs 11,466 now)"
+echo "  • Ready for KILLER client demo!"
+echo ""
+read -p "🚀 Press ENTER to launch overnight enrichment..."
+
+cd /Users/mbeckett/Documents/codeprojects/flourish
+
+# Set API key (use your own OpenAI API key from environment or .env file)
+export OPENAI_API_KEY="${OPENAI_API_KEY:-your-openai-api-key-here}"
+
+echo ""
+echo "🚀 LAUNCHING SMART TENANT ENRICHMENT..."
+echo ""
+
+# Run on ALL tiers (10+ stores)
+nohup pnpm tsx scripts/enrich-smart-tenants.ts all > /tmp/smart-tenants-overnight.log 2>&1 &
+PID=$!
+
+echo "✅ Smart enrichment launched! PID: $PID"
+echo ""
+echo "═══════════════════════════════════════════════════════════════════"
+echo ""
+echo "📊 WHAT'S RUNNING:"
+echo "   Target: 603 locations (10+ stores, with websites, no tenants)"
+echo "   Strategy: Smart URL detection + AI scraping"
+echo "   Duration: ~10-14 hours"
+echo ""
+echo "💡 MONITORING:"
+echo "   Quick check:  bash scripts/check-smart-progress.sh"
+echo "   Live tail:    tail -f /tmp/smart-tenants-overnight.log"
+echo "   Auto-refresh: watch -n 60 bash scripts/check-smart-progress.sh"
+echo ""
+echo "📝 PROGRESS FILE:"
+echo "   /tmp/smart-tenants-progress.json"
+echo ""
+echo "⏸️  TO PAUSE:"
+echo "   pkill -f 'enrich-smart-tenants'"
+echo ""
+echo "▶️  TO RESUME (if paused):"
+echo "   cd $PWD"
+echo "   export OPENAI_API_KEY=\"your_key\""
+echo "   pnpm tsx scripts/enrich-smart-tenants.ts all"
+echo ""
+echo "═══════════════════════════════════════════════════════════════════"
+echo ""
+echo "🌙 GO TO SLEEP! CHECK RESULTS IN THE MORNING!"
+echo ""
+echo "🎯 Expected by morning:"
+echo "   • 150-250 new locations enriched"
+echo "   • 5,000-10,000 new tenants added"
+echo "   • Total: 400-500 locations with tenant data"
+echo "   • Total: 16,000-21,000 tenants"
+echo ""
+echo "🎉 YOU'LL HAVE THE BEST SHOPPING CENTER DATABASE IN THE UK!"
+echo ""
+

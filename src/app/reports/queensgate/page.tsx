@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
+import { FlourishLogo } from "@/components/flourish-logo"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -233,13 +234,7 @@ export default async function QueensgateReportPage() {
                 <Card>
                   <CardHeader className="text-center">
                     <div className="flex items-center justify-center gap-4 mb-4">
-                      <Image
-                        src="/images/logo.png"
-                        alt="Flourish"
-                        width={120}
-                        height={40}
-                        className="h-8 w-auto"
-                      />
+                      <FlourishLogo />
                       <span className="text-2xl font-bold">×</span>
                       <div className="text-center">
                         <h2 className="text-xl font-bold">Queensgate Shopping Centre</h2>

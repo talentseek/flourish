@@ -1,43 +1,18 @@
-/* CRITICAL: Override CSS variable at :root level for V2 pages */
-html.v2-page-active,
-html:has(.v2-page) {
-  --background: transparent !important;
+/* Only make hero section area transparent - rest uses theme-aware backgrounds */
+html.v2-page-active body {
+  /* Allow normal background for sections, but transparent for hero area */
 }
 
-/* Override body background - target the @layer base rule */
-html.v2-page-active body,
-html:has(.v2-page) body,
-html body.v2-page-active {
-  background-color: transparent !important;
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* Override Tailwind bg-background utility class */
-html.v2-page-active body.bg-background,
-html:has(.v2-page) body.bg-background,
-html body.v2-page-active.bg-background {
-  background-color: transparent !important;
-  background: transparent !important;
-  background-image: none !important;
-}
-
-/* Ensure V2 page wrapper is transparent */
-.v2-page {
-  background-color: transparent !important;
-  background: transparent !important;
-}
-
-.v2-page main {
-  background-color: transparent !important;
-}
-
-/* Force navigation and header to be transparent */
-.v2-page header,
+/* Navigation background is handled dynamically by the component */
+/* Only ensure container doesn't have forced backgrounds */
 .v2-page header > div,
 .v2-page header .container {
+  /* Let component handle background dynamically */
+}
+
+/* Hero section area should be transparent to show video */
+.v2-page main > div:first-of-type {
+  /* This is the spacer div - keep transparent */
   background-color: transparent !important;
-  background: transparent !important;
-  background-image: none !important;
 }
 
