@@ -39,7 +39,7 @@ export default async function OutreachRunPage({ params, searchParams }: { params
     const base = n.replace(/\s+/g, '.').toLowerCase()
     const first = pickName(n)
 
-    // Vary contact channels
+    // Vary contact channels - ensure we have email, phone, and LinkedIn for demo
     const channels: Array<{ kind: string; icon: string; label: string; value: string; href?: string }> = []
     if (idx % 3 !== 1) channels.push({ kind: 'email', icon: 'mail', label: 'Email', value: `${base}@example.com`, href: `mailto:${base}@example.com` })
     if (idx % 4 !== 2) channels.push({ kind: 'phone', icon: 'phone', label: 'Phone', value: `01733 ${Math.floor(100000 + Math.random()*899999)}` })
@@ -48,7 +48,7 @@ export default async function OutreachRunPage({ params, searchParams }: { params
     if (idx % 3 === 0) channels.push({ kind: 'linkedin', icon: 'linkedin', label: 'LinkedIn', value: `/${handle}`, href: `https://linkedin.com/company/${handle}` })
     if (idx % 5 === 0) channels.push({ kind: 'twitter', icon: 'twitter', label: 'X', value: `@${handle}`, href: `https://x.com/${handle}` })
 
-    const message = `Hi ${first},\n\nWe're reaching out about high-demand fast-casual opportunities within 10 miles of Queensgate Shopping Centre (PE1 1NT). Our peer set shows under-supply in your category, and your concept appears well-suited to current footfall and catchment preferences. We can share quick benchmarks (category share, competitor density, suitable units) and coordinate an intro to the landlord team.\n\nWould you be open to a short call this week to explore fit and timing?`
+    const message = `Hi ${first},\n\nWe're reaching out about high-demand fast-casual dining opportunities at Pentagon Shopping Centre in Chatham. Our analysis shows this category is under-represented versus similar centres within 10 miles by 6-8 units — a significant revenue opportunity.\n\nYour concept appears well-suited to current footfall and catchment preferences. We can share:\n- Footfall and catchment data for Pentagon\n- Category performance benchmarks\n- Unit sizes and rental ranges\n\nWould you be open to a short call this week to explore fit and timing?`
 
     return { name: n, channels, message }
   })

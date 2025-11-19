@@ -253,4 +253,111 @@ Your leasing or asset management team simply sees qualified, data-backed appoint
 
 ## Scene 6 – Reports & Analytics (3:15–3:45)
 
-(continues as in original script…)
+**On screen:**  
+Navigate to Reports page.  
+Show available reports with download options.
+
+**NARRATOR:**  
+"Generate comprehensive reports from your gap analyses, ready to share with stakeholders."
+
+---
+
+## Scene 7 – Outreach (Replacing Old Gap Fulfilment) (2:00–2:30)
+
+**Length:** ~25–30 seconds
+
+**On screen:**  
+Click Outreach in the sidebar.  
+Show the outreach cards list — businesses matched to gaps from your earlier Pentagon analysis.
+
+**NARRATOR:**  
+"Flourish Outreach takes your analysis a step further — finding real local operators who match the gaps identified in the reporting process."
+
+**On screen:**  
+Scroll through outreach cards with smooth animations.  
+Open one card to show:
+- Business name
+- Address with map pin icon
+- Category match badge
+- AI blurb explaining fit (with sparkle icon)
+- Contact details displayed as badges (email / phone / social)
+
+**NARRATOR:**  
+"For each opportunity, you'll see why the business is a match, where they're located, and all the contact details you need — no manual research required."
+
+**On screen:**  
+Select two or three businesses (cards highlight with ring animation).  
+Click **Start Outreach** button (with sparkle icon).
+
+**NARRATOR:**  
+"And with one click, Flourish generates personalised outreach messages tailored to that operator, the local catchment, and the identified revenue gap."
+
+---
+
+## Scene 8 – AI Voice Calling (When Phone Number Is the Only Contact) (2:30–2:55)
+
+**Length:** ~20–25 seconds
+
+**On screen:**  
+Show an outreach card that only has a phone number (other contact badges missing).  
+Show **AI Voice Call** button prominently.
+
+**NARRATOR:**  
+"And if a business has no email or social channels — just a phone number — Flourish can still reach them."
+
+**On screen:**  
+Click **AI Voice Call** button.  
+Display AI Call Setup panel briefly showing:
+- Business: Sarah's Kitchen – High Street, Chatham
+- Gap: Fast Casual Dining – Pentagon
+- Objective: Book 15–20 min call
+
+**NARRATOR:**  
+"Our AI voice agent can place an outbound call on your behalf, explain the opportunity, and book an appointment directly into your leasing calendar."
+
+**On screen:**  
+Show call status progression:
+- "Connecting..." (with spinner)
+- "Ringing..." (with pulsing animation)
+- Live transcript appears, scrolling line-by-line:
+  - AI Agent messages (blue, left-aligned)
+  - Business Owner responses (right-aligned)
+  - Real-time typing animation
+
+**On screen:**  
+Show call outcome — either:
+- **"Completed – Appointment Booked"** (green card with checkmark):
+  - Business: Sarah's Kitchen
+  - Meeting: Intro call booked
+  - Time: Tuesday at 3:00pm
+  - Duration: 15-20 minutes
+  - "Synced to leasing team calendar • SMS reminder sent"
+- OR **"No Answer"** (orange card with phone-off icon)
+
+**NARRATOR:**  
+"Every call is logged, transcribed, and tracked — giving you qualified, local conversations without the legwork."
+
+---
+
+## Scene 9 – Automated Outreach Messages (2:55–3:15)
+
+**On screen:**  
+Navigate to outreach run page (after clicking Start Outreach).  
+Show animated message sending sequence.
+
+**NARRATOR:**  
+"Flourish automatically sends personalized messages across multiple channels — email, SMS, WhatsApp, and LinkedIn."
+
+**On screen:**  
+Show cards for each business with:
+- Business name with status badge (Prepared → Sending → Sent)
+- Channel-specific message previews:
+  - **Email** (blue card) — Full message preview
+  - **SMS** (cyan card) — Truncated preview
+  - **WhatsApp** (green card) — Truncated preview  
+  - **LinkedIn** (blue card) — Full message preview
+- Messages animate in sequence (one after another)
+- Each channel shows sending animation, then checkmark when sent
+
+**NARRATOR:**  
+"Each message is tailored to the channel format and references the specific gap, catchment data, and opportunity. All sent automatically — no copy-paste required."

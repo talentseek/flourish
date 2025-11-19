@@ -18,6 +18,7 @@ async function getMockPlaces() {
   await sleep(600)
   return {
     places: [
+      { name: "Sarah's Kitchen", rating: 4.8, reviews: 342, price: '£10–20', type: 'Fast Casual Dining', address: 'High Street, Chatham', blurb: 'Strong local operator in fast-casual dining, perfect fit for Pentagon Shopping Centre.' },
       { name: 'The Ladz Peterborough', rating: 4.7, reviews: 2000, price: '£10–20', type: 'Restaurant', address: '15 Cowgate', blurb: 'Friendly staff, stellar food and drink, reasonably priced.' },
       { name: 'Wingstop Peterborough', rating: 4.7, reviews: 303, price: '£10–20', type: 'Chicken wings', address: 'Unit 2, 1-4 Long Causeway', blurb: 'Helped me get my food quickly and great service' },
       { name: 'Turtle Bay Peterborough', rating: 4.8, reviews: 11000, price: '£30–40', type: 'Caribbean', address: '46, Queensgate Shopping Centre', blurb: 'Service quick, drinks lovely and food delish' },
