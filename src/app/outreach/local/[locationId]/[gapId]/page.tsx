@@ -19,19 +19,19 @@ async function getMockPlaces() {
   return {
     places: [
       { name: "Sarah's Kitchen", rating: 4.8, reviews: 342, price: '£10–20', type: 'Fast Casual Dining', address: 'High Street, Chatham', blurb: 'Strong local operator in fast-casual dining, perfect fit for Pentagon Shopping Centre.' },
-      { name: 'The Ladz Peterborough', rating: 4.7, reviews: 2000, price: '£10–20', type: 'Restaurant', address: '15 Cowgate', blurb: 'Friendly staff, stellar food and drink, reasonably priced.' },
-      { name: 'Wingstop Peterborough', rating: 4.7, reviews: 303, price: '£10–20', type: 'Chicken wings', address: 'Unit 2, 1-4 Long Causeway', blurb: 'Helped me get my food quickly and great service' },
-      { name: 'Turtle Bay Peterborough', rating: 4.8, reviews: 11000, price: '£30–40', type: 'Caribbean', address: '46, Queensgate Shopping Centre', blurb: 'Service quick, drinks lovely and food delish' },
-      { name: "Cathedral Square Diner", rating: 4.3, reviews: 12, price: '£1–10', type: 'Diner', address: 'Exchange St', blurb: 'Food is freshly made and fast service.' },
-      { name: 'The Frying Scotsman', rating: 4.8, reviews: 258, price: '£1–10', type: 'Restaurant', address: 'Padholme Rd E', blurb: 'Excellent food, lovely staff and great prices.' },
-      { name: 'KOKORO - Peterborough', rating: 4.6, reviews: 219, price: '£10–20', type: 'Restaurant', address: '7 Cathedral Square', blurb: 'Polite, quick, delicious food.' },
-      { name: 'The Good Stuff - healthy fast food takeaway', rating: 4.9, reviews: 127, price: '£1–10', type: 'Restaurant', address: '16 Cowgate', blurb: 'Affordable, quick, and convenient; menu slaps.' },
-      { name: 'Five Guys Burgers and Fries Peterborough', rating: 4.3, reviews: 858, price: '£10–20', type: 'Hamburger', address: '6 Church St', blurb: 'Top quality; reasonable prices.' },
+      { name: 'The Ladz Chatham', rating: 4.7, reviews: 2000, price: '£10–20', type: 'Restaurant', address: '15 High Street, Chatham', blurb: 'Friendly staff, stellar food and drink, reasonably priced.' },
+      { name: 'Wingstop Chatham', rating: 4.7, reviews: 303, price: '£10–20', type: 'Chicken wings', address: 'Unit 2, Pentagon Shopping Centre, Chatham', blurb: 'Helped me get my food quickly and great service' },
+      { name: 'Turtle Bay Chatham', rating: 4.8, reviews: 11000, price: '£30–40', type: 'Caribbean', address: '46, Pentagon Shopping Centre, Chatham', blurb: 'Service quick, drinks lovely and food delish' },
+      { name: "Chatham Diner", rating: 4.3, reviews: 12, price: '£1–10', type: 'Diner', address: 'Exchange St, Chatham', blurb: 'Food is freshly made and fast service.' },
+      { name: 'The Frying Scotsman Chatham', rating: 4.8, reviews: 258, price: '£1–10', type: 'Restaurant', address: 'High Street, Chatham', blurb: 'Excellent food, lovely staff and great prices.' },
+      { name: 'KOKORO - Chatham', rating: 4.6, reviews: 219, price: '£10–20', type: 'Restaurant', address: '7 Pentagon Shopping Centre, Chatham', blurb: 'Polite, quick, delicious food.' },
+      { name: 'The Good Stuff - healthy fast food takeaway', rating: 4.9, reviews: 127, price: '£1–10', type: 'Restaurant', address: '16 High Street, Chatham', blurb: 'Affordable, quick, and convenient; menu slaps.' },
+      { name: 'Five Guys Burgers and Fries Chatham', rating: 4.3, reviews: 858, price: '£10–20', type: 'Hamburger', address: '6 Pentagon Shopping Centre, Chatham', blurb: 'Top quality; reasonable prices.' },
     ],
     clusters: [
-      { title: 'Healthy delivery', examples: ["Kiko Sushi and Bubble Tea", "Nando's Peterborough"] },
+      { title: 'Healthy delivery', examples: ["Kiko Sushi and Bubble Tea", "Nando's Chatham"] },
       { title: 'Hamburger restaurants', examples: ["Five Guys", "Burger King"] },
-      { title: 'Fast food restaurants', examples: ["The Good Stuff", "Westgate Grill"] },
+      { title: 'Fast food restaurants', examples: ["The Good Stuff", "Chatham Grill"] },
       { title: 'Healthy eating', examples: ["KOKORO", "wagamama"] },
     ]
   }

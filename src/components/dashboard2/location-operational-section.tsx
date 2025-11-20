@@ -91,19 +91,27 @@ export function LocationOperationalSection({ location }: LocationOperationalSect
             <h4 className="font-semibold">Opening Hours</h4>
             <div className="p-3 border rounded-lg bg-muted/50">
               {(() => {
-                // Handle different formats of opening hours
+                let hoursData = location.openingHours
+                
+                // If it's a string, try to parse it as JSON
                 if (typeof location.openingHours === 'string') {
-                  return <div className="text-sm whitespace-pre-wrap">{location.openingHours}</div>
+                  try {
+                    hoursData = JSON.parse(location.openingHours)
+                  } catch {
+                    // If parsing fails, treat as plain text
+                    return <div className="text-sm whitespace-pre-wrap">{location.openingHours}</div>
+                  }
                 }
                 
                 // If it's an object with weekday_text array, use that
                 if (
-                  typeof location.openingHours === 'object' &&
-                  location.openingHours !== null &&
-                  'weekday_text' in location.openingHours &&
-                  Array.isArray((location.openingHours as any).weekday_text)
+                  typeof hoursData === 'object' &&
+                  hoursData !== null &&
+                  'weekday_text' in hoursData &&
+                  Array.isArray((hoursData as any).weekday_text) &&
+                  (hoursData as any).weekday_text.length > 0
                 ) {
-                  const hours = location.openingHours as { weekday_text: string[] }
+                  const hours = hoursData as { weekday_text: string[] }
                   return (
                     <div className="space-y-1">
                       {hours.weekday_text.map((day, index) => (
@@ -115,10 +123,106 @@ export function LocationOperationalSection({ location }: LocationOperationalSect
                   )
                 }
                 
+                // If it's an object with periods array, format it
+                if (
+                  typeof hoursData === 'object' &&
+                  hoursData !== null &&
+                  'periods' in hoursData &&
+                  Array.isArray((hoursData as any).periods) &&
+                  (hoursData as any).periods.length > 0
+                ) {
+                  try {
+                    const hours = hoursData as { periods: Array<{ open?: { day?: number; time?: string }, close?: { day?: number; time?: string } }> }
+                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+                    
+                    // Group periods by day
+                    const dayGroups: { [key: number]: string[] } = {}
+                    hours.periods.forEach(period => {
+                      if (period.open && typeof period.open === 'object' && 
+                          period.close && typeof period.close === 'object' &&
+                          typeof period.open.day === 'number' && 
+                          typeof period.open.time === 'string' &&
+                          typeof period.close.time === 'string') {
+                        const day = period.open.day
+                        const openTime = period.open.time.length >= 4 
+                          ? `${period.open.time.substring(0, 2)}:${period.open.time.substring(2)}`
+                          : period.open.time
+                        const closeTime = period.close.time.length >= 4
+                          ? `${period.close.time.substring(0, 2)}:${period.close.time.substring(2)}`
+                          : period.close.time
+                        const timeRange = `${openTime} - ${closeTime}`
+                        
+                        if (!dayGroups[day]) {
+                          dayGroups[day] = []
+                        }
+                        dayGroups[day].push(timeRange)
+                      }
+                    })
+                    
+                    if (Object.keys(dayGroups).length > 0) {
+                      return (
+                        <div className="space-y-1">
+                          {Object.keys(dayGroups).sort((a, b) => parseInt(a) - parseInt(b)).map(dayNum => {
+                            const day = parseInt(dayNum)
+                            return (
+                              <div key={day} className="text-sm">
+                                <strong>{dayNames[day]}:</strong> {dayGroups[day].join(', ')}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    }
+                  } catch (error) {
+                    // If periods parsing fails, fall through to next format handler
+                    console.error('Error parsing periods:', error)
+                  }
+                }
+                
+                // If it's a plain object with day names as keys
+                if (typeof hoursData === 'object' && hoursData !== null) {
+                  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+                  const hasDayKeys = dayNames.some(day => day.toLowerCase() in hoursData || day in hoursData)
+                  
+                  if (hasDayKeys) {
+                    return (
+                      <div className="space-y-1">
+                        {dayNames.map(day => {
+                          const dayKey = Object.keys(hoursData).find(key => 
+                            key.toLowerCase() === day.toLowerCase()
+                          )
+                          if (dayKey && (hoursData as any)[dayKey]) {
+                            const value = (hoursData as any)[dayKey]
+                            let displayValue: string
+                            
+                            // Check if value is an object with open/close properties
+                            if (typeof value === 'object' && value !== null && 'open' in value && 'close' in value) {
+                              const openTime = typeof value.open === 'string' ? value.open : String(value.open)
+                              const closeTime = typeof value.close === 'string' ? value.close : String(value.close)
+                              displayValue = `${openTime} - ${closeTime}`
+                            } else if (typeof value === 'string') {
+                              displayValue = value
+                            } else {
+                              displayValue = JSON.stringify(value)
+                            }
+                            
+                            return (
+                              <div key={day} className="text-sm">
+                                <strong>{day}:</strong> {displayValue}
+                              </div>
+                            )
+                          }
+                          return null
+                        }).filter(Boolean)}
+                      </div>
+                    )
+                  }
+                }
+                
                 // Fallback: display as formatted JSON
                 return (
                   <pre className="text-sm whitespace-pre-wrap font-sans">
-                    {JSON.stringify(location.openingHours, null, 2)}
+                    {JSON.stringify(hoursData, null, 2)}
                   </pre>
                 )
               })()}

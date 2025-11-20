@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Location } from "@/types/location"
@@ -12,6 +13,7 @@ import { LocationDemographicsSection } from "./location-demographics-section"
 import { LocationSEOSection } from "./location-seo-section"
 import { LocationTenantsSection } from "./location-tenants-section"
 import { LocationOperationalSection } from "./location-operational-section"
+import { PDFDownloadButton } from "./pdf-download-button"
 import { generateSlug } from "@/lib/slug-utils"
 import { useRouter } from "next/navigation"
 
@@ -22,6 +24,7 @@ interface LocationDiscoveryStageProps {
 
 export function LocationDiscoveryStage({ location, onCompareClick }: LocationDiscoveryStageProps) {
   const router = useRouter()
+  const contentRef = useRef<HTMLDivElement>(null)
 
   const handleCompareClick = () => {
     // Update URL to include stage parameter
@@ -32,6 +35,13 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
 
   return (
     <div className="space-y-6">
+      {/* PDF Download Button */}
+      <div className="flex justify-end">
+        <PDFDownloadButton location={location} contentRef={contentRef} />
+      </div>
+
+      {/* Content Container with ref for PDF generation */}
+      <div id="location-content" ref={contentRef} className="space-y-6">
       {/* Hero Section with Website Prominence */}
       <LocationHeroSection location={location} />
 
@@ -75,6 +85,7 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
           Compare with Others
           <ArrowRight className="h-4 w-4" />
         </Button>
+      </div>
       </div>
     </div>
   )

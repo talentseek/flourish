@@ -37,14 +37,6 @@ export function OutreachClient({ places, clusters, locationId, gapId }: { places
     [selected]
   )
 
-  const selectAll = () => {
-    const next: Record<number, boolean> = {}
-    allIds.forEach((id) => (next[id] = true))
-    setSelected(next)
-  }
-
-  const clearAll = () => setSelected({})
-
   // Mock contact channels for each place
   // Make the first business (index 0) have only a phone number to demonstrate AI Voice Call
   const getContactChannels = (idx: number) => {
@@ -65,6 +57,30 @@ export function OutreachClient({ places, clusters, locationId, gapId }: { places
     return channels
   }
 
+  const selectAll = () => {
+    const next: Record<number, boolean> = {}
+    // Exclude businesses that only have phone (index 0 = Sarah's Kitchen)
+    allIds.forEach((id) => {
+      const channels = getContactChannels(id)
+      const hasOnlyPhone = channels.length === 1 && channels[0].kind === 'phone'
+      if (!hasOnlyPhone) {
+        next[id] = true
+      }
+    })
+    setSelected(next)
+  }
+
+  const clearAll = () => setSelected({})
+
+  // Calculate count of selectable businesses (excluding phone-only)
+  const selectableCount = useMemo(() => {
+    return places.filter((_, i) => {
+      const channels = getContactChannels(i)
+      const hasOnlyPhone = channels.length === 1 && channels[0].kind === 'phone'
+      return !hasOnlyPhone
+    }).length
+  }, [places])
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -73,7 +89,7 @@ export function OutreachClient({ places, clusters, locationId, gapId }: { places
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={selectAll} disabled={loading}>
-            Select All ({places.length})
+            Select All ({selectableCount})
           </Button>
           <Button variant="ghost" size="sm" onClick={clearAll} disabled={loading || selectedCount === 0}>
             Clear

@@ -21,13 +21,13 @@ const channelIcons: Record<string, any> = {
 }
 
 const channelColors: Record<string, string> = {
-  email: "bg-blue-500/10 text-blue-600 border-blue-200",
-  phone: "bg-green-500/10 text-green-600 border-green-200",
-  web: "bg-purple-500/10 text-purple-600 border-purple-200",
-  instagram: "bg-pink-500/10 text-pink-600 border-pink-200",
-  linkedin: "bg-blue-600/10 text-blue-700 border-blue-300",
-  whatsapp: "bg-green-600/10 text-green-700 border-green-300",
-  sms: "bg-cyan-500/10 text-cyan-600 border-cyan-200",
+  email: "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-700",
+  phone: "bg-green-50 text-green-700 border-green-300 dark:bg-green-950 dark:text-green-300 dark:border-green-700",
+  web: "bg-purple-50 text-purple-700 border-purple-300 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-700",
+  instagram: "bg-pink-50 text-pink-700 border-pink-300 dark:bg-pink-950 dark:text-pink-300 dark:border-pink-700",
+  linkedin: "bg-blue-50 text-blue-800 border-blue-400 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-700",
+  whatsapp: "bg-green-50 text-green-800 border-green-400 dark:bg-green-950 dark:text-green-300 dark:border-green-700",
+  sms: "bg-cyan-50 text-cyan-700 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-700",
 }
 
 export function OutreachSendClient({ results }: { results: OutreachResult[] }) {
@@ -98,29 +98,30 @@ export function OutreachSendClient({ results }: { results: OutreachResult[] }) {
           <Card 
             key={i} 
             className={cn(
-              "transition-all duration-300",
-              isSending && "ring-2 ring-primary animate-pulse",
-              isSent && "bg-muted/30"
+              "transition-all duration-300 border-2",
+              isSending && "ring-2 ring-primary ring-offset-2 animate-pulse shadow-lg",
+              isSent && "bg-muted/50 border-green-200 dark:border-green-800",
+              !isSent && !isSending && "border-border shadow-sm"
             )}
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
+                <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
                   {r.name}
                   {isSending && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
                   {isSent && <CheckCircle2 className="h-4 w-4 text-green-600" />}
                 </CardTitle>
-                <Badge variant={isSent ? "default" : isSending ? "secondary" : "outline"}>
+                <Badge variant={isSent ? "default" : isSending ? "secondary" : "outline"} className="text-sm font-medium">
                   {isSent ? "Sent" : isSending ? "Sending…" : "Prepared"}
                 </Badge>
               </div>
-              <CardDescription className="flex flex-wrap gap-2 mt-2">
+              <CardDescription className="flex flex-wrap gap-3 mt-3">
                 {r.channels.map((c, j) => {
                   const Icon = channelIcons[c.kind] || Globe
                   return (
-                    <div key={j} className="flex items-center gap-1.5 text-xs">
-                      <Icon className="h-3 w-3" />
-                      <span>{c.value}</span>
+                    <div key={j} className="flex items-center gap-2 text-sm text-foreground/80 bg-muted/50 px-3 py-1.5 rounded-md">
+                      <Icon className="h-4 w-4 text-primary" />
+                      <span className="font-medium">{c.value}</span>
                     </div>
                   )
                 })}
@@ -130,12 +131,12 @@ export function OutreachSendClient({ results }: { results: OutreachResult[] }) {
               <Separator />
               
               {/* Channel-specific message previews */}
-              <div className="space-y-3">
-                <div className="text-sm font-medium">Personalized Messages</div>
-                <div className="grid gap-3">
+              <div className="space-y-4">
+                <div className="text-base font-semibold text-foreground">Personalized Messages</div>
+                <div className="grid gap-4">
                   {allChannels.map((channel, idx) => {
                     const Icon = channelIcons[channel.kind] || Globe
-                    const colorClass = channelColors[channel.kind] || "bg-muted"
+                    const colorClass = channelColors[channel.kind] || "bg-muted text-foreground border-border"
                     const channelSent = isSent
                     const channelSending = isSending && isCurrent
 
@@ -143,25 +144,47 @@ export function OutreachSendClient({ results }: { results: OutreachResult[] }) {
                       <div 
                         key={idx}
                         className={cn(
-                          "border rounded-lg p-3 transition-all duration-300",
+                          "border-2 rounded-lg p-4 transition-all duration-300 shadow-sm",
                           colorClass,
-                          channelSending && "ring-2 ring-primary animate-pulse",
-                          channelSent && "opacity-75"
+                          channelSending && "ring-2 ring-primary ring-offset-2 animate-pulse",
+                          channelSent && "opacity-90"
                         )}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-4 w-4" />
-                            <span className="text-sm font-medium">{channel.label}</span>
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "p-2 rounded-md",
+                              channel.kind === 'email' && "bg-blue-100 dark:bg-blue-900",
+                              channel.kind === 'phone' && "bg-green-100 dark:bg-green-900",
+                              channel.kind === 'sms' && "bg-cyan-100 dark:bg-cyan-900",
+                              channel.kind === 'whatsapp' && "bg-green-100 dark:bg-green-900",
+                              channel.kind === 'linkedin' && "bg-blue-100 dark:bg-blue-900",
+                              channel.kind === 'web' && "bg-purple-100 dark:bg-purple-900",
+                              channel.kind === 'instagram' && "bg-pink-100 dark:bg-pink-900",
+                            )}>
+                              <Icon className={cn(
+                                "h-5 w-5",
+                                channel.kind === 'email' && "text-blue-600 dark:text-blue-300",
+                                channel.kind === 'phone' && "text-green-600 dark:text-green-300",
+                                channel.kind === 'sms' && "text-cyan-600 dark:text-cyan-300",
+                                channel.kind === 'whatsapp' && "text-green-600 dark:text-green-300",
+                                channel.kind === 'linkedin' && "text-blue-600 dark:text-blue-300",
+                                channel.kind === 'web' && "text-purple-600 dark:text-purple-300",
+                                channel.kind === 'instagram' && "text-pink-600 dark:text-pink-300",
+                              )} />
+                            </div>
+                            <span className="text-base font-semibold text-foreground">{channel.label}</span>
                           </div>
-                          {channelSending && (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          )}
-                          {channelSent && (
-                            <CheckCircle2 className="h-3 w-3 text-green-600" />
-                          )}
+                          <div className="flex items-center gap-2">
+                            {channelSending && (
+                              <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                            )}
+                            {channelSent && (
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            )}
+                          </div>
                         </div>
-                        <div className="text-xs whitespace-pre-wrap bg-background/50 p-2 rounded mt-2">
+                        <div className="text-sm whitespace-pre-wrap bg-background/80 dark:bg-background/60 p-3 rounded-md mt-3 text-foreground border border-border/50">
                           {getMessagePreview(channel, r.message)}
                         </div>
                       </div>
