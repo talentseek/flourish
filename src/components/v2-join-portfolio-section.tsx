@@ -28,7 +28,7 @@ export function V2JoinPortfolioSection() {
 
         {/* Track Record & Expertise */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <Card className="border-[#D8D8D6]">
+          <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <TrendingUp className="h-8 w-8 text-[#E6FB60]" />
@@ -48,7 +48,7 @@ export function V2JoinPortfolioSection() {
             </CardContent>
           </Card>
 
-          <Card className="border-[#D8D8D6]">
+          <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Users className="h-8 w-8 text-[#E6FB60]" />
@@ -70,7 +70,7 @@ export function V2JoinPortfolioSection() {
 
         {/* Key Differentiators */}
         <div className="grid md:grid-cols-3 gap-6 mb-16">
-          <Card className="border-[#D8D8D6]">
+          <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Lightbulb className="h-6 w-6 text-[#E6FB60]" />
@@ -85,7 +85,7 @@ export function V2JoinPortfolioSection() {
             </CardContent>
           </Card>
 
-          <Card className="border-[#D8D8D6]">
+          <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <MapPin className="h-6 w-6 text-[#E6FB60]" />
@@ -100,7 +100,7 @@ export function V2JoinPortfolioSection() {
             </CardContent>
           </Card>
 
-          <Card className="border-[#D8D8D6]">
+          <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Eye className="h-6 w-6 text-[#E6FB60]" />
@@ -122,7 +122,7 @@ export function V2JoinPortfolioSection() {
             Client Testimonials
           </h3>
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <Card className="border-[#D8D8D6]">
+            <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
               <CardHeader>
                 <Quote className="h-8 w-8 text-[#E6FB60] mb-2" />
                 <CardTitle className="text-xl text-[#E6FB60]">Shopping Centre Owner</CardTitle>
@@ -137,7 +137,7 @@ export function V2JoinPortfolioSection() {
               </CardContent>
             </Card>
 
-            <Card className="border-[#D8D8D6]">
+            <Card className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
               <CardHeader>
                 <Quote className="h-8 w-8 text-[#E6FB60] mb-2" />
                 <CardTitle className="text-xl text-[#E6FB60]">Property Management Company</CardTitle>

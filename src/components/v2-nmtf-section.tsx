@@ -41,7 +41,7 @@ export function V2NMTFSection() {
           </div>
 
           {/* Who are NMTF */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Who are NMTF?</CardTitle>
             </CardHeader>
@@ -61,7 +61,7 @@ export function V2NMTFSection() {
           </Card>
 
           {/* Why Partner */}
-          <Card className="mb-8">
+          <Card className="mb-8 bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Why Have We Partnered with Them?</CardTitle>
             </CardHeader>
@@ -84,7 +84,7 @@ export function V2NMTFSection() {
           </Card>
 
           {/* What They Do for Traders */}
-          <Card>
+          <Card className="bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">What Do They Do for Traders?</CardTitle>
               <CardDescription className="text-white text-base font-medium">

@@ -84,7 +84,7 @@ export function V2LookingForSpaceSection() {
             ].map((item, index) => {
               const Icon = item.icon
               return (
-                <Card key={index} className="border-[#D8D8D6]">
+                <Card key={index} className="border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 bg-[#E6FB60]/20 rounded-lg">
@@ -174,7 +174,7 @@ export function V2LookingForSpaceSection() {
             </h3>
           </div>
           
-          <Card className="max-w-3xl mx-auto mb-8 border-[#D8D8D6]">
+          <Card className="max-w-3xl mx-auto mb-8 border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Spud Haven</CardTitle>
               <CardDescription className="text-white">One Stop Shopping Centre</CardDescription>
