@@ -99,7 +99,7 @@ export function GapPriorityCards({ analysis }: GapPriorityCardsProps) {
       {priorities.length === 0 && (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            No gaps identified. The target location's tenant mix aligns well with competitors.
+            No gaps identified. The target location&apos;s tenant mix aligns well with competitors.
           </CardContent>
         </Card>
       )}

@@ -84,7 +84,7 @@ export function PreRegisterButton() {
           </div>
           <div className="bg-muted p-3 rounded-md">
             <p className="text-xs text-muted-foreground">
-              By pre-registering, you'll receive early access to Flourish AI, exclusive beta features, 
+              By pre-registering, you&apos;ll receive early access to Flourish AI, exclusive beta features,
               and special launch pricing.
             </p>
           </div>

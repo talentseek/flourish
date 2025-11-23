@@ -61,7 +61,7 @@ export default function DebugAuthPage() {
             </Button>
             
             <div className="text-sm text-muted-foreground">
-              <p>If you're signed in but not being redirected to dashboard, check the console for redirect URL configuration.</p>
+              <p>If you&apos;re signed in but not being redirected to dashboard, check the console for redirect URL configuration.</p>
             </div>
           </CardContent>
         </Card>

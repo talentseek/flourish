@@ -176,14 +176,14 @@ export function V2VideoHero() {
                 size="lg" 
                 className="text-lg px-8 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 border-0 font-semibold"
               >
-                <Link href="#join-portfolio">I'm a Landlord/Managing Agent</Link>
+                <Link href="#join-portfolio">I&apos;m a Landlord/Managing Agent</Link>
               </Button>
               <Button 
                 asChild 
                 size="lg" 
                 className="text-lg px-8 bg-white/10 text-white border-2 border-white/50 hover:bg-white/20 backdrop-blur font-semibold"
               >
-                <Link href="#looking-for-space">I'm an Operator</Link>
+                <Link href="#looking-for-space">I&apos;m an Operator</Link>
               </Button>
             </div>
           </div>

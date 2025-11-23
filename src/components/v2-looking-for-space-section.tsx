@@ -65,7 +65,7 @@ export function V2LookingForSpaceSection() {
               The Opportunity
             </h3>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto">
-              Flourish offers flexible retail spaces within some of the UK's busiest shopping centres — 
+              Flourish offers flexible retail spaces within some of the UK&apos;s busiest shopping centres —
               from kiosks and pop-ups to promotional stands and seasonal setups.
             </p>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto mt-4">
@@ -146,7 +146,7 @@ export function V2LookingForSpaceSection() {
               you have everything you need to succeed.
             </p>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto mt-4">
-              From paperwork and compliance to marketing and customer insights, we're here to help you 
+              From paperwork and compliance to marketing and customer insights, we&apos;re here to help you
               every step of the way.
             </p>
           </div>
@@ -181,7 +181,7 @@ export function V2LookingForSpaceSection() {
             </CardHeader>
             <CardContent>
               <p className="text-lg text-white italic mb-4 font-medium">
-                "Flourish made the whole process easy — from day one we felt supported."
+                &quot;Flourish made the whole process easy — from day one we felt supported.&quot;
               </p>
               <p className="text-white font-medium">
                 Spud Haven found the perfect space at One Stop Shopping Centre and was trading within 
@@ -208,7 +208,7 @@ export function V2LookingForSpaceSection() {
             Ready to Start?
           </h3>
           <p className="text-lg text-[#4D4A46] mb-6 max-w-2xl mx-auto">
-            Whether you're launching your first pop-up or expanding your brand nationwide, Flourish 
+            Whether you&apos;re launching your first pop-up or expanding your brand nationwide, Flourish
             helps you find the perfect space to grow.
           </p>
           <Button 
@@ -234,7 +234,7 @@ export function V2LookingForSpaceSection() {
                 What documents do I need to start trading?
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
-                You'll typically need public liability insurance, PAT testing certificates for electrical 
+                You&apos;ll typically need public liability insurance, PAT testing certificates for electrical
                 equipment, and risk assessment documentation (RAMS). Our team will guide you through all 
                 required documentation and can help you obtain what you need.
               </AccordionContent>
@@ -245,7 +245,7 @@ export function V2LookingForSpaceSection() {
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
                 Both options are available depending on the location. Some spaces come with existing kiosks 
-                or units, while others allow you to bring your own. We'll discuss your specific needs 
+                or units, while others allow you to bring your own. We&apos;ll discuss your specific needs
                 during the matching process and find the best solution for your business.
               </AccordionContent>
             </AccordionItem>

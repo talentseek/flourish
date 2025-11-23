@@ -149,7 +149,7 @@ export function OutreachClient({ places, clusters, locationId, gapId }: { places
                     </div>
                     <div className="text-sm bg-muted/50 p-2 rounded-md">
                       <Sparkles className="h-3 w-3 inline mr-1 text-primary" />
-                      <span className="italic">"{p!.blurb}"</span>
+                      <span className="italic">&quot;{p!.blurb}&quot;</span>
                     </div>
                     <Separator />
                     <div className="space-y-2">

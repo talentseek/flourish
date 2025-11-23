@@ -61,31 +61,31 @@ export default async function AssistantPage() {
                       <div className="flex items-start gap-2">
                         <span className="text-primary font-semibold">•</span>
                         <span>
-                          "Tell me about Manchester Arndale"
+                          &quot;Tell me about Manchester Arndale&quot;
                         </span>
                       </div>
                       <div className="flex items-start gap-2">
                         <span className="text-primary font-semibold">•</span>
                         <span>
-                          "What recommendations do you have for Bluewater Shopping Centre?"
+                          &quot;What recommendations do you have for Bluewater Shopping Centre?&quot;
                         </span>
                       </div>
                       <div className="flex items-start gap-2">
                         <span className="text-primary font-semibold">•</span>
                         <span>
-                          "Compare The Trafford Centre with nearby competitors"
+                          &quot;Compare The Trafford Centre with nearby competitors&quot;
                         </span>
                       </div>
                       <div className="flex items-start gap-2">
                         <span className="text-primary font-semibold">•</span>
                         <span>
-                          "What tenant categories are missing in my area?"
+                          &quot;What tenant categories are missing in my area?&quot;
                         </span>
                       </div>
                       <div className="flex items-start gap-2">
                         <span className="text-primary font-semibold">•</span>
                         <span>
-                          "Find competitors near Meadowhall"
+                          &quot;Find competitors near Meadowhall&quot;
                         </span>
                       </div>
                     </div>

@@ -156,25 +156,25 @@ export function FlourishAssistantClient() {
             <div className="flex items-start gap-2 text-sm">
               <Badge variant="outline" className="mt-0.5">Q</Badge>
               <span className="text-muted-foreground">
-                "What recommendations do you have for Manchester Arndale?"
+                &quot;What recommendations do you have for Manchester Arndale?&quot;
               </span>
             </div>
             <div className="flex items-start gap-2 text-sm">
               <Badge variant="outline" className="mt-0.5">Q</Badge>
               <span className="text-muted-foreground">
-                "Compare Bluewater with nearby competitors"
+                &quot;Compare Bluewater with nearby competitors&quot;
               </span>
             </div>
             <div className="flex items-start gap-2 text-sm">
               <Badge variant="outline" className="mt-0.5">Q</Badge>
               <span className="text-muted-foreground">
-                "What tenant categories are missing in my area?"
+                &quot;What tenant categories are missing in my area?&quot;
               </span>
             </div>
             <div className="flex items-start gap-2 text-sm">
               <Badge variant="outline" className="mt-0.5">Q</Badge>
               <span className="text-muted-foreground">
-                "Tell me more about The Trafford Centre"
+                &quot;Tell me more about The Trafford Centre&quot;
               </span>
             </div>
           </div>

@@ -285,7 +285,7 @@ export default async function QueensgateReportPage() {
                       <p className="text-muted-foreground leading-relaxed">
                         Queensgate Shopping Centre demonstrates strong performance with 9.5 million annual visitors 
                         and a solid tenant mix. However, analysis reveals significant opportunities for revenue 
-                        growth through strategic tenant mix optimization. The centre's prime location in Peterborough, 
+                        growth through strategic tenant mix optimization. The centre&apos;s prime location in Peterborough,
                         combined with strong anchor tenants and excellent accessibility, positions it well for 
                         expansion and enhancement.
                       </p>
@@ -1280,7 +1280,7 @@ export default async function QueensgateReportPage() {
                               <h4 className="font-semibold">Paul Clifford</h4>
                               <p className="text-xs text-muted-foreground mb-2">Founder & Director</p>
                               <p className="text-sm text-muted-foreground">
-                                Paul has over 20 years retail and property management experience. Paul has worked in some of the UK's largest retailers including Boots, DSG and IKEA and managed shopping centres in Slough, Kings Lynn, Epsom and East London. The knowledge acquired throughout this career, gives Paul unparalleled expertise in the field of mall commercialisation.
+                                Paul has over 20 years retail and property management experience. Paul has worked in some of the UK&apos;s largest retailers including Boots, DSG and IKEA and managed shopping centres in Slough, Kings Lynn, Epsom and East London. The knowledge acquired throughout this career, gives Paul unparalleled expertise in the field of mall commercialisation.
                               </p>
                               <p className="text-xs text-muted-foreground mt-2">paul@thisisflourish.co.uk</p>
                             </div>
@@ -1365,7 +1365,7 @@ export default async function QueensgateReportPage() {
                               <h4 className="font-semibold">Giorgia Shepherd</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager</p>
                               <p className="text-sm text-muted-foreground">
-                                Giorgia is a passionate and enthusiastic regional manager based in the vibrant South East, with a wealth of experience in the hospitality industry. The dynamic and fast-paced environment of retail has always ignited Giorgia's enthusiasm, allowing her to thrive and develop her leadership qualities.
+                                Giorgia is a passionate and enthusiastic regional manager based in the vibrant South East, with a wealth of experience in the hospitality industry. The dynamic and fast-paced environment of retail has always ignited Giorgia&apos;s enthusiasm, allowing her to thrive and develop her leadership qualities.
                               </p>
                               <p className="text-xs text-muted-foreground mt-2">giorgia@thisisflourish.co.uk</p>
                             </div>
@@ -1413,7 +1413,7 @@ export default async function QueensgateReportPage() {
                           <div className="flex items-start gap-4">
                             <Image src="/sharonnew.webp" alt="Sharon O'Rourke" width={72} height={72} className="rounded-full object-cover team-member-image" />
                             <div>
-                              <h4 className="font-semibold">Sharon O'Rourke</h4>
+                              <h4 className="font-semibold">Sharon O&apos;Rourke</h4>
                               <p className="text-xs text-muted-foreground mb-2">Regional Manager Scotland</p>
                               <p className="text-sm text-muted-foreground">
                                 11 years ago, Sharon started her own marketing and events business which is still going strong today managing a large portfolio of clients including numerous shopping centres in Glasgow and the West and a Business Improvement District in the leafy suburb of Giffnock.

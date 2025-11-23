@@ -47,7 +47,7 @@ export function V2NMTFSection() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-white text-base leading-relaxed font-medium">
-                The National Market Traders Federation (NMTF) is the UK's leading trade association for market traders, 
+                The National Market Traders Federation (NMTF) is the UK&apos;s leading trade association for market traders,
                 street traders, and small independent retailers. With over 100 years of history, NMTF represents and 
                 supports thousands of traders across the country, providing advocacy, advice, and resources to help 
                 independent businesses thrive.
@@ -68,11 +68,11 @@ export function V2NMTFSection() {
             <CardContent className="space-y-4">
               <p className="text-white text-base leading-relaxed font-medium">
                 Flourish and NMTF share a common mission: to support independent traders and create thriving retail 
-                environments. Our partnership brings together Flourish's expertise in retail space activation with 
-                NMTF's deep understanding of trader needs and market dynamics.
+                environments. Our partnership brings together Flourish&apos;s expertise in retail space activation with
+                NMTF&apos;s deep understanding of trader needs and market dynamics.
               </p>
               <p className="text-white text-base font-semibold">
-                Together, we're working to:
+                Together, we&apos;re working to:
               </p>
               <ul className="list-disc list-inside space-y-2 text-white ml-4 text-base font-medium">
                 <li>Connect traders with premium retail spaces in shopping centres</li>

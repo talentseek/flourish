@@ -42,11 +42,11 @@ export function V2ContactSection() {
         {/* Header */}
         <div className="text-center space-y-4 mb-12 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#4D4A46]">
-            Let's Work Together
+            Let&apos;s Work Together
           </h2>
           <p className="text-lg text-[#4D4A46] font-medium">
-            Whether you're a landlord looking to unlock opportunities or a trader ready to take 
-            your business to the next level — we'd love to hear from you.
+            Whether you&apos;re a landlord looking to unlock opportunities or a trader ready to take
+            your business to the next level — we&apos;d love to hear from you.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function V2ContactSection() {
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Get in Touch</CardTitle>
               <CardDescription>
-                Fill out the form below and we'll get back to you within 2 working days
+                Fill out the form below and we&apos;ll get back to you within 2 working days
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -244,7 +244,7 @@ export function V2ContactSection() {
             </CardHeader>
             <CardContent>
               <p className="text-[#4D4A46] italic mb-4 font-medium">
-                "Flourish helped us find the perfect space — and we were trading within a week!"
+                &quot;Flourish helped us find the perfect space — and we were trading within a week!&quot;
               </p>
               <p className="font-semibold text-[#4D4A46]">— Spud Haven, One Stop</p>
             </CardContent>
@@ -256,7 +256,7 @@ export function V2ContactSection() {
             </CardHeader>
             <CardContent>
               <p className="text-[#4D4A46] font-medium">
-                We're on the ground, across the UK, helping traders and landlords flourish together.
+                We&apos;re on the ground, across the UK, helping traders and landlords flourish together.
               </p>
             </CardContent>
           </Card>

@@ -130,9 +130,9 @@ export function V2JoinPortfolioSection() {
               </CardHeader>
               <CardContent>
                 <p className="text-white italic font-medium">
-                  "Flourish transformed our vacant spaces into thriving retail destinations. Their 
-                  approach is professional, innovative, and results-driven. We've seen a significant 
-                  increase in footfall and revenue."
+                  &quot;Flourish transformed our vacant spaces into thriving retail destinations. Their
+                  approach is professional, innovative, and results-driven. We&apos;ve seen a significant
+                  increase in footfall and revenue.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -145,9 +145,9 @@ export function V2JoinPortfolioSection() {
               </CardHeader>
               <CardContent>
                 <p className="text-white italic font-medium">
-                  "Working with Flourish has been a game-changer. They understand retail, they 
-                  understand our spaces, and they deliver results. The team's expertise and 
-                  hands-on approach make all the difference."
+                  &quot;Working with Flourish has been a game-changer. They understand retail, they
+                  understand our spaces, and they deliver results. The team&apos;s expertise and
+                  hands-on approach make all the difference.&quot;
                 </p>
               </CardContent>
             </Card>
@@ -181,7 +181,7 @@ export function V2JoinPortfolioSection() {
             Ready to Maximize Your Space?
           </h3>
           <p className="text-lg text-white/90 mb-6 max-w-2xl mx-auto">
-            Let's discuss how we can help activate your retail spaces and drive sustainable growth.
+            Let&apos;s discuss how we can help activate your retail spaces and drive sustainable growth.
           </p>
           <Button 
             asChild 

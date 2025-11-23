@@ -12,7 +12,7 @@ export function V2TraderStoriesSection() {
             Trader Stories
           </h2>
           <p className="text-xl text-[#4D4A46]">
-            Real stories from traders who've flourished with us
+            Real stories from traders who&apos;ve flourished with us
           </p>
         </div>
 
@@ -38,8 +38,8 @@ export function V2TraderStoriesSection() {
               <div className="p-6">
                 <Quote className="h-6 w-6 text-[#E6FB60] mb-2" />
                 <p className="text-muted-foreground italic mb-4">
-                  "Flourish helped us find the perfect space and we were trading within a week. 
-                  The support throughout was incredible."
+                  &quot;Flourish helped us find the perfect space and we were trading within a week.
+                  The support throughout was incredible.&quot;
                 </p>
                 <p className="font-semibold text-[#E6FB60]">— Independent Trader</p>
                 <p className="text-sm text-muted-foreground">Shopping Centre Location</p>
@@ -58,8 +58,8 @@ export function V2TraderStoriesSection() {
               <div className="p-6">
                 <Quote className="h-6 w-6 text-[#E6FB60] mb-2" />
                 <p className="text-muted-foreground italic mb-4">
-                  "The flexibility and understanding Flourish showed made all the difference. 
-                  They really care about making it work for everyone."
+                  &quot;The flexibility and understanding Flourish showed made all the difference.
+                  They really care about making it work for everyone.&quot;
                 </p>
                 <p className="font-semibold text-[#E6FB60]">— Local Business Owner</p>
                 <p className="text-sm text-muted-foreground">Multiple Centre Operator</p>
@@ -87,7 +87,7 @@ export function V2TraderStoriesSection() {
               </p>
               <div className="mt-6 pt-6 border-t border-[#D8D8D6]">
                 <p className="text-sm text-[#4D4A46] font-medium">
-                  This retention rate reflects our commitment to understanding each trader's 
+                  This retention rate reflects our commitment to understanding each trader&apos;s
                   unique needs and creating sustainable, long-term opportunities.
                 </p>
               </div>
@@ -103,8 +103,8 @@ export function V2TraderStoriesSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground italic mb-4">
-                "The team at Flourish made everything so simple. From finding the right space 
-                to helping with compliance, they were there every step of the way."
+                &quot;The team at Flourish made everything so simple. From finding the right space
+                to helping with compliance, they were there every step of the way.&quot;
               </p>
               <p className="font-semibold text-[#E6FB60]">— Sarah M.</p>
               <p className="text-sm text-muted-foreground">Pop-up Retailer</p>
@@ -117,8 +117,8 @@ export function V2TraderStoriesSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground italic mb-4">
-                "We've expanded to three locations thanks to Flourish. Their understanding of 
-                our business and the spaces available is unmatched."
+                &quot;We&apos;ve expanded to three locations thanks to Flourish. Their understanding of
+                our business and the spaces available is unmatched.&quot;
               </p>
               <p className="font-semibold text-[#E6FB60]">— James T.</p>
               <p className="text-sm text-muted-foreground">Multi-location Trader</p>
@@ -131,8 +131,8 @@ export function V2TraderStoriesSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground italic mb-4">
-                "Starting out was daunting, but Flourish made it feel achievable. The support 
-                and guidance we received was invaluable."
+                &quot;Starting out was daunting, but Flourish made it feel achievable. The support
+                and guidance we received was invaluable.&quot;
               </p>
               <p className="font-semibold text-[#E6FB60]">— Emma L.</p>
               <p className="text-sm text-muted-foreground">First-time Trader</p>
