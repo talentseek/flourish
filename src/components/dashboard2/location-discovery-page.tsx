@@ -8,11 +8,19 @@ import { LocationDiscoveryStage } from "./location-discovery-stage"
 import { AssistantWidget } from "./assistant-widget"
 import { useRouter } from "next/navigation"
 
+import { RegionalManagerWidget } from "@/components/regional-manager-widget"
+
 interface LocationDiscoveryPageProps {
   location: Location
+  regionalManager?: {
+    name: string
+    phone?: string
+    email?: string
+    imageSrc: string
+  }
 }
 
-export function LocationDiscoveryPage({ location }: LocationDiscoveryPageProps) {
+export function LocationDiscoveryPage({ location, regionalManager }: LocationDiscoveryPageProps) {
   const router = useRouter()
 
   const handleCompareClick = () => {
@@ -28,13 +36,17 @@ export function LocationDiscoveryPage({ location }: LocationDiscoveryPageProps) 
         <div className="flex flex-1 flex-col">
           <div className="flex flex-1 flex-col gap-2">
             <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <LocationDiscoveryStage 
+              <LocationDiscoveryStage
                 location={location}
                 onCompareClick={handleCompareClick}
               />
 
-              {/* Floating Assistant */}
-              <AssistantWidget />
+              {/* Floating Assistant or RM Widget */}
+              {regionalManager ? (
+                <RegionalManagerWidget {...regionalManager} />
+              ) : (
+                <AssistantWidget />
+              )}
             </div>
           </div>
         </div>

@@ -4,12 +4,17 @@ import { prisma } from "@/lib/db"
 export async function GET() {
   try {
     const locations = await prisma.location.findMany({
+      where: {
+        isManaged: true
+      },
       select: {
         id: true,
         name: true,
         city: true,
         county: true,
         type: true,
+        latitude: true,
+        longitude: true,
       },
       orderBy: {
         name: 'asc'

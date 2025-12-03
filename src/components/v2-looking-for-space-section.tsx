@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-  MapPin, 
-  Calendar, 
-  Users2, 
-  Users, 
+import {
+  MapPin,
+  Calendar,
+  Users2,
+  Users,
   TrendingUp,
   FileCheck,
   Search,
@@ -40,16 +40,16 @@ export function V2LookingForSpaceSection() {
             We connect local traders and national brands with high-footfall shopping centres across the UK.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button 
-              asChild 
-              size="lg" 
+            <Button
+              asChild
+              size="lg"
               className="bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
             >
               <Link href="#contact">Apply for a Space</Link>
             </Button>
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               size="lg"
               className="border-[#4D4A46] bg-[#4D4A46] text-white hover:bg-[#4D4A46]/90 font-semibold"
             >
@@ -69,7 +69,7 @@ export function V2LookingForSpaceSection() {
               from kiosks and pop-ups to promotional stands and seasonal setups.
             </p>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto mt-4">
-              We make it simple for businesses of all sizes to access high-quality locations and reach 
+              We make it simple for businesses of all sizes to access high-quality locations and reach
               thousands of shoppers every week.
             </p>
           </div>
@@ -142,7 +142,7 @@ export function V2LookingForSpaceSection() {
               How We Help You Flourish
             </h3>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto">
-              Our team are on the ground across the UK — visiting sites, meeting traders, and ensuring 
+              Our team are on the ground across the UK — visiting sites, meeting traders, and ensuring
               you have everything you need to succeed.
             </p>
             <p className="text-lg text-[#4D4A46] max-w-3xl mx-auto mt-4">
@@ -173,7 +173,7 @@ export function V2LookingForSpaceSection() {
               Success Stories / Trader Testimonials
             </h3>
           </div>
-          
+
           <Card className="max-w-3xl mx-auto mb-8 border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Spud Haven</CardTitle>
@@ -184,8 +184,8 @@ export function V2LookingForSpaceSection() {
                 &quot;Flourish made the whole process easy — from day one we felt supported.&quot;
               </p>
               <p className="text-white font-medium">
-                Spud Haven found the perfect space at One Stop Shopping Centre and was trading within 
-                a week. Our team provided comprehensive support throughout the setup process, from 
+                Spud Haven found the perfect space at One Stop Shopping Centre and was trading within
+                a week. Our team provided comprehensive support throughout the setup process, from
                 compliance documentation to visual merchandising advice.
               </p>
             </CardContent>
@@ -193,11 +193,16 @@ export function V2LookingForSpaceSection() {
 
           {/* Video Montage Placeholder */}
           <div className="max-w-4xl mx-auto">
-            <div className="aspect-video bg-[#F7F4F2] rounded-lg flex items-center justify-center border border-[#D8D8D6]">
-              <div className="text-center">
-                <Play className="h-16 w-16 text-[#E6FB60] mx-auto mb-4" />
-                <p className="text-[#4D4A46]">Trader video montage placeholder</p>
-              </div>
+            <div className="aspect-video bg-[#F7F4F2] rounded-lg overflow-hidden border border-[#D8D8D6]">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/uzZaZZJIt-c"
+                title="Trader video montage"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
             </div>
           </div>
         </div>
@@ -211,8 +216,8 @@ export function V2LookingForSpaceSection() {
             Whether you&apos;re launching your first pop-up or expanding your brand nationwide, Flourish
             helps you find the perfect space to grow.
           </p>
-          <Button 
-            asChild 
+          <Button
+            asChild
             size="lg"
             className="bg-[#4D4A46] text-white hover:bg-[#4D4A46]/90 font-semibold"
           >
@@ -235,7 +240,7 @@ export function V2LookingForSpaceSection() {
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
                 You&apos;ll typically need public liability insurance, PAT testing certificates for electrical
-                equipment, and risk assessment documentation (RAMS). Our team will guide you through all 
+                equipment, and risk assessment documentation (RAMS). Our team will guide you through all
                 required documentation and can help you obtain what you need.
               </AccordionContent>
             </AccordionItem>
@@ -244,7 +249,7 @@ export function V2LookingForSpaceSection() {
                 Do I need my own kiosk or can I rent one?
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
-                Both options are available depending on the location. Some spaces come with existing kiosks 
+                Both options are available depending on the location. Some spaces come with existing kiosks
                 or units, while others allow you to bring your own. We&apos;ll discuss your specific needs
                 during the matching process and find the best solution for your business.
               </AccordionContent>
@@ -254,8 +259,8 @@ export function V2LookingForSpaceSection() {
                 How much does it cost to trade?
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
-                Costs vary depending on the location, space size, and duration of your stay. We work with 
-                you to find options that fit your budget. There are no rate cards — we understand each 
+                Costs vary depending on the location, space size, and duration of your stay. We work with
+                you to find options that fit your budget. There are no rate cards — we understand each
                 space and opportunity individually to make it work for both you and the landlord.
               </AccordionContent>
             </AccordionItem>
@@ -264,8 +269,8 @@ export function V2LookingForSpaceSection() {
                 Can I move between centres?
               </AccordionTrigger>
               <AccordionContent className="text-[#4D4A46]">
-                Absolutely! Many of our traders operate across multiple locations. We can help you scale 
-                your presence and move between centres as your business grows. Our flexible terms make it 
+                Absolutely! Many of our traders operate across multiple locations. We can help you scale
+                your presence and move between centres as your business grows. Our flexible terms make it
                 easy to expand your reach.
               </AccordionContent>
             </AccordionItem>

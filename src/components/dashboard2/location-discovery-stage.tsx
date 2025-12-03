@@ -22,15 +22,18 @@ interface LocationDiscoveryStageProps {
   onCompareClick: () => void
 }
 
+import { useState } from "react"
+import { PreReservationDialog } from "@/components/pre-reservation-dialog"
+
+// ... imports
+
 export function LocationDiscoveryStage({ location, onCompareClick }: LocationDiscoveryStageProps) {
   const router = useRouter()
   const contentRef = useRef<HTMLDivElement>(null)
+  const [showPreReservation, setShowPreReservation] = useState(false)
 
   const handleCompareClick = () => {
-    // Update URL to include stage parameter
-    const slug = generateSlug(location.name)
-    router.push(`/dashboard2/${slug}?stage=3`, { scroll: false })
-    onCompareClick()
+    setShowPreReservation(true)
   }
 
   return (
@@ -42,51 +45,56 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
 
       {/* Content Container with ref for PDF generation */}
       <div id="location-content" ref={contentRef} className="space-y-6">
-      {/* Hero Section with Website Prominence */}
-      <LocationHeroSection location={location} />
+        {/* Hero Section with Website Prominence */}
+        <LocationHeroSection location={location} />
 
-      {/* Key Metrics */}
-      <LocationMetricsGrid location={location} />
+        {/* Key Metrics */}
+        <LocationMetricsGrid location={location} />
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-6">
-          {/* Commercial Performance */}
-          <LocationCommercialKPIs location={location} />
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-6">
+            {/* Commercial Performance */}
+            <LocationCommercialKPIs location={location} />
 
-          {/* Reviews */}
-          <LocationReviewsSection location={location} />
+            {/* Reviews */}
+            <LocationReviewsSection location={location} />
 
-          {/* SEO Data */}
-          <LocationSEOSection location={location} />
+            {/* SEO Data */}
+            <LocationSEOSection location={location} />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Operational Details */}
+            <LocationOperationalSection location={location} />
+
+            {/* Demographics */}
+            <LocationDemographicsSection location={location} />
+          </div>
         </div>
 
-        {/* Right Column */}
-        <div className="space-y-6">
-          {/* Operational Details */}
-          <LocationOperationalSection location={location} />
+        {/* Full Width Sections */}
+        <LocationTenantsSection location={location} />
 
-          {/* Demographics */}
-          <LocationDemographicsSection location={location} />
+        {/* Action Button */}
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={handleCompareClick}
+            size="lg"
+            className="gap-2"
+          >
+            Get Full Analytics and Comparison
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      {/* Full Width Sections */}
-      <LocationTenantsSection location={location} />
-
-      {/* Action Button */}
-      <div className="flex justify-center pt-4">
-        <Button
-          onClick={handleCompareClick}
-          size="lg"
-          className="gap-2"
-        >
-          Compare with Others
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
-      </div>
+      <PreReservationDialog
+        open={showPreReservation}
+        onOpenChange={setShowPreReservation}
+      />
     </div>
   )
 }

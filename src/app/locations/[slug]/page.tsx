@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { prisma } from "@/lib/db"
 import { generateSlug, findLocationBySlug } from "@/lib/slug-utils"
-import { LocationDiscoveryPage } from "@/components/dashboard2/location-discovery-page"
+import { PublicLocationPage } from "@/components/public-location-page"
 
 export const runtime = 'nodejs';
 
@@ -11,7 +11,22 @@ interface SlugPageProps {
   }
 }
 
-export default async function PublicLocationPage({ params }: SlugPageProps) {
+import locationManagers from "@/data/location-managers.json"
+
+// Map of Regional Manager names to their image paths
+const rmImages: Record<string, string> = {
+  "Amanda Bishop": "/amandanew.webp",
+  "Callum Clifford": "/callumnew.webp",
+  "Paula Muers": "/paulanew.webp",
+  "Giorgia Shepherd": "/giorgianew.webp",
+  "Jemma Mills": "/jemmanew.webp",
+  "Michelle Clark": "/michellenew.webp",
+  "Sharon O'Rourke": "/sharonnew.webp",
+  "Paul": "/paulnew.webp",
+  "Suki": "/sukinew.webp"
+}
+
+export default async function LocationPage({ params }: SlugPageProps) {
   // No authentication required - this is a public route
 
   // Fetch all locations
@@ -39,6 +54,24 @@ export default async function PublicLocationPage({ params }: SlugPageProps) {
 
   if (!location) {
     notFound()
+  }
+
+  // Find Regional Manager for this location
+  const managerData = locationManagers.find((m: any) => m.Location === location.name)
+
+  let regionalManager = undefined
+  if (managerData && managerData["Regional Manager"]) {
+    const name = managerData["Regional Manager"]
+    const imageSrc = rmImages[name] || rmImages[name.split(' ')[0]] // Try full name, then first name
+
+    if (imageSrc) {
+      regionalManager = {
+        name,
+        email: managerData["RM Email"] || undefined,
+        phone: managerData["RM Telephone"] ? String(managerData["RM Telephone"]) : (managerData["RM Tel:"] ? String(managerData["RM Tel:"]) : undefined),
+        imageSrc
+      }
+    }
   }
 
   // Serialize location data (same as dashboard2/page.tsx)
@@ -110,7 +143,7 @@ export default async function PublicLocationPage({ params }: SlugPageProps) {
     })),
   }
 
-  return <LocationDiscoveryPage location={serializedLocation} />
+  return <PublicLocationPage location={serializedLocation} regionalManager={regionalManager} />
 }
 
 

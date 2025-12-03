@@ -13,17 +13,21 @@ import { Menu } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [
-  { label: "Locations", href: "#locations" },
-  { label: "NMTF", href: "#nmtf" },
+  { label: "Our Locations", href: "#locations" },
   { label: "Looking For Space?", href: "#looking-for-space" },
   { label: "Join our portfolio", href: "#join-portfolio" },
   { label: "Trader Stories", href: "#trader-stories" },
-  { label: "Team/About Us", href: "#team" },
+  { label: "About Us", href: "#team" },
   { label: "Video Gallery", href: "#video-gallery" },
   { label: "Contact Us", href: "#contact" },
 ]
 
-export function V2Navigation() {
+interface V2NavigationProps {
+  forceSolid?: boolean
+  useAbsoluteLinks?: boolean
+}
+
+export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V2NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
@@ -41,19 +45,21 @@ export function V2Navigation() {
     }
   }, [])
 
+  const showSolid = forceSolid || isScrolled
+
   return (
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled
+        showSolid
           ? "bg-[#4D4A46] border-b border-[#D8D8D6]"
           : "bg-transparent border-b border-transparent"
       )}
-      style={isScrolled ? { backgroundColor: '#4D4A46' } : { backgroundColor: 'transparent' }}
+      style={showSolid ? { backgroundColor: '#4D4A46' } : { backgroundColor: 'transparent' }}
     >
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/v2" className="flex items-center space-x-2">
+        <Link href={useAbsoluteLinks ? "/v2" : "/v2"} className="flex items-center space-x-2">
           <Image
             src="/flourishlogonew.png"
             alt="Flourish"
@@ -69,10 +75,10 @@ export function V2Navigation() {
           {navigationItems.map((item) => (
             <Link
               key={item.href}
-              href={item.href}
+              href={useAbsoluteLinks ? `/v2${item.href}` : item.href}
               className={cn(
-                "text-sm font-medium transition-colors",
-                isScrolled
+                "text-base font-medium transition-colors",
+                showSolid
                   ? "text-white/90 hover:text-[#E6FB60]"
                   : "text-white/90 hover:text-[#E6FB60] drop-shadow-md"
               )}
@@ -84,12 +90,12 @@ export function V2Navigation() {
 
         {/* Right side - Sign in, Mobile menu */}
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="outline" 
-            asChild 
+          <Button
+            variant="outline"
+            asChild
             className={cn(
               "hidden md:inline-flex transition-colors",
-              isScrolled
+              showSolid
                 ? "bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
                 : "bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
             )}
@@ -100,9 +106,9 @@ export function V2Navigation() {
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild className="md:hidden">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="text-white hover:bg-white/10"
               >
                 <Menu className="h-5 w-5" />
@@ -114,7 +120,7 @@ export function V2Navigation() {
                 {navigationItems.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={useAbsoluteLinks ? `/v2${item.href}` : item.href}
                     className="text-base font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {item.label}

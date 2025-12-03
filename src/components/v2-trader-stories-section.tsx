@@ -19,8 +19,8 @@ export function V2TraderStoriesSection() {
         {/* Key Message */}
         <div className="bg-[#E6FB60] py-8 px-6 rounded-lg mb-16 max-w-4xl mx-auto">
           <p className="text-lg md:text-xl text-[#4D4A46] text-center font-medium">
-            No rate cards, we understand the space and the opportunity to help make it work for 
-            both the client and the trader. Every business deserves the opportunity to showcase 
+            No rate cards, we understand the space and the opportunity to help make it work for
+            both the client and the trader. Every business deserves the opportunity to showcase
             their product to others — let us help you make that dream a reality.
           </p>
         </div>
@@ -68,29 +68,41 @@ export function V2TraderStoriesSection() {
           </Card>
         </div>
 
-        {/* Retention Data */}
-        <div className="mb-16 bg-[#F7F4F2] py-12 rounded-lg">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <TrendingUp className="h-12 w-12 text-[#E6FB60]" />
+        {/* Trader Retention */}
+        <div className="mb-16">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
               <h3 className="text-3xl md:text-4xl font-bold text-[#4D4A46]">
                 Trader Retention
               </h3>
-            </div>
-            <div className="bg-white p-8 rounded-lg border border-[#D8D8D6] max-w-2xl mx-auto">
-              <p className="text-2xl md:text-3xl font-bold text-[#4D4A46] mb-4">
-                80% More Likely to Rebook
-              </p>
-              <p className="text-lg text-[#4D4A46] font-medium">
-                Traders who book with us for the 4th time are 80% more likely to rebook, 
-                demonstrating the value and satisfaction of our partnership approach.
-              </p>
-              <div className="mt-6 pt-6 border-t border-[#D8D8D6]">
-                <p className="text-sm text-[#4D4A46] font-medium">
+              <div className="space-y-4">
+                <h4 className="text-2xl font-bold text-[#E6FB60] bg-[#4D4A46] inline-block px-3 py-1 rounded">
+                  80% More Likely to Rebook
+                </h4>
+                <p className="text-lg text-[#4D4A46] leading-relaxed">
+                  Traders who book with us for the 4th time are 80% more likely to rebook,
+                  demonstrating the value and satisfaction of our partnership approach.
+                </p>
+                <p className="text-lg text-[#4D4A46] leading-relaxed">
                   This retention rate reflects our commitment to understanding each trader&apos;s
                   unique needs and creating sustainable, long-term opportunities.
                 </p>
               </div>
+            </div>
+            <div className="relative">
+              <div className="aspect-video bg-[#D8D8D6] rounded-lg overflow-hidden shadow-xl">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/c4KHL_aey8U"
+                  title="Trader Retention"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+              {/* Decorative element */}
+              <div className="absolute -z-10 top-4 -right-4 w-full h-full bg-[#E6FB60] rounded-lg opacity-50" />
             </div>
           </div>
         </div>
