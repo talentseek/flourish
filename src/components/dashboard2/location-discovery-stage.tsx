@@ -36,13 +36,9 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
     setShowPreReservation(true)
   }
 
+
   return (
     <div className="space-y-6">
-      {/* PDF Download Button */}
-      <div className="flex justify-end">
-        <PDFDownloadButton location={location} contentRef={contentRef} />
-      </div>
-
       {/* Content Container with ref for PDF generation */}
       <div id="location-content" ref={contentRef} className="space-y-6">
         {/* Hero Section with Website Prominence */}
@@ -78,12 +74,17 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
         {/* Full Width Sections */}
         <LocationTenantsSection location={location} />
 
-        {/* Action Button */}
-        <div className="flex justify-center pt-4">
+        {/* Action Section */}
+        <div className="bg-[#4D4A46] rounded-xl p-8 text-center">
+          <h3 className="text-xl font-bold text-[#E6FB60] mb-3">Ready to explore opportunities?</h3>
+          <p className="text-white/90 mb-6 max-w-2xl mx-auto">
+            Flourish provides comprehensive retail intelligence for shopping centres across the UK.
+            Access footfall data, demographics, competitor analysis, and connect directly with our regional team.
+          </p>
           <Button
             onClick={handleCompareClick}
             size="lg"
-            className="gap-2"
+            className="gap-2 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
           >
             Get Full Analytics and Comparison
             <ArrowRight className="h-4 w-4" />

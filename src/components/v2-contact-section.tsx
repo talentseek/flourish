@@ -60,8 +60,8 @@ export function V2ContactSection() {
               <p className="text-sm text-muted-foreground mb-4">
                 Enquiry form linking to your trader onboarding team
               </p>
-              <Button 
-                asChild 
+              <Button
+                asChild
                 variant="outline"
                 className="w-full bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
               >
@@ -78,8 +78,8 @@ export function V2ContactSection() {
               <p className="text-sm text-muted-foreground mb-4">
                 Contact for property or commercialisation discussions
               </p>
-              <Button 
-                asChild 
+              <Button
+                asChild
                 variant="outline"
                 className="w-full bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
               >
@@ -96,8 +96,8 @@ export function V2ContactSection() {
               <p className="text-sm text-muted-foreground mb-4">
                 For everything else
               </p>
-              <Button 
-                asChild 
+              <Button
+                asChild
                 variant="outline"
                 className="w-full bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
               >
@@ -225,8 +225,8 @@ export function V2ContactSection() {
             <span className="font-semibold text-lg">Prefer to talk?</span>
           </div>
           <div>
-            <Button 
-              asChild 
+            <Button
+              asChild
               variant="outline"
               size="lg"
               className="border-[#4D4A46] bg-[#4D4A46] text-white hover:bg-[#4D4A46]/90 text-lg px-8 py-6"
@@ -244,9 +244,9 @@ export function V2ContactSection() {
             </CardHeader>
             <CardContent>
               <p className="text-[#4D4A46] italic mb-4 font-medium">
-                &quot;Flourish helped us find the perfect space — and we were trading within a week!&quot;
+                &quot;Working with Flourish has been transformational for our business — they are always proactive, dependable, and ready to help at a moment&apos;s notice.&quot;
               </p>
-              <p className="font-semibold text-[#4D4A46]">— Spud Haven, One Stop</p>
+              <p className="font-semibold text-[#4D4A46]">— Rukhsana, Spud Haven, One Stop Perry Barr</p>
             </CardContent>
           </Card>
 
@@ -267,7 +267,7 @@ export function V2ContactSection() {
           <div className="flex items-center justify-center gap-2 mb-4">
             <Shield className="h-5 w-5 text-[#E6FB60]" />
             <p className="text-sm text-[#4D4A46] font-medium">
-              <strong className="text-[#4D4A46]">Trust & Compliance:</strong> Your information is 
+              <strong className="text-[#4D4A46]">Trust & Compliance:</strong> Your information is
               confidential and will only be used to respond to your enquiry.
             </p>
           </div>

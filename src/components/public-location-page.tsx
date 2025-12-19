@@ -30,8 +30,8 @@ export function PublicLocationPage({ location, regionalManager }: PublicLocation
         <div className="min-h-screen flex flex-col bg-white">
             <V2Navigation forceSolid={true} useAbsoluteLinks={true} />
 
-            <main className="flex-1 pt-20"> {/* pt-20 to account for fixed navigation */}
-                <div className="container mx-auto px-4 py-8">
+            <main className={`flex-1 ${location.heroImage ? 'pt-[64px]' : 'pt-20'}`}>
+                <div className="container mx-auto px-4 py-0">
                     <LocationDiscoveryStage
                         location={location}
                         onCompareClick={handleCompareClick}
@@ -43,7 +43,7 @@ export function PublicLocationPage({ location, regionalManager }: PublicLocation
 
             {/* Floating Assistant or RM Widget */}
             {regionalManager ? (
-                <RegionalManagerWidget {...regionalManager} />
+                <RegionalManagerWidget {...regionalManager} locationName={location.name} />
             ) : (
                 <AssistantWidget />
             )}

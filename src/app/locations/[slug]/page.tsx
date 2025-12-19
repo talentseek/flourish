@@ -97,6 +97,7 @@ export default async function LocationPage({ params }: SlugPageProps) {
     owner: location.owner ?? undefined,
     management: location.management ?? undefined,
     openedYear: location.openedYear ?? undefined,
+    heroImage: location.heroImage ?? undefined,
     footfall: location.footfall ?? undefined,
     retailers: location.retailers ?? undefined,
     carParkPrice: location.carParkPrice != null ? Number(location.carParkPrice) : undefined,

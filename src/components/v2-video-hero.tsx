@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { LogoCarousel } from "@/components/logo-carousel"
 
 export function V2VideoHero() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -30,12 +31,12 @@ export function V2VideoHero() {
   // Logo flip animation after video fades in
   useEffect(() => {
     let returnTimer: NodeJS.Timeout | null = null
-    
+
     // Wait for video fade-in to complete (0.9s transition + 100ms delay = ~1000ms)
     const logoAnimationTimer = setTimeout(() => {
       // First flip to mirror
       setLogoFlip('mirror')
-      
+
       // Then return to normal after a brief pause
       returnTimer = setTimeout(() => {
         setLogoFlip('normal-final')
@@ -59,7 +60,7 @@ export function V2VideoHero() {
       // Hero content fades out when scrollProgress = 0.5 (contentOpacity reaches 0)
       // Stop parallax scaling when content fades out
       const parallaxStopPoint = 0.5
-      
+
       if (scrollProgress < parallaxStopPoint) {
         // Still in parallax phase - scale video down as user scrolls
         const parallaxProgress = scrollProgress / parallaxStopPoint
@@ -115,8 +116,8 @@ export function V2VideoHero() {
         style={{
           transform: `scale(${scale})`,
           opacity: videoOpacity,
-          transition: isFixed 
-            ? "transform 0.1s ease-out, opacity 0.9s ease-out" 
+          transition: isFixed
+            ? "transform 0.1s ease-out, opacity 0.9s ease-out"
             : "transform 0.1s ease-out",
         }}
       >
@@ -143,7 +144,7 @@ export function V2VideoHero() {
       />
 
       {/* Hero Content */}
-      <div 
+      <div
         className="relative z-10 flex h-full items-center justify-center"
         style={{
           opacity: contentOpacity,
@@ -171,21 +172,23 @@ export function V2VideoHero() {
               Transforming retail space into thriving destinations
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="text-lg px-8 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 border-0 font-semibold"
               >
                 <Link href="#join-portfolio">I&apos;m a Landlord/Managing Agent</Link>
               </Button>
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="text-lg px-8 bg-white/10 text-white border-2 border-white/50 hover:bg-white/20 backdrop-blur font-semibold"
               >
                 <Link href="#looking-for-space">I&apos;m an Operator</Link>
               </Button>
             </div>
+            {/* Logo Carousel */}
+            <LogoCarousel />
           </div>
         </div>
       </div>

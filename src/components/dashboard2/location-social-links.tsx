@@ -42,7 +42,7 @@ export function LocationSocialLinks({ location }: LocationSocialLinksProps) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <span className="text-sm font-medium text-muted-foreground">Follow us:</span>
+      <span className="text-sm font-medium text-muted-foreground">Social Media:</span>
       {socialLinks.map((link) => {
         const Icon = link.icon
         return (

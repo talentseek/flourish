@@ -52,8 +52,8 @@ export function LocationHeroSection({ location }: LocationHeroSectionProps) {
     },
     {
       label: "Health Index",
-      value: location.healthIndex !== undefined && location.healthIndex !== null 
-        ? location.healthIndex.toFixed(1) 
+      value: location.healthIndex !== undefined && location.healthIndex !== null
+        ? location.healthIndex.toFixed(1)
         : "N/A",
       icon: TrendingUp,
     },
@@ -66,48 +66,129 @@ export function LocationHeroSection({ location }: LocationHeroSectionProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div className="space-y-3 flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-4xl font-bold tracking-tight">{location.name}</h1>
-            <Badge variant={location.type === 'SHOPPING_CENTRE' ? "default" : "secondary"}>
-              {getTypeLabel(location.type)}
-            </Badge>
-            {location.openedYear && (
-              <Badge variant="outline">
-                Est. {location.openedYear}
+      {/* Hero Image Section */}
+      {location.heroImage && (
+        <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${location.heroImage})` }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 lg:p-12 text-white">
+            <div className="flex items-center gap-3 flex-wrap mb-2">
+              <h1 className="text-4xl font-bold tracking-tight drop-shadow-lg">{location.name}</h1>
+              <Badge variant={location.type === 'SHOPPING_CENTRE' ? "default" : "secondary"} className="bg-[#E6FB60] text-[#4D4A46]">
+                {getTypeLabel(location.type)}
               </Badge>
+              {location.openedYear && (
+                <Badge variant="outline" className="border-white/50 text-white">
+                  Est. {location.openedYear}
+                </Badge>
+              )}
+            </div>
+            <p className="flex items-center gap-2 text-white/90 drop-shadow mb-3">
+              <MapPin className="h-4 w-4" />
+              {location.address}, {location.city}, {location.county}
+            </p>
+            {/* Social Media Links - Inside Hero */}
+            {(location.instagram || location.facebook || location.youtube || location.tiktok || location.twitter) && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-medium text-white/70">Social Media:</span>
+                {location.instagram && (
+                  <a href={location.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-medium hover:opacity-90">
+                    Instagram
+                  </a>
+                )}
+                {location.facebook && (
+                  <a href={location.facebook} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded bg-blue-600 text-white text-xs font-medium hover:opacity-90">
+                    Facebook
+                  </a>
+                )}
+                {location.twitter && (
+                  <a href={location.twitter} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded bg-sky-500 text-white text-xs font-medium hover:opacity-90">
+                    Twitter
+                  </a>
+                )}
+                {location.youtube && (
+                  <a href={location.youtube} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-600 text-white text-xs font-medium hover:opacity-90">
+                    YouTube
+                  </a>
+                )}
+                {location.tiktok && (
+                  <a href={location.tiktok} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-2 py-1 rounded bg-black text-white text-xs font-medium hover:opacity-90">
+                    TikTok
+                  </a>
+                )}
+              </div>
             )}
           </div>
-          <p className="text-muted-foreground flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            {location.address}, {location.city}, {location.county}
-          </p>
+          {/* Website Button - Prominent */}
+          {location.website && (
+            <div className="absolute top-4 right-4">
+              <Button
+                size="lg"
+                className="gap-2 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 shadow-lg"
+                asChild
+              >
+                <a
+                  href={location.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Globe className="h-5 w-5" />
+                  Visit Website
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          )}
         </div>
+      )}
 
-        {/* Website Button - Prominent */}
-        {location.website && (
-          <Button
-            size="lg"
-            className="gap-2"
-            asChild
-          >
-            <a
-              href={location.website}
-              target="_blank"
-              rel="noopener noreferrer"
+      {/* Header Section (shown only if no hero image) */}
+      {!location.heroImage && (
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-4xl font-bold tracking-tight text-[#4D4A46]">{location.name}</h1>
+              <Badge variant={location.type === 'SHOPPING_CENTRE' ? "default" : "secondary"}>
+                {getTypeLabel(location.type)}
+              </Badge>
+              {location.openedYear && (
+                <Badge variant="outline">
+                  Est. {location.openedYear}
+                </Badge>
+              )}
+            </div>
+            <p className="text-[#4D4A46] flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              {location.address}, {location.city}, {location.county}
+            </p>
+          </div>
+
+          {/* Website Button - Prominent */}
+          {location.website && (
+            <Button
+              size="lg"
+              className="gap-2"
+              asChild
             >
-              <Globe className="h-5 w-5" />
-              Visit Website
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
-        )}
-      </div>
+              <a
+                href={location.website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Globe className="h-5 w-5" />
+                Visit Website
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          )}
+        </div>
+      )}
 
-      {/* Social Media Links */}
-      {(location.instagram || location.facebook || location.youtube || location.tiktok || location.twitter) && (
+      {/* Social Media Links (only when no hero image - hero has its own) */}
+      {!location.heroImage && (location.instagram || location.facebook || location.youtube || location.tiktok || location.twitter) && (
         <LocationSocialLinks location={location} />
       )}
 

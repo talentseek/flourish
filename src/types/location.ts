@@ -16,12 +16,13 @@ export interface Location {
   numberOfFloors?: number
   anchorTenants?: number
   openedYear?: number
+  heroImage?: string
   publicTransit?: string
   owner?: string
   management?: string
   openingHours?: any
   tenants: Tenant[]
-  
+
   // Enhanced details
   footfall?: number
   retailers?: number
@@ -29,7 +30,7 @@ export interface Location {
   retailSpace?: number
   evCharging?: boolean
   evChargingSpaces?: number
-  
+
   // CSV KPIs
   healthIndex?: number
   largestCategory?: string
@@ -54,14 +55,14 @@ export interface Location {
   floorspaceVacancyRetail?: number
   floorspaceVacancyRetailGrowth?: number
   floorspacePersistentVacancy?: number
-  
+
   // Social media links
   instagram?: string
   facebook?: string
   youtube?: string
   tiktok?: string
   twitter?: string
-  
+
   // Online reviews
   googleRating?: number
   googleReviews?: number
@@ -69,11 +70,11 @@ export interface Location {
   facebookRating?: number
   facebookReviews?: number
   facebookVotes?: number
-  
+
   // SEO data
   seoKeywords?: any[]
   topPages?: any[]
-  
+
   // Demographics
   population?: number
   medianAge?: number

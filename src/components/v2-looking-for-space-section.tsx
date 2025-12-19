@@ -151,18 +151,30 @@ export function V2LookingForSpaceSection() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
-              "Compliance guidance (PAT, RAMS, insurance)",
-              "Visual merchandising advice",
-              "Help connecting to local audiences",
-              "Access to premium space usually reserved for major brands",
-            ].map((item, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <CheckCircle2 className="h-6 w-6 text-[#E6FB60] flex-shrink-0 mt-0.5" />
-                <p className="text-[#4D4A46]">{item}</p>
-              </div>
-            ))}
+              { icon: FileCheck, title: "Compliance guidance", desc: "PAT testing, RAMS, insurance — we'll help you get everything in order" },
+              { icon: TrendingUp, title: "Visual merchandising advice", desc: "Expert tips to make your stand look its best and attract customers" },
+              { icon: Users, title: "Help connecting to local audiences", desc: "Marketing support and insights to reach shoppers in your area" },
+              { icon: MapPin, title: "Access to premium space", desc: "Locations usually reserved for major brands, now accessible to you" },
+            ].map((item, index) => {
+              const Icon = item.icon
+              return (
+                <Card key={index} className="border-[#4D4A46] bg-[#4D4A46]">
+                  <CardHeader>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 bg-[#E6FB60]/20 rounded-lg">
+                        <Icon className="h-6 w-6 text-[#E6FB60]" />
+                      </div>
+                      <CardTitle className="text-xl text-[#E6FB60]">{item.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-white font-medium">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
 
@@ -177,16 +189,20 @@ export function V2LookingForSpaceSection() {
           <Card className="max-w-3xl mx-auto mb-8 border-[#D8D8D6] bg-[#4D4A46] border-[#4D4A46]">
             <CardHeader>
               <CardTitle className="text-2xl text-[#E6FB60]">Spud Haven</CardTitle>
-              <CardDescription className="text-white">One Stop Shopping Centre</CardDescription>
+              <CardDescription className="text-white">One Stop Shopping Centre, Perry Barr</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-lg text-white italic mb-4 font-medium">
-                &quot;Flourish made the whole process easy — from day one we felt supported.&quot;
+                &quot;Working with Callum and This Is Flourish has been one of the best decisions we&apos;ve made.&quot;
               </p>
-              <p className="text-white font-medium">
-                Spud Haven found the perfect space at One Stop Shopping Centre and was trading within
-                a week. Our team provided comprehensive support throughout the setup process, from
-                compliance documentation to visual merchandising advice.
+              <p className="text-white font-medium mb-4">
+                From the moment we partnered with Callum and the team at This Is Flourish, the experience has been outstanding. Callum has made every stage of the process effortless, demonstrating a level of professionalism, responsiveness, and genuine care that is rare to find.
+              </p>
+              <p className="text-white font-medium mb-4">
+                Working with Flourish has been transformational for our business. Their expertise, creativity, and hands-on approach have not only streamlined our operations but also contributed to a noticeable increase in performance and growth. Since joining forces with them, business has been thriving, and we&apos;re already exploring opportunities to expand into additional venues together.
+              </p>
+              <p className="text-white/80 text-sm mt-4">
+                — Rukhsana, Spud Haven
               </p>
             </CardContent>
           </Card>
