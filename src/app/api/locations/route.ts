@@ -15,6 +15,8 @@ export async function GET() {
         type: true,
         latitude: true,
         longitude: true,
+        numberOfStores: true,
+        heroImage: true,
       },
       orderBy: {
         name: 'asc'
