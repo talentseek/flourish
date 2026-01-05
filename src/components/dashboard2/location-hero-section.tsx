@@ -11,6 +11,28 @@ interface LocationHeroSectionProps {
   location: Location
 }
 
+// Helper to compute most common category from tenants
+function getMostCommonCategory(tenants: { category: string }[]): string {
+  if (!tenants || tenants.length === 0) return "N/A"
+
+  const counts: Record<string, number> = {}
+  tenants.forEach(t => {
+    const cat = t.category || "Other"
+    counts[cat] = (counts[cat] || 0) + 1
+  })
+
+  let maxCat = "Other"
+  let maxCount = 0
+  Object.entries(counts).forEach(([cat, count]) => {
+    if (count > maxCount) {
+      maxCount = count
+      maxCat = cat
+    }
+  })
+
+  return maxCat
+}
+
 export function LocationHeroSection({ location }: LocationHeroSectionProps) {
   const formatNumber = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(num)) {
@@ -42,7 +64,8 @@ export function LocationHeroSection({ location }: LocationHeroSectionProps) {
   const quickStats = [
     {
       label: "Stores",
-      value: location.numberOfStores ? formatNumber(location.numberOfStores) : "N/A",
+      value: location.numberOfStores ? formatNumber(location.numberOfStores) :
+        (location.tenants?.length ? formatNumber(location.tenants.length) : "N/A"),
       icon: Building2,
     },
     {
@@ -51,16 +74,15 @@ export function LocationHeroSection({ location }: LocationHeroSectionProps) {
       icon: Users,
     },
     {
-      label: "Health Index",
-      value: location.healthIndex !== undefined && location.healthIndex !== null
-        ? location.healthIndex.toFixed(1)
-        : "N/A",
-      icon: TrendingUp,
+      label: "Tenants",
+      value: location.tenants?.length ? formatNumber(location.tenants.length) : "N/A",
+      icon: Tag,
     },
     {
       label: "Largest Category",
-      value: location.largestCategory || "N/A",
-      icon: Tag,
+      value: location.largestCategory ||
+        (location.tenants?.length ? getMostCommonCategory(location.tenants) : "N/A"),
+      icon: TrendingUp,
     },
   ]
 
