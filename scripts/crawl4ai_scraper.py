@@ -64,7 +64,13 @@ async def crawl_stores(url: str, api_key: str):
             if result.success and result.extracted_content:
                 try:
                     data = json.loads(result.extracted_content)
-                    stores = data.get("stores", [])
+                    # Handle both list and dict responses
+                    if isinstance(data, list):
+                        stores = data
+                    elif isinstance(data, dict):
+                        stores = data.get("stores", [])
+                    else:
+                        stores = []
                     return stores
                 except Exception as e:
                     print(json.dumps({"error": f"Parse error: {str(e)}"}), file=sys.stderr)

@@ -12,7 +12,7 @@ import { LocationCommercialKPIs } from "./location-commercial-kpis"
 import { LocationDemographicsSection } from "./location-demographics-section"
 import { LocationSEOSection } from "./location-seo-section"
 import { LocationTenantsSection } from "./location-tenants-section"
-import { LocationOperationalSection } from "./location-operational-section"
+import { LocationParkingCard, LocationPropertyCard, LocationOwnershipCard } from "./location-compact-cards"
 import { PDFDownloadButton } from "./pdf-download-button"
 import { generateSlug } from "@/lib/slug-utils"
 import { useRouter } from "next/navigation"
@@ -47,27 +47,36 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
         {/* Key Metrics */}
         <LocationMetricsGrid location={location} />
 
-        {/* Main Content Grid */}
+        {/* Operational Cards Row - 3 columns on desktop */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Parking Card */}
+          <LocationParkingCard location={location} />
+
+          {/* Property Details Card */}
+          <LocationPropertyCard location={location} />
+
+          {/* Ownership Card */}
+          <LocationOwnershipCard location={location} />
+        </div>
+
+        {/* Main Content Grid - Balanced 2 columns */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Left Column */}
           <div className="space-y-6">
-            {/* Commercial Performance */}
-            <LocationCommercialKPIs location={location} />
-
             {/* Reviews */}
             <LocationReviewsSection location={location} />
 
-            {/* SEO Data */}
-            <LocationSEOSection location={location} />
+            {/* Demographics */}
+            <LocationDemographicsSection location={location} />
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Operational Details */}
-            <LocationOperationalSection location={location} />
+            {/* Commercial Performance */}
+            <LocationCommercialKPIs location={location} />
 
-            {/* Demographics */}
-            <LocationDemographicsSection location={location} />
+            {/* SEO Data */}
+            <LocationSEOSection location={location} />
           </div>
         </div>
 
