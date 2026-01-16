@@ -136,7 +136,7 @@ export function RegionalManagerWidget({ name, phone, email, imageSrc, locationNa
                     <div className="bg-white rounded-lg shadow-lg p-3 max-w-[200px] border-2 border-[#E6FB60] relative">
                         <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-8 border-b-8 border-l-8 border-transparent border-l-white" />
                         <p className="text-sm text-[#4D4A46] font-medium">
-                            👋 Need help exploring this location?
+                            👋 Hi! I&apos;m {name.split(' ')[0]}, your Regional Manager for {locationName || 'this location'}. How can I help?
                         </p>
                     </div>
                 </div>
