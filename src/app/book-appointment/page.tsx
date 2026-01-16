@@ -133,8 +133,8 @@ export default function BookAppointmentPage() {
                                                                 type="button"
                                                                 onClick={() => setSelectedDate(dateStr)}
                                                                 className={`flex-shrink-0 p-3 rounded-lg border-2 text-center min-w-[70px] transition-all ${isSelected
-                                                                        ? 'border-[#E6FB60] bg-[#E6FB60] text-[#4D4A46]'
-                                                                        : 'border-[#D8D8D6] hover:border-[#4D4A46]/30'
+                                                                    ? 'border-[#E6FB60] bg-[#E6FB60] text-[#4D4A46]'
+                                                                    : 'border-[#D8D8D6] bg-white text-[#4D4A46] hover:border-[#4D4A46]/30'
                                                                     }`}
                                                             >
                                                                 <div className="text-xs font-medium">
@@ -163,8 +163,8 @@ export default function BookAppointmentPage() {
                                                                 type="button"
                                                                 onClick={() => setSelectedTime(time)}
                                                                 className={`p-2 rounded-lg border text-sm font-medium transition-all ${selectedTime === time
-                                                                        ? 'border-[#E6FB60] bg-[#E6FB60] text-[#4D4A46]'
-                                                                        : 'border-[#D8D8D6] hover:border-[#4D4A46]/30'
+                                                                    ? 'border-[#E6FB60] bg-[#E6FB60] text-[#4D4A46]'
+                                                                    : 'border-[#D8D8D6] bg-white text-[#4D4A46] hover:border-[#4D4A46]/30'
                                                                     }`}
                                                             >
                                                                 {time}
@@ -302,7 +302,7 @@ export default function BookAppointmentPage() {
                                         </h3>
                                         <div className="space-y-4">
                                             <a
-                                                href="tel:+441onal234567890"
+                                                href="tel:+442073588125"
                                                 className="flex items-center gap-3 hover:text-[#E6FB60] transition-colors"
                                             >
                                                 <div className="w-10 h-10 rounded-full bg-[#E6FB60]/20 flex items-center justify-center">
@@ -310,7 +310,7 @@ export default function BookAppointmentPage() {
                                                 </div>
                                                 <div>
                                                     <div className="text-sm text-white/60">Call us</div>
-                                                    <div className="font-semibold">0800 123 4567</div>
+                                                    <div className="font-semibold">(+44) 020 7358 8125</div>
                                                 </div>
                                             </a>
 
