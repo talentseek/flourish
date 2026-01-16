@@ -59,7 +59,7 @@ export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V
     >
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href={useAbsoluteLinks ? "/v2" : "/v2"} className="flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2">
           <Image
             src="/flourishlogonew.png"
             alt="Flourish"
@@ -75,7 +75,7 @@ export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V
           {navigationItems.map((item) => (
             <Link
               key={item.href}
-              href={useAbsoluteLinks ? `/v2${item.href}` : item.href}
+              href={useAbsoluteLinks ? `/${item.href}` : item.href}
               className={cn(
                 "text-base font-medium transition-colors",
                 showSolid
@@ -120,7 +120,7 @@ export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V
                 {navigationItems.map((item) => (
                   <Link
                     key={item.href}
-                    href={useAbsoluteLinks ? `/v2${item.href}` : item.href}
+                    href={useAbsoluteLinks ? `/${item.href}` : item.href}
                     className="text-base font-medium text-foreground hover:text-primary transition-colors"
                   >
                     {item.label}
