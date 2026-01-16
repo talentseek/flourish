@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'content.landsec.com',
+        pathname: '/**',
+      },
+    ],
+  },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
   },
