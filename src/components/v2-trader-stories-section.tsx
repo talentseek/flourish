@@ -29,20 +29,25 @@ export function V2TraderStoriesSection() {
         <div className="grid md:grid-cols-2 gap-8 mb-16">
           <Card className="border-[#D8D8D6] overflow-hidden">
             <CardContent className="p-0">
-              <div className="aspect-video bg-[#F7F4F2] flex items-center justify-center border-b border-[#D8D8D6]">
-                <div className="text-center">
-                  <Play className="h-12 w-12 text-[#E6FB60] mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Trader video testimonial 1</p>
-                </div>
+              <div className="aspect-video bg-[#D8D8D6] border-b border-[#D8D8D6]">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/0dc9dk6AKws"
+                  title="Bringing Luxury Scents to Bootle: Callum Interviews Ayush Kundaria of Oudvana"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
               </div>
               <div className="p-6">
                 <Quote className="h-6 w-6 text-[#E6FB60] mb-2" />
                 <p className="text-muted-foreground italic mb-4">
-                  &quot;Flourish helped us find the perfect space and we were trading within a week.
-                  The support throughout was incredible.&quot;
+                  &quot;Flourish helped us establish Oudvana and bring luxury oud fragrances to The Strand.
+                  Their support made our vision of refined fragrance experiences a reality.&quot;
                 </p>
-                <p className="font-semibold text-[#E6FB60]">— Independent Trader</p>
-                <p className="text-sm text-muted-foreground">Shopping Centre Location</p>
+                <p className="font-semibold text-[#E6FB60]">— Ayush Kundaria, Founder of Oudvana</p>
+                <p className="text-sm text-muted-foreground">The Strand Shopping Centre, Bootle</p>
               </div>
             </CardContent>
           </Card>
