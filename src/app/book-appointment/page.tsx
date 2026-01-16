@@ -110,7 +110,7 @@ export default function BookAppointmentPage() {
 
                             {/* Booking Form */}
                             <div className="lg:col-span-2">
-                                <Card className="border-[#D8D8D6] shadow-lg">
+                                <Card className="border-[#D8D8D6] shadow-lg bg-white">
                                     <CardContent className="p-6 md:p-8">
                                         <h2 className="text-2xl font-bold text-[#4D4A46] mb-6 flex items-center gap-2">
                                             <Calendar className="h-6 w-6 text-[#E6FB60]" />
@@ -270,7 +270,7 @@ export default function BookAppointmentPage() {
                             {/* Contact Info Sidebar */}
                             <div className="space-y-6">
                                 {/* What to Expect */}
-                                <Card className="border-[#D8D8D6]">
+                                <Card className="border-[#D8D8D6] bg-white">
                                     <CardContent className="p-6">
                                         <h3 className="font-bold text-[#4D4A46] mb-4 flex items-center gap-2">
                                             <Clock className="h-5 w-5 text-[#E6FB60]" />
