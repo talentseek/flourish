@@ -385,7 +385,7 @@ export default function LandSecDemoPage() {
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Image
-                            src="https://content.landsec.com/media/t5lnuchl/logo-b-90x90.png"
+                            src="/landsec-logo.png"
                             alt="Landsec"
                             width={50}
                             height={50}
@@ -586,8 +586,8 @@ export default function LandSecDemoPage() {
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${activeTab === tab
-                                            ? 'bg-[#E6FB60] text-[#002855]'
-                                            : 'bg-white/10 text-white/70 hover:bg-white/20'
+                                        ? 'bg-[#E6FB60] text-[#002855]'
+                                        : 'bg-white/10 text-white/70 hover:bg-white/20'
                                         }`}
                                 >
                                     {tab === 'all' ? 'All Properties' :
@@ -719,7 +719,7 @@ export default function LandSecDemoPage() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <Image
-                                src="https://content.landsec.com/media/t5lnuchl/logo-b-90x90.png"
+                                src="/landsec-logo.png"
                                 alt="Landsec"
                                 width={40}
                                 height={40}
