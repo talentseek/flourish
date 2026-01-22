@@ -22,18 +22,12 @@ interface LocationDiscoveryStageProps {
   onCompareClick: () => void
 }
 
-import { useState } from "react"
-import { PreReservationDialog } from "@/components/pre-reservation-dialog"
-
-// ... imports
-
 export function LocationDiscoveryStage({ location, onCompareClick }: LocationDiscoveryStageProps) {
   const router = useRouter()
   const contentRef = useRef<HTMLDivElement>(null)
-  const [showPreReservation, setShowPreReservation] = useState(false)
 
   const handleCompareClick = () => {
-    setShowPreReservation(true)
+    onCompareClick()  // Call the parent's handler to advance to Compare stage
   }
 
 
@@ -100,11 +94,6 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
           </Button>
         </div>
       </div>
-
-      <PreReservationDialog
-        open={showPreReservation}
-        onOpenChange={setShowPreReservation}
-      />
     </div>
   )
 }
