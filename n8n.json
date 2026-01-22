@@ -1,0 +1,62 @@
+{
+    "name": "[Tool] Firecrawl Scraper",
+    "nodes": [
+        {
+            "parameters": {
+                "inputDataMode": "define",
+                "inputFields": {
+                    "fields": [
+                        {
+                            "name": "url",
+                            "description": "The URL to scrape (e.g. https://company.com/about)",
+                            "required": true
+                        }
+                    ]
+                }
+            },
+            "type": "n8n-nodes-base.executeWorkflowTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                480,
+                224
+            ],
+            "id": "trigger",
+            "name": "When Executed by Another Workflow"
+        },
+        {
+            "parameters": {
+                "resource": "scrape",
+                "url": "={{ $json.url }}",
+                "includeMarkdown": true,
+                "onlyMainContent": true
+            },
+            "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+            "typeVersion": 1,
+            "position": [
+                700,
+                224
+            ],
+            "id": "firecrawl-node",
+            "name": "Firecrawl Scrape",
+            "credentials": {
+                "firecrawlApi": {
+                    "id": "YOUR_CREDS_ID",
+                    "name": "Firecrawl account"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "When Executed by Another Workflow": {
+            "main": [
+                [
+                    {
+                        "node": "Firecrawl Scrape",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
