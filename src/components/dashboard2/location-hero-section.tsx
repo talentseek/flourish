@@ -74,8 +74,8 @@ export function LocationHeroSection({ location }: LocationHeroSectionProps) {
       icon: Users,
     },
     {
-      label: "Tenants",
-      value: location.tenants?.length ? formatNumber(location.tenants.length) : "N/A",
+      label: "Retail Space",
+      value: location.retailSpace ? formatNumber(location.retailSpace) + " sqft" : "N/A",
       icon: Tag,
     },
     {

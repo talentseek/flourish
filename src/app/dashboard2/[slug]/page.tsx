@@ -14,7 +14,7 @@ interface SlugPageProps {
 
 export default async function SlugPage({ params }: SlugPageProps) {
   const { userId } = auth()
-  
+
   if (!userId) {
     redirect("/")
   }
@@ -75,6 +75,7 @@ export default async function SlugPage({ params }: SlugPageProps) {
     retailSpace: location.retailSpace ?? undefined,
     evCharging: location.evCharging ?? undefined,
     evChargingSpaces: location.evChargingSpaces ?? undefined,
+    heroImage: location.heroImage ?? undefined,
     instagram: location.instagram ?? undefined,
     facebook: location.facebook ?? undefined,
     youtube: location.youtube ?? undefined,

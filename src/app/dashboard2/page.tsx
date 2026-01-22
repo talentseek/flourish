@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 export default async function Dashboard2Page() {
   const { userId } = auth()
-  
+
   if (!userId) {
     redirect("/")
   }
@@ -60,6 +60,7 @@ export default async function Dashboard2Page() {
     retailSpace: location.retailSpace ?? undefined,
     evCharging: location.evCharging ?? undefined,
     evChargingSpaces: location.evChargingSpaces ?? undefined,
+    heroImage: location.heroImage ?? undefined,
     instagram: location.instagram ?? undefined,
     facebook: location.facebook ?? undefined,
     youtube: location.youtube ?? undefined,
@@ -119,7 +120,7 @@ export default async function Dashboard2Page() {
   }))
 
   return (
-    <Dashboard2Client 
+    <Dashboard2Client
       locations={serializedLocations}
       metrics={{
         totalLocations,
