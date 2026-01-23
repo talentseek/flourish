@@ -17,7 +17,7 @@ async function main() {
             // Ownership & Management
             owner: 'Evolve Estates',
             management: 'LCP Properties',
-            // openedYear: TBD - needs further research
+            openedYear: 1961, // Opened as Jarrow Arndale Centre
 
             // Operations
             parkingSpaces: 400,
@@ -40,9 +40,14 @@ async function main() {
             youtube: null,
             tiktok: null,
 
-            // Google Reviews - needs manual check
-            // googleRating: TBD
-            // googleReviews: TBD
+            // Online Reviews (Researched Jan 2026)
+            googleRating: 4.0,
+            googleReviews: 2501,
+            googleVotes: 2501,
+
+            facebookRating: 4.4,
+            facebookReviews: 37,
+            facebookVotes: 37,
 
             // SEO Data
             seoKeywords: [
