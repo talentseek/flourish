@@ -1,101 +1,70 @@
 # Research Workflow
 
-Detailed step-by-step procedures for researching location data.
+Detailed step-by-step procedures for researching location data using the **Lightweight First** strategy.
+
+---
+
+## Tool Hierarchy
+1. `search_web` (Primary)
+2. `read_url_content` (Secondary - when URL known)
+3. `browser_subagent` (BANNED - unless blocked)
 
 ---
 
 ## Phase 1: Discovery
 
 ### 1.1 Find Official Website
-```
-Primary: Search "[location name] official website"
-Backup: Search "[location name] shopping centre UK"
-Verify: Look for consistent branding, official domain
+```python
+search_web(query="[location name] official website")
+# Extract URL from results summary
 ```
 
 ### 1.2 Verify Location Identity
-- Confirm address matches database record
-- Check location type (shopping centre, retail park, outlet)
-- Note any name changes or rebranding
+```python
+read_url_content(url="official_website_url")
+# Confirm address and location type from text content
+```
 
 ---
 
 ## Phase 2: Contact Information
 
-### 2.1 Phone Number
-```
-Source: Website footer or contact page
-Source: Google Maps listing
-Format: UK format - 01234 567890 or +44 1234 567890
-```
+### 2.1 Phone & Hours
+```python
+# If website content read successfully in 1.2:
+# Search text for phone pattern (01XXX / +44)
+# Search text for "Opening Hours" or "Trading Hours"
 
-### 2.2 Opening Hours
-```
-Source: Website visitor info or footer
-Source: Google Maps
-Format: "Mon-Sat 09:00-18:00, Sun 11:00-17:00"
-Note: Include bank holiday variations if prominent
+# If not found on home page:
+read_url_content(url="official_website_url/contact")
+read_url_content(url="official_website_url/opening-hours")
 ```
 
 ---
 
 ## Phase 3: Operational Data
 
-### 3.1 Store Count
-```
-Source: Official store directory page
-Method: Count unique store entries
-Note: Exclude "Coming Soon" or vacant units
-→ numberOfStores field
-```
+### 3.1 Stores & Parking
+```python
+# Try finding specific pages via simple URL guessing first
+read_url_content(url="official_website_url/stores")
+read_url_content(url="official_website_url/parking")
 
-### 3.2 Anchor Tenants
-```
-Identify: Major department stores, large footprint retailers
-Common: M&S, Debenhams, Primark, Next, John Lewis
-→ anchorTenants (count as integer)
-```
-
-### 3.3 Parking
-```
-Source: Website parking/getting here page
-Extract: Total spaces, EV charging availability
-Extract: Tariff (first 2 hours or hourly rate)
-→ parkingSpaces, carParkPrice, evCharging, evChargingSpaces
-```
-
-### 3.4 Retail Space
-```
-Source: Press releases, property databases
-Search: "[location name] sqft" or "square feet"
-Format: Integer (e.g., 475000)
-→ retailSpace
+# If 404, fallback to search:
+search_web(query="[location name] number of parking spaces")
+search_web(query="[location name] shop list directory")
 ```
 
 ---
 
 ## Phase 4: Ownership & History
 
-### 4.1 Current Owner
-```
-Search: "[location name] owner"
-Search: "[location name] acquired by"
-Source: Company websites, property news
-→ owner
-```
-
-### 4.2 Management
-```
-Source: Website "About Us" or contact page
-Look for: Management company, centre management
-→ management
-```
-
-### 4.3 Opening Year
-```
-Search: "[location name] opened" or "history"
-Source: Wikipedia, local news archives
-→ openedYear
+### 4.1 Owner & Opening
+```python
+# Direct fact search is fastest here
+search_web(query="who owns [location name]")
+search_web(query="when did [location name] open")
+search_web(query="[location name] opening date history")
 ```
 
 ---
@@ -103,51 +72,45 @@ Source: Wikipedia, local news archives
 ## Phase 5: Footfall
 
 ### 5.1 Annual Footfall
-```
-Search: "[location name] footfall"
-Search: "[location name] visitors annually"
-Source: Owner annual reports, press releases
-Format: Integer (e.g., 9400000 for 9.4M)
-→ footfall
+```python
+search_web(query="[location name] annual footfall 2024")
+search_web(query="[location name] visitor numbers")
+# Look for values in millions (e.g. "10 million visitors")
 ```
 
 ---
 
 ## Phase 6: Social Media
 
-### 6.1 Discovery Pattern
-```
-Instagram: "[location name]" site:instagram.com
-Facebook: "[location name]" site:facebook.com
-Twitter/X: "[location name]" site:twitter.com
-TikTok: "[location name]" site:tiktok.com
-YouTube: "[location name]" site:youtube.com
+### 6.1 Discovery
+```python
+search_web(query="site:instagram.com [location name]")
+search_web(query="site:facebook.com [location name]")
+search_web(query="site:twitter.com [location name]")
 ```
 
-### 6.2 Verification
-- Check for verified badge
-- Confirm official branding
-- Look for cross-links from official website
-- Ignore fan pages or unofficial accounts
+### 6.2 Validation
+```python
+# Do NOT open the social pages. Just verify the URL looks official.
+# e.g., facebook.com/TheVikingCentre (Official) vs facebook.com/groups/VikingCentreFans (Community)
+```
 
 ---
 
 ## Phase 7: Reviews
 
 ### 7.1 Google Reviews
-```
-Source: Google Maps search for location
-Extract: Star rating (X.X format)
-Extract: Review count
-→ googleRating, googleReviews
+```python
+# Do NOT browse Google Maps.
+search_web(query="[location name] google reviews rating")
+# Look for rich snippet: "4.2 (1,500 reviews)"
 ```
 
 ### 7.2 Facebook Reviews
-```
-Source: Facebook business page
-Navigate: Reviews tab
-Extract: Star rating, review count
-→ facebookRating, facebookReviews
+```python
+# Do NOT browse Facebook.
+search_web(query="[location name] facebook reviews rating")
+# Look for snippet: "Rating: 4.4 · ‎35 reviews"
 ```
 
 ---
@@ -155,15 +118,15 @@ Extract: Star rating, review count
 ## Phase 8: Demographics
 
 ### 8.1 Identify LTLA
-```
-1. Get location's city/town
-2. Search: "[city] local authority"
-3. Identify LTLA (Lower Tier Local Authority) name
+```python
+search_web(query="what local authority is [location city] in")
 ```
 
 ### 8.2 Extract Census Data
-```
-Source: ONS Census 2021 area profiles
-Source: NOMIS local authority profiles
-See: uk-demographics.md for detailed extraction
+```python
+# Don't use ONS explorer (too complex for text reading).
+# Use simple search for key stats in that area:
+search_web(query="[LTLA name] census 2021 population")
+search_web(query="[LTLA name] median age census 2021")
+search_web(query="[LTLA name] average household income")
 ```

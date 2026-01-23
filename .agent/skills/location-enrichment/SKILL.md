@@ -2,11 +2,17 @@
 name: location-enrichment
 description: |
   Research and enrich retail location data from web sources. Use when populating missing database fields for shopping centres, retail parks, or outlet centres. Triggers on "enrich location", "research location", "populate location data", "find location info", "complete location fields".
+  WARNING: Do not use browser_subagent unless absolutely necessary.
 ---
 
 # Location Enrichment
 
 > **Purpose:** Systematically research locations to populate missing database fields.
+
+> **Tool Usage Strategy (CRITICAL):**
+> 1. **Tier 1: `search_web`** - ALWAYS try this first for facts (years, reviews, owners).
+> 2. **Tier 2: `read_url_content`** - Use when you have a specific URL (website, wiki).
+> 3. **Tier 3: `browser_subagent`** - **AVOID**. Only use as absolute last resort if 403/404 errors block other methods. It is too slow for this workflow.
 
 ---
 
