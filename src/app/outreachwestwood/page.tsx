@@ -298,8 +298,6 @@ hello@thisisflourish.com`
                             height={30}
                             className="h-7 w-auto"
                         />
-                        <div className="h-8 w-px bg-white/20" />
-                        <span className="text-white/60 text-sm">Outreach Simulator</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                         <div className={cn(
