@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { DemoRequestModal } from "@/components/demo-request-modal"
 import {
     Building2,
     TrendingUp,
@@ -18,7 +19,11 @@ import {
     ArrowRight,
     CheckCircle2,
     Zap,
-    LineChart
+    LineChart,
+    Play,
+    Lightbulb,
+    Eye,
+    HeartHandshake
 } from "lucide-react"
 
 // LandSec brand colors
@@ -403,12 +408,14 @@ export default function LandSecDemoPage() {
                             />
                         </div>
                     </div>
-                    <Button
-                        className="bg-[#E6FB60] text-[#002855] hover:bg-[#E6FB60]/90 font-semibold"
-                        asChild
-                    >
-                        <Link href="/#contact">Request Demo</Link>
-                    </Button>
+                    <DemoRequestModal
+                        variant="landsec"
+                        trigger={
+                            <Button className="bg-[#E6FB60] text-[#002855] hover:bg-[#E6FB60]/90 font-semibold">
+                                Request Demo
+                            </Button>
+                        }
+                    />
                 </div>
             </header>
 
@@ -440,14 +447,28 @@ export default function LandSecDemoPage() {
                         </p>
 
                         <div className="flex flex-wrap justify-center gap-4 pt-4">
-                            <Button size="lg" className="bg-[#E6FB60] text-[#002855] hover:bg-[#E6FB60]/90 font-semibold gap-2">
-                                <Target className="h-5 w-5" />
-                                Start Gap Analysis
+                            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 gap-2" asChild>
+                                <Link href="#portfolio-map">
+                                    <BarChart3 className="h-5 w-5" />
+                                    View Portfolio Insights
+                                </Link>
                             </Button>
-                            <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 gap-2">
-                                <BarChart3 className="h-5 w-5" />
-                                View Portfolio Insights
-                            </Button>
+                        </div>
+
+                        {/* Video Section */}
+                        <div className="mt-8 max-w-3xl mx-auto">
+                            <div className="aspect-video rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/M-ALomLEtBk"
+                                    title="Flourish - Transforming Retail Spaces"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                />
+                            </div>
+                            <p className="text-sm text-white/50 mt-3 text-center">See how Flourish transforms retail destinations</p>
                         </div>
                     </div>
                 </div>
@@ -478,7 +499,7 @@ export default function LandSecDemoPage() {
             </section>
 
             {/* Interactive Map Section */}
-            <section className="py-16">
+            <section id="portfolio-map" className="py-16">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -486,7 +507,7 @@ export default function LandSecDemoPage() {
                         </h2>
                         <p className="text-white/60 max-w-2xl mx-auto">
                             Interactive map showing all Landsec retail and leisure properties.
-                            Click any location to see Flourish AI opportunity analysis.
+                            Click any location to explore AI-driven opportunity analysis.
                         </p>
                     </div>
 
@@ -513,20 +534,21 @@ export default function LandSecDemoPage() {
                                 <CardContent className="space-y-4">
                                     <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
                                         <span className="text-sm">F&B Opportunities</span>
-                                        <span className="font-bold text-green-400">12 gaps</span>
+                                        <span className="font-bold text-green-400">Identified</span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                                         <span className="text-sm">Leisure Expansion</span>
-                                        <span className="font-bold text-blue-400">8 gaps</span>
+                                        <span className="font-bold text-blue-400">Identified</span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
                                         <span className="text-sm">Premium Brands</span>
-                                        <span className="font-bold text-purple-400">15 gaps</span>
+                                        <span className="font-bold text-purple-400">Identified</span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
                                         <span className="text-sm">Value Retail</span>
-                                        <span className="font-bold text-orange-400">6 gaps</span>
+                                        <span className="font-bold text-orange-400">Identified</span>
                                     </div>
+                                    <p className="text-xs text-white/50 pt-2">Full analysis available upon demo request</p>
                                 </CardContent>
                             </Card>
 
@@ -538,10 +560,11 @@ export default function LandSecDemoPage() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-4xl font-bold text-[#E6FB60] mb-2">£50M+</div>
+                                    <div className="text-2xl font-bold text-[#E6FB60] mb-2">Significant Growth Potential</div>
                                     <p className="text-sm text-white/60">
-                                        Estimated additional annual revenue through AI-optimized tenant mix across your portfolio.
+                                        Our AI identifies revenue opportunities through optimized tenant mix tailored to your portfolio.
                                     </p>
+                                    <p className="text-xs text-white/40 mt-2">Contact us for a personalized assessment</p>
                                 </CardContent>
                             </Card>
 
@@ -645,6 +668,113 @@ export default function LandSecDemoPage() {
                 </div>
             </section>
 
+            {/* Why Partner with Flourish - Full Service Value Proposition */}
+            <section className="py-20 bg-[#001832]">
+                <div className="container mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                            Why Partner with Flourish?
+                        </h2>
+                        <p className="text-xl text-white/70 max-w-3xl mx-auto">
+                            We don&apos;t just identify opportunities — we help you activate them.
+                            Flourish is your full-service partner for transforming retail space into thriving destinations.
+                        </p>
+                    </div>
+
+                    {/* Two Column Value Props */}
+                    <div className="grid md:grid-cols-2 gap-8 mb-16 max-w-5xl mx-auto">
+                        <Card className="bg-white/5 border-white/10 text-white p-6">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-[#E6FB60]/20 rounded-xl">
+                                        <Lightbulb className="h-6 w-6 text-[#E6FB60]" />
+                                    </div>
+                                    <CardTitle className="text-xl text-[#E6FB60]">Beyond Analytics</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <p className="text-white/80">
+                                    Our AI-powered gap analysis is just the beginning. We connect you with a curated network
+                                    of vetted tenants — from independent traders to national brands — ready to fill your spaces.
+                                </p>
+                                <p className="text-white/60 text-sm">
+                                    We understand that data without action is just numbers. That&apos;s why we combine
+                                    intelligent insights with hands-on occupancy management.
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/5 border-white/10 text-white p-6">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-[#00A3E0]/20 rounded-xl">
+                                        <Eye className="h-6 w-6 text-[#00A3E0]" />
+                                    </div>
+                                    <CardTitle className="text-xl text-[#00A3E0]">Transparent Model</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <p className="text-white/80">
+                                    Our unique letting and occupancy model focuses on delivering sustainable business
+                                    through insight, management, and ongoing support.
+                                </p>
+                                <p className="text-white/60 text-sm">
+                                    No hidden fees, no surprises. We work as an extension of your leasing team,
+                                    aligned with your goals for occupancy and revenue growth.
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Three Column Features */}
+                    <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <div className="text-center p-6">
+                            <div className="w-16 h-16 rounded-2xl bg-[#E6FB60]/20 flex items-center justify-center mx-auto mb-4">
+                                <TrendingUp className="h-8 w-8 text-[#E6FB60]" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">Proven Track Record</h3>
+                            <p className="text-white/60 text-sm">
+                                Our partners see an average 30% increase in net income through our innovative
+                                approach to space activation and tenant curation.
+                            </p>
+                        </div>
+
+                        <div className="text-center p-6">
+                            <div className="w-16 h-16 rounded-2xl bg-[#00A3E0]/20 flex items-center justify-center mx-auto mb-4">
+                                <Users className="h-8 w-8 text-[#00A3E0]" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">On-the-Ground Team</h3>
+                            <p className="text-white/60 text-sm">
+                                Expert team with backgrounds in retail, visual merchandising, finance, and
+                                placemaking — visiting sites and building local relationships.
+                            </p>
+                        </div>
+
+                        <div className="text-center p-6">
+                            <div className="w-16 h-16 rounded-2xl bg-[#E6FB60]/20 flex items-center justify-center mx-auto mb-4">
+                                <HeartHandshake className="h-8 w-8 text-[#E6FB60]" />
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">End-to-End Support</h3>
+                            <p className="text-white/60 text-sm">
+                                From compliance (PAT testing, RAMS, insurance) to visual merchandising advice —
+                                we handle the details so you can focus on your portfolio.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Testimonial Quote */}
+                    <div className="mt-16 max-w-3xl mx-auto text-center">
+                        <div className="bg-gradient-to-br from-white/10 to-white/5 border border-white/10 rounded-2xl p-8">
+                            <p className="text-xl text-white/80 italic mb-4">
+                                &quot;Flourish transformed our vacant spaces into thriving retail destinations.
+                                Their approach is professional, innovative, and results-driven.&quot;
+                            </p>
+                            <p className="text-white/50 text-sm">— Shopping Centre Owner, Major UK Portfolio</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* How Flourish Helps */}
             <section className="py-20">
                 <div className="container mx-auto px-4">
@@ -702,13 +832,15 @@ export default function LandSecDemoPage() {
                         Let&apos;s discuss how Flourish can help Landsec unlock hidden value across your retail and leisure assets.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
-                        <Button size="lg" className="bg-[#002855] text-white hover:bg-[#002855]/90 font-semibold gap-2">
-                            <CheckCircle2 className="h-5 w-5" />
-                            Schedule a Demo
-                        </Button>
-                        <Button size="lg" variant="outline" className="border-[#002855] text-[#002855] hover:bg-[#002855]/10 font-semibold">
-                            Download Portfolio Report
-                        </Button>
+                        <DemoRequestModal
+                            variant="landsec"
+                            trigger={
+                                <Button size="lg" className="bg-[#002855] text-white hover:bg-[#002855]/90 font-semibold gap-2">
+                                    <CheckCircle2 className="h-5 w-5" />
+                                    Schedule a Demo
+                                </Button>
+                            }
+                        />
                     </div>
                 </div>
             </section>
