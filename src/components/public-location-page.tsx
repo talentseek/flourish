@@ -35,6 +35,7 @@ export function PublicLocationPage({ location, regionalManager }: PublicLocation
                     <LocationDiscoveryStage
                         location={location}
                         onCompareClick={handleCompareClick}
+                        isPublic={true}
                     />
                 </div>
             </main>

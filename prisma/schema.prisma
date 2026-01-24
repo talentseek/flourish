@@ -39,6 +39,9 @@ model Location {
   publicTransit   String?
   owner           String?
   management      String?
+  managementContact String?
+  managementEmail   String?
+  managementPhone   String?
   openedYear      Int?
   heroImage       String?  // path to hero background image
   isManaged       Boolean  @default(false)

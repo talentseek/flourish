@@ -1,0 +1,379 @@
+[
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclz73000z9atsl05u9ui4",
+    "name": "Piccadilly Train Station",
+    "city": "Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxx3000g9ats4xhyetsk",
+    "name": "The Meadows",
+    "city": "Chelmsford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx1400019atsbpwqmlh0",
+    "name": "Bloomfield Shopping Centre",
+    "city": "Bangor",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksfw8350001ivpapzhddzdj",
+    "name": "Knightswood Shopping Centre",
+    "city": "Glasgow",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8b10004ivpajuj6k4br",
+    "name": "Cornmill Centre",
+    "city": "Darlington",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmks95l3l0003fajklv13xjzk",
+    "name": "Kingfisher Shopping Centre",
+    "city": "Redditch",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kp6601ilmtpufcvk2v56",
+    "name": "Arcadian Centre",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kpmt01iwmtpuko3qh1rt",
+    "name": "Bay View Centre",
+    "city": "Conwy",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0koxk01icmtpu6s438yq7",
+    "name": "Aldridge Shopping Centre",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kpw501j6mtpuwifjup05",
+    "name": "Bettws Shopping Centre",
+    "city": "Newport",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kq1l01jcmtpu9wd9hioc",
+    "name": "Blenheim Shopping Centre",
+    "city": "Greater London",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kqk501jwmtputu5nu1wi",
+    "name": "Broadwalk Shopping Centre",
+    "city": "City Of Bristol",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kqrz01k4mtpuoxpa6m9t",
+    "name": "Burntwood Town Shopping Centre",
+    "city": "Staffordshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kqqx01k3mtpu47vnk2t6",
+    "name": "Burns Mall",
+    "city": "East Ayrshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kqup01k7mtpugf8yfzck",
+    "name": "Byron Place",
+    "city": "Durham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kr5d01kimtpuwycosi8n",
+    "name": "Cascades Shopping Centre",
+    "city": "Hampshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kr0001kdmtpuevlya8pk",
+    "name": "Canolfan Menai Centre",
+    "city": "Gwynedd",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kr2t01kgmtpuioa1zfpq",
+    "name": "Carillon Court",
+    "city": "Leicestershire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kr8701klmtpu9rlgqym9",
+    "name": "Castle Dene Shopping Centre",
+    "city": "Durham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0krej01ksmtpusitu8zxk",
+    "name": "Cathedral Lanes Shopping Centre",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kqz301kcmtpuada8gz8f",
+    "name": "Cannon Park",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0krs501l7mtpuq60o8743",
+    "name": "Christ Church Centre",
+    "city": "Kent",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0krqb01l5mtpum7y64e0q",
+    "name": "Cherry Tree Shopping Centre",
+    "city": "Merseyside",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  }
+]

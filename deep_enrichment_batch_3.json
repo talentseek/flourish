@@ -1,0 +1,379 @@
+[
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmkscly2t000l9atsp99d0f4w",
+    "name": "The Thistles Shopping Centre",
+    "city": "Stirling",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l5tm01zmmtpusfeo6k3n",
+    "name": "Trinity Walk Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclz73000z9atsl05u9ui4",
+    "name": "Piccadilly Train Station",
+    "city": "Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxpo000a9atsg930t02a",
+    "name": "Swords Pavilions",
+    "city": "Dublin",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxx3000g9ats4xhyetsk",
+    "name": "The Meadows",
+    "city": "Chelmsford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly0f000i9ats9p3kzm98",
+    "name": "The Regent Centre",
+    "city": "Kirkintilloch",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly7g000m9atsk5cpzu8z",
+    "name": "Willow Place & Corby Town Shopping",
+    "city": "Corby",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly94000n9atsskthi9a3",
+    "name": "CastleCourt",
+    "city": "Belfast",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx1400019atsbpwqmlh0",
+    "name": "Bloomfield Shopping Centre",
+    "city": "Bangor",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx8x00049ats438p9xex",
+    "name": "Elephant & Castle Shopping Centre",
+    "city": "London",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemc5i000roqpnc6dotqp1",
+    "name": "Freshney Place",
+    "city": "Grimsby",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemc77000soqpnlf5gxgbk",
+    "name": "Broadmarsh Centre",
+    "city": "Nottingham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l1b101uymtpum3d9a7uy",
+    "name": "Telford Centre",
+    "city": "Shropshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw8350001ivpapzhddzdj",
+    "name": "Knightswood Shopping Centre",
+    "city": "Glasgow",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8b10004ivpajuj6k4br",
+    "name": "Cornmill Centre",
+    "city": "Darlington",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8500002ivpawg7jnvek",
+    "name": "New Kirkgate",
+    "city": "Edinburgh (Leith)",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8bx0005ivparetxlync",
+    "name": "The Pavilion",
+    "city": "Thornaby-on-Tees",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksema3s0000oqpne5wngef6",
+    "name": "Arc Shopping Centre",
+    "city": "Bury St Edmunds",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmks95l3l0003fajklv13xjzk",
+    "name": "Kingfisher Shopping Centre",
+    "city": "Redditch",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclxl100089atsodc6ubmb",
+    "name": "Quedam Shopping Centre",
+    "city": "Yeovil",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxsv000c9atsgcm3ieh3",
+    "name": "The Harvey Centre",
+    "city": "Harlow",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kp6601ilmtpufcvk2v56",
+    "name": "Arcadian Centre",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  },
+  {
+    "id": "cmid0kp7z01inmtpusdig7a0j",
+    "name": "Arndale Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": null
+  }
+]

@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmicxw4i8000q13hxzukdlnbo",
+    "name": "Lower Precinct Shopping Centre",
+    "city": "Coventry",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4jq000t13hxgqkrk1zk",
+    "name": "Market Quay Shopping Centre",
+    "city": "Fareham",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4c8000d13hxw8ui2frd",
+    "name": "Chelmsley Wood Shopping Centre",
+    "city": "Chelmsley Wood (Solihull)",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw482000413hx6wu6uigt",
+    "name": "Beacons Place Shopping Centre",
+    "city": "Merthyr Tydfil",
+    "management": "LCP Properties"
+  },
+  {
+    "id": "cmicxw4l3000w13hxpi1ja553",
+    "name": "Middleton Shopping Centre",
+    "city": "Middleton",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4qj001813hxaoq2y2y0",
+    "name": "Richmond Gardens Shopping Centre",
+    "city": "Bournemouth",
+    "management": "Sam Cohen"
+  },
+  {
+    "id": "cmicxw4q3001713hxwky54t3o",
+    "name": "Rainham Shopping Centre",
+    "city": "Rainham",
+    "management": "Adam Davies"
+  },
+  {
+    "id": "cmicxw4tl001e13hx7ae4i2db",
+    "name": "The Swan Centre",
+    "city": "Eastleigh",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclwy700009atsvppjfhe1",
+    "name": "Ankerside Shopping Centre",
+    "city": "Tamworth",
+    "management": "Savills"
+  },
+  {
+    "id": "cmks95l3l0003fajklv13xjzk",
+    "name": "Kingfisher Shopping Centre",
+    "city": "Redditch",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmks95lcp0007fajkcfjgnu0m",
+    "name": "The Centre, Livingston",
+    "city": "Livingston",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclxnc00099atsn6ptzs4z",
+    "name": "St George's Shopping Centre",
+    "city": "Harrow",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclxr9000b9atsr7h3qpm6",
+    "name": "The Brunel",
+    "city": "Swindon",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxum000d9atsbwospi7x",
+    "name": "The Idlewells Centre",
+    "city": "Sutton In Ashfield",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxw8000f9atsoakm9akp",
+    "name": "The Malls Shopping Centre",
+    "city": "Basingstoke",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxxw000h9atsf5lv672y",
+    "name": "The Merrion Centre",
+    "city": "Leeds",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmkscly1z000k9atsw07ou5v2",
+    "name": "The Stamford Quarter",
+    "city": "Altrincham",
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly2t000l9atsp99d0f4w",
+    "name": "The Thistles Shopping Centre",
+    "city": "Stirling",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclz73000z9atsl05u9ui4",
+    "name": "Piccadilly Train Station",
+    "city": "Manchester",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxl100089atsodc6ubmb",
+    "name": "Quedam Shopping Centre",
+    "city": "Yeovil",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxpo000a9atsg930t02a",
+    "name": "Swords Pavilions",
+    "city": "Dublin",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxsv000c9atsgcm3ieh3",
+    "name": "The Harvey Centre",
+    "city": "Harlow",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxx3000g9ats4xhyetsk",
+    "name": "The Meadows",
+    "city": "Chelmsford",
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly0f000i9ats9p3kzm98",
+    "name": "The Regent Centre",
+    "city": "Kirkintilloch",
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly7g000m9atsk5cpzu8z",
+    "name": "Willow Place & Corby Town Shopping",
+    "city": "Corby",
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly94000n9atsskthi9a3",
+    "name": "CastleCourt",
+    "city": "Belfast",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx1400019atsbpwqmlh0",
+    "name": "Bloomfield Shopping Centre",
+    "city": "Bangor",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx8x00049ats438p9xex",
+    "name": "Elephant & Castle Shopping Centre",
+    "city": "London",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemc5i000roqpnc6dotqp1",
+    "name": "Freshney Place",
+    "city": "Grimsby",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemc77000soqpnlf5gxgbk",
+    "name": "Broadmarsh Centre",
+    "city": "Nottingham",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclxvf000e9atsl1syc0gh",
+    "name": "The Kingdom Centre",
+    "city": "Glenrothes",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8350001ivpapzhddzdj",
+    "name": "Knightswood Shopping Centre",
+    "city": "Glasgow",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8500002ivpawg7jnvek",
+    "name": "New Kirkgate",
+    "city": "Edinburgh (Leith)",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8b10004ivpajuj6k4br",
+    "name": "Cornmill Centre",
+    "city": "Darlington",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8bx0005ivparetxlync",
+    "name": "The Pavilion",
+    "city": "Thornaby-on-Tees",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksema3s0000oqpne5wngef6",
+    "name": "Arc Shopping Centre",
+    "city": "Bury St Edmunds",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4j7000s13hxzkrmasy0",
+    "name": "The Mailbox",
+    "city": "Birmingham",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw49t000813hxr6frnapt",
+    "name": "Borough Parade Shopping Centre",
+    "city": "Chippenham",
+    "management": "Rob Ault"
+  },
+  {
+    "id": "cmicxw4hd000o13hxkrkb8enf",
+    "name": "The Lexicon",
+    "city": "Bracknell",
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4e2000h13hx4f2650mh",
+    "name": "Grosvenor",
+    "city": "Northampton",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4ab000913hxacpya41l",
+    "name": "The Britten Centre",
+    "city": "Lowestoft",
+    "management": "Adam Davies"
+  },
+  {
+    "id": "cmicxw4is000r13hxavd7ijyw",
+    "name": "Swanley Shopping Centre",
+    "city": "Swanley",
+    "management": "Kat Behbani"
+  },
+  {
+    "id": "cmicxw4u4001f13hxatqekwgs",
+    "name": "The Bridges",
+    "city": "Sunderland",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmks9w2wy0001p2aauakdcyww",
+    "name": "Fosse Park",
+    "city": "Leicester",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclx2e00029atsjlmev047",
+    "name": "Bowen Square",
+    "city": "Daventry",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx7800039atsba7svxmi",
+    "name": "Clydebank Centre",
+    "city": "Glasgow (West)",
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4gi000m13hx9mghuxqm",
+    "name": "Kingsland Shopping Centre",
+    "city": "Thatcham",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx9p00059atsvtvtjctf",
+    "name": "Erneside Shopping Centre",
+    "city": "Enniskillen",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxbb00069atscb2m0ggh",
+    "name": "Great Northern Mall",
+    "city": "Belfast",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxho00079ats3zlva79h",
+    "name": "N1 Shopping Centre",
+    "city": "Islington",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclybn000o9atsyrhmkpjq",
+    "name": "Dundrum Town Centre",
+    "city": "Dublin",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclyld000q9atsz1g1ihxe",
+    "name": "Queensgate",
+    "city": "Peterborough",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclysp000r9atsah54ogcx",
+    "name": "Midsummer Place (formerly intu MK)",
+    "city": "Milton Keynes",
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemabo0005oqpnqszqmrxg",
+    "name": "The Pavilions",
+    "city": "Uxbridge",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema4y0001oqpn3bl3anxt",
+    "name": "Great Northern",
+    "city": "Manchester",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema770002oqpnvju64jqv",
+    "name": "The Exchange",
+    "city": "Ilford",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema8x0003oqpnipotmcez",
+    "name": "Islington Square",
+    "city": "London (Angel)",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema9s0004oqpnesnblm5f",
+    "name": "The Aylesham Centre",
+    "city": "Peckham",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemadh0006oqpn2jit3n3j",
+    "name": "West India Quay",
+    "city": "London (Docklands)",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemaf80007oqpnob5teich",
+    "name": "Tower Park",
+    "city": "Poole",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemah50008oqpnzyzcvvdz",
+    "name": "Cardigan Fields",
+    "city": "Leeds",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemai40009oqpnfx0yl4nu",
+    "name": "Riverside Leisure Park",
+    "city": "Norwich",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemaiz000aoqpnh9mahtp7",
+    "name": "Parrswood Leisure Park",
+    "city": "Manchester (Didsbury)",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemajw000boqpn46fxb97w",
+    "name": "Xscape Milton Keynes",
+    "city": "Milton Keynes",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb0q000eoqpn1xwkozz8",
+    "name": "The Priory",
+    "city": "Dartford",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb4c000foqpn0euo1dpv",
+    "name": "Salford Shopping City",
+    "city": "Salford",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb9d000goqpnr8xvdenl",
+    "name": "The Spindles",
+    "city": "Oldham",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksembbs000ioqpnzt74yblc",
+    "name": "Arndale Centre",
+    "city": "Morecambe",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksembcq000joqpn6dzt4d6m",
+    "name": "Fishergate Centre",
+    "city": "Preston",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemc22000qoqpnh2z7hke7",
+    "name": "Eastgate Centre",
+    "city": "Inverness",
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemba8000hoqpnzlsmc2h4",
+    "name": "The Concourse",
+    "city": "Skelmersdale",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksembjo000loqpnyz6o7uyx",
+    "name": "Four Seasons Shopping Centre",
+    "city": "Mansfield",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksemay1000doqpnibvqlx6d",
+    "name": "Abbey Centre",
+    "city": "Belfast",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4y7001o13hxp4niwnzx",
+    "name": "Weavers Wharf Shopping Park",
+    "city": "Kidderminster",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8f10006ivpa2p2t028t",
+    "name": "5 Rise Shopping Centre",
+    "city": "Bingley",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksembin000koqpnqb4ea7gp",
+    "name": "Hardshaw Centre",
+    "city": "St Helens",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8ho0007ivpa73g57zv0",
+    "name": "Cockhedge Retail Park",
+    "city": "Warrington",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8m6000aivpaao3g5ck4",
+    "name": "Wulfrun Centre",
+    "city": "Wolverhampton",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8n5000bivpad9njtzxi",
+    "name": "The Churchill Centre",
+    "city": "Dudley",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8qj000civpavu52mtd8",
+    "name": "Southwater Square",
+    "city": "Telford",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8rg000divpaw58re2mm",
+    "name": "The Octagon",
+    "city": "Burton upon Trent",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8vv000eivpaw96hpz9a",
+    "name": "Kennedy Way",
+    "city": "Immingham",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmkscly17000j9atsg01bg92x",
+    "name": "The Sovereign",
+    "city": "Weston-super-Mare",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw90z000givpa5ctvnq5v",
+    "name": "Baverstock",
+    "city": "Bristol",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8yh000fivpaft2h2tez",
+    "name": "Swadlincote Shopping Centre",
+    "city": "Swadlincote",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw97m000kivpaw2c9dinh",
+    "name": "Gracechurch Centre",
+    "city": "Sutton Coldfield",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw96i000jivpadg0yxma2",
+    "name": "Old Square",
+    "city": "Walsall",
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw93b000iivpahcxg6kr9",
+    "name": "Navan Town Centre",
+    "city": "Navan",
+    "management": "M Core (LCP/Evolve)"
+  }
+]

@@ -1,0 +1,354 @@
+[
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ]
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ]
+  },
+  {
+    "id": "cmksclxum000d9atsbwospi7x",
+    "name": "The Idlewells Centre",
+    "city": "Sutton In Ashfield",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmkscly2t000l9atsp99d0f4w",
+    "name": "The Thistles Shopping Centre",
+    "city": "Stirling",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0l5tm01zmmtpusfeo6k3n",
+    "name": "Trinity Walk Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jidz00a2mtpuzs8snwtq",
+    "name": "Abbots Langley (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jifu00a3mtpuxvmity5v",
+    "name": "Addlestone (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jih400a4mtpuu7u4dkel",
+    "name": "Aldershot (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jii700a5mtpua97dhmvz",
+    "name": "Amersham (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jill00a7mtpubjqnrtyp",
+    "name": "Ashford (Surrey) (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jirs00a9mtpup07jvktk",
+    "name": "Aylesbury (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jit600aamtpukm2p2jar",
+    "name": "Aylesford (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jiua00abmtpuov4sissb",
+    "name": "Baldock (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jiv900acmtpunsh1u5j7",
+    "name": "Barking (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jiw600admtpuhbdjdok3",
+    "name": "Barnet (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jix400aemtpunwl6xz91",
+    "name": "Basildon (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jiyv00agmtpusrp9y3vu",
+    "name": "Beaconsfield (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jizp00ahmtpu5782r23k",
+    "name": "Beckenham (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj1k00ajmtpuodejl1tc",
+    "name": "Benfleet (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj2i00akmtpugd26aeby",
+    "name": "Betchworth (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmksclz73000z9atsl05u9ui4",
+    "name": "Piccadilly Train Station",
+    "city": "Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj5800anmtpuexjo21u5",
+    "name": "Billingshurst (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj7300apmtpucjn2hkp8",
+    "name": "Bordon (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj8400aqmtput9faf3w6",
+    "name": "Borehamwood (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  },
+  {
+    "id": "cmid0jj9v00asmtpu5n2dmofd",
+    "name": "Brackley (Other)",
+    "city": "-",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ]
+  }
+]

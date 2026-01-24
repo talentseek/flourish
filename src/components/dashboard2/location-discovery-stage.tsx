@@ -16,13 +16,15 @@ import { LocationParkingCard, LocationPropertyCard, LocationOwnershipCard } from
 import { PDFDownloadButton } from "./pdf-download-button"
 import { generateSlug } from "@/lib/slug-utils"
 import { useRouter } from "next/navigation"
+import { DemoRequestModal } from "@/components/demo-request-modal"
 
 interface LocationDiscoveryStageProps {
   location: Location
   onCompareClick: () => void
+  isPublic?: boolean
 }
 
-export function LocationDiscoveryStage({ location, onCompareClick }: LocationDiscoveryStageProps) {
+export function LocationDiscoveryStage({ location, onCompareClick, isPublic = false }: LocationDiscoveryStageProps) {
   const router = useRouter()
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -84,14 +86,28 @@ export function LocationDiscoveryStage({ location, onCompareClick }: LocationDis
             Flourish provides comprehensive retail intelligence for shopping centres across the UK.
             Access footfall data, demographics, competitor analysis, and connect directly with our regional team.
           </p>
-          <Button
-            onClick={handleCompareClick}
-            size="lg"
-            className="gap-2 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
-          >
-            Get Full Analytics and Comparison
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          {isPublic ? (
+            <DemoRequestModal
+              trigger={
+                <Button
+                  size="lg"
+                  className="gap-2 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
+                >
+                  Request Access
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              }
+            />
+          ) : (
+            <Button
+              onClick={handleCompareClick}
+              size="lg"
+              className="gap-2 bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
+            >
+              Get Full Analytics and Comparison
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

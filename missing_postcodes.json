@@ -1,0 +1,254 @@
+[
+  {
+    "id": "cmksemc5i000roqpnc6dotqp1",
+    "name": "Freshney Place",
+    "city": "Grimsby",
+    "county": "Yorkshire"
+  },
+  {
+    "id": "cmksemc77000soqpnlf5gxgbk",
+    "name": "Broadmarsh Centre",
+    "city": "Nottingham",
+    "county": "East Midlands"
+  },
+  {
+    "id": "cmksfw8350001ivpapzhddzdj",
+    "name": "Knightswood Shopping Centre",
+    "city": "Glasgow",
+    "county": "Scotland"
+  },
+  {
+    "id": "cmksfw8500002ivpawg7jnvek",
+    "name": "New Kirkgate",
+    "city": "Edinburgh (Leith)",
+    "county": "Scotland"
+  },
+  {
+    "id": "cmksfw8b10004ivpajuj6k4br",
+    "name": "Cornmill Centre",
+    "city": "Darlington",
+    "county": "North East"
+  },
+  {
+    "id": "cmksfw8bx0005ivparetxlync",
+    "name": "The Pavilion",
+    "city": "Thornaby-on-Tees",
+    "county": "North East"
+  },
+  {
+    "id": "cmksema3s0000oqpne5wngef6",
+    "name": "Arc Shopping Centre",
+    "city": "Bury St Edmunds",
+    "county": "East of England"
+  },
+  {
+    "id": "cmksema4y0001oqpn3bl3anxt",
+    "name": "Great Northern",
+    "city": "Manchester",
+    "county": "North West"
+  },
+  {
+    "id": "cmksema770002oqpnvju64jqv",
+    "name": "The Exchange",
+    "city": "Ilford",
+    "county": "London"
+  },
+  {
+    "id": "cmksema8x0003oqpnipotmcez",
+    "name": "Islington Square",
+    "city": "London (Angel)",
+    "county": "London"
+  },
+  {
+    "id": "cmksema9s0004oqpnesnblm5f",
+    "name": "The Aylesham Centre",
+    "city": "Peckham",
+    "county": "London"
+  },
+  {
+    "id": "cmksemabo0005oqpnqszqmrxg",
+    "name": "The Pavilions",
+    "city": "Uxbridge",
+    "county": "London"
+  },
+  {
+    "id": "cmksemadh0006oqpn2jit3n3j",
+    "name": "West India Quay",
+    "city": "London (Docklands)",
+    "county": "London"
+  },
+  {
+    "id": "cmksemaf80007oqpnob5teich",
+    "name": "Tower Park",
+    "city": "Poole",
+    "county": "South West"
+  },
+  {
+    "id": "cmksemah50008oqpnzyzcvvdz",
+    "name": "Cardigan Fields",
+    "city": "Leeds",
+    "county": "Yorkshire"
+  },
+  {
+    "id": "cmksemai40009oqpnfx0yl4nu",
+    "name": "Riverside Leisure Park",
+    "city": "Norwich",
+    "county": "East of England"
+  },
+  {
+    "id": "cmksemaiz000aoqpnh9mahtp7",
+    "name": "Parrswood Leisure Park",
+    "city": "Manchester (Didsbury)",
+    "county": "North West"
+  },
+  {
+    "id": "cmksemajw000boqpn46fxb97w",
+    "name": "Xscape Milton Keynes",
+    "city": "Milton Keynes",
+    "county": "South East"
+  },
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "county": "South West"
+  },
+  {
+    "id": "cmksemb0q000eoqpn1xwkozz8",
+    "name": "The Priory",
+    "city": "Dartford",
+    "county": "South East"
+  },
+  {
+    "id": "cmksemb4c000foqpn0euo1dpv",
+    "name": "Salford Shopping City",
+    "city": "Salford",
+    "county": "North West"
+  },
+  {
+    "id": "cmksemb9d000goqpnr8xvdenl",
+    "name": "The Spindles",
+    "city": "Oldham",
+    "county": "North West"
+  },
+  {
+    "id": "cmksembbs000ioqpnzt74yblc",
+    "name": "Arndale Centre",
+    "city": "Morecambe",
+    "county": "North West"
+  },
+  {
+    "id": "cmksembcq000joqpn6dzt4d6m",
+    "name": "Fishergate Centre",
+    "city": "Preston",
+    "county": "North West"
+  },
+  {
+    "id": "cmksemc22000qoqpnh2z7hke7",
+    "name": "Eastgate Centre",
+    "city": "Inverness",
+    "county": "Scotland"
+  },
+  {
+    "id": "cmksemba8000hoqpnzlsmc2h4",
+    "name": "The Concourse",
+    "city": "Skelmersdale",
+    "county": "North West"
+  },
+  {
+    "id": "cmksembjo000loqpnyz6o7uyx",
+    "name": "Four Seasons Shopping Centre",
+    "city": "Mansfield",
+    "county": "East Midlands"
+  },
+  {
+    "id": "cmksemay1000doqpnibvqlx6d",
+    "name": "Abbey Centre",
+    "city": "Belfast",
+    "county": "Northern Ireland"
+  },
+  {
+    "id": "cmksfw8f10006ivpa2p2t028t",
+    "name": "5 Rise Shopping Centre",
+    "city": "Bingley",
+    "county": "Yorkshire"
+  },
+  {
+    "id": "cmksembin000koqpnqb4ea7gp",
+    "name": "Hardshaw Centre",
+    "city": "St Helens",
+    "county": "North West"
+  },
+  {
+    "id": "cmksfw8ho0007ivpa73g57zv0",
+    "name": "Cockhedge Retail Park",
+    "city": "Warrington",
+    "county": "North West"
+  },
+  {
+    "id": "cmksfw8m6000aivpaao3g5ck4",
+    "name": "Wulfrun Centre",
+    "city": "Wolverhampton",
+    "county": "West Midlands"
+  },
+  {
+    "id": "cmksfw8n5000bivpad9njtzxi",
+    "name": "The Churchill Centre",
+    "city": "Dudley",
+    "county": "West Midlands"
+  },
+  {
+    "id": "cmksfw8qj000civpavu52mtd8",
+    "name": "Southwater Square",
+    "city": "Telford",
+    "county": "West Midlands"
+  },
+  {
+    "id": "cmksfw8rg000divpaw58re2mm",
+    "name": "The Octagon",
+    "city": "Burton upon Trent",
+    "county": "East Midlands"
+  },
+  {
+    "id": "cmksfw8vv000eivpaw96hpz9a",
+    "name": "Kennedy Way",
+    "city": "Immingham",
+    "county": "East Midlands"
+  },
+  {
+    "id": "cmksfw8yh000fivpaft2h2tez",
+    "name": "Swadlincote Shopping Centre",
+    "city": "Swadlincote",
+    "county": "East Midlands"
+  },
+  {
+    "id": "cmksfw90z000givpa5ctvnq5v",
+    "name": "Baverstock",
+    "city": "Bristol",
+    "county": "South West"
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "county": "South East"
+  },
+  {
+    "id": "cmksfw93b000iivpahcxg6kr9",
+    "name": "Navan Town Centre",
+    "city": "Navan",
+    "county": "Ireland"
+  },
+  {
+    "id": "cmksfw96i000jivpadg0yxma2",
+    "name": "Old Square",
+    "city": "Walsall",
+    "county": "West Midlands"
+  },
+  {
+    "id": "cmksfw97m000kivpaw2c9dinh",
+    "name": "Gracechurch Centre",
+    "city": "Sutton Coldfield",
+    "county": "West Midlands"
+  }
+]
