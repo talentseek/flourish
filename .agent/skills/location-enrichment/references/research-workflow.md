@@ -8,6 +8,7 @@ Detailed step-by-step procedures for researching location data using the **Light
 1. `search_web` (Primary)
 2. `read_url_content` (Secondary - when URL known)
 3. `browser_subagent` (BANNED - unless blocked)
+4. **Fallback Logic**: If #1 fails, skip research fields and proceed to Demographics (Census Lookups).
 
 ---
 
@@ -17,6 +18,7 @@ Detailed step-by-step procedures for researching location data using the **Light
 ```python
 search_web(query="[location name] official website")
 # Extract URL from results summary
+# ⚠️ ON FAILURE: Guess URL (e.g., [name].co.uk), log warning, and proceed to Phase 8 (Demographics).
 ```
 
 ### 1.2 Verify Location Identity

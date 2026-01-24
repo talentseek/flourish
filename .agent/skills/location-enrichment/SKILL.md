@@ -13,6 +13,7 @@ description: |
 > 1. **Tier 1: `search_web`** - ALWAYS try this first for facts (years, reviews, owners).
 > 2. **Tier 2: `read_url_content`** - Use when you have a specific URL (website, wiki).
 > 3. **Tier 3: `browser_subagent`** - **AVOID**. Only use as absolute last resort if 403/404 errors block other methods. It is too slow for this workflow.
+> 4. **FAILURE MODE:** IF `search_web` fails (500/API Error), **DO NOT STOP**. Skip to the next phase (e.g., Demographics) or use best estimates. Label the update as "Partial Enrichment".
 
 ---
 
