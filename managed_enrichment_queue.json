@@ -1,0 +1,2599 @@
+[
+  {
+    "id": "cmksemamj000coqpn4igflqyi",
+    "name": "Bath Riverside",
+    "city": "Bath",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw91u000hivpach8zythi",
+    "name": "Emperor's Gate",
+    "city": "Stevenage",
+    "score": 0,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclx1400019atsbpwqmlh0",
+    "name": "Bloomfield Shopping Centre",
+    "city": "Bangor",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksfw8350001ivpapzhddzdj",
+    "name": "Knightswood Shopping Centre",
+    "city": "Glasgow",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kv0r01obmtpuinuwnn2n",
+    "name": "Highcross Shopping Centre",
+    "city": "Leicestershire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kwba01pomtputr1bhwgy",
+    "name": "Marble Place Shopping Centre",
+    "city": "Merseyside",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kwhp01pvmtpu7uy3cmc0",
+    "name": "Marketgate",
+    "city": "Lancashire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kwtn01q8mtpuu6lwmtx3",
+    "name": "Merseyway Shopping Centre",
+    "city": "Greater Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0ky5101rnmtpujqfwj8ma",
+    "name": "Park View Shopping Centre",
+    "city": "Tyne And Wear",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kxuy01rcmtpuod0qok4s",
+    "name": "Orchard Shopping Centre",
+    "city": "Somerset",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l19801uwmtput5wc7wns",
+    "name": "Swinton Square",
+    "city": "Greater Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l10z01unmtpu6hqa00ff",
+    "name": "Strand Shopping Centre",
+    "city": "Merseyside",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l1pu01vcmtpulg1x23jz",
+    "name": "The Brewery",
+    "city": "Greater London",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l2re01wcmtpu9n25lq3z",
+    "name": "The Forum Shopping Centre",
+    "city": "Tyne And Wear",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l39201wvmtpubtq83ujc",
+    "name": "The Howard Centre",
+    "city": "Hertfordshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l2w201whmtpuqmp7v6oh",
+    "name": "The Gate",
+    "city": "Tyne And Wear",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l44201xsmtpuiu5c9yqp",
+    "name": "The Moor Shopping Centre",
+    "city": "West Midlands",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l3vo01xjmtpumh74fin1",
+    "name": "The Marlands Shopping Centre",
+    "city": "Hampshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l3zf01xnmtpul9s7jrmn",
+    "name": "The Martlets",
+    "city": "West Sussex",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l3xl01xlmtpu3pm5j1je",
+    "name": "The Marlowes Shopping Centre",
+    "city": "Hertfordshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l4ed01y3mtpuwt1n1d9a",
+    "name": "The Parishes Shopping Centre",
+    "city": "Lincolnshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l4aj01xzmtpuvix0j5zt",
+    "name": "The Orchards Shopping Centre",
+    "city": "Kent",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l4j101y8mtpuxe9yyrc2",
+    "name": "The Piazza Centre",
+    "city": "West Yorkshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l56e01yxmtpu6mj57ls0",
+    "name": "The Three Spires Shopping Centre",
+    "city": "Staffordshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l5ss01zlmtpup5k0812p",
+    "name": "Trinity Square",
+    "city": "Tyne And Wear",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l70h020smtpuyvgcxqqc",
+    "name": "Wharfside Shopping Centre",
+    "city": "Cornwall",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0ky6y01rpmtpu9wv5rc7k",
+    "name": "Parkway Shopping Centre",
+    "city": "Berkshire",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l12t01upmtpuc0uy3cgq",
+    "name": "Stretford Mall",
+    "city": "Greater Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclx2e00029atsjlmev047",
+    "name": "Bowen Square",
+    "city": "Daventry",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclx7800039atsba7svxmi",
+    "name": "Clydebank Centre",
+    "city": "Glasgow (West)",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxbb00069atscb2m0ggh",
+    "name": "Great Northern Mall",
+    "city": "Belfast",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxho00079ats3zlva79h",
+    "name": "N1 Shopping Centre",
+    "city": "Islington",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksema4y0001oqpn3bl3anxt",
+    "name": "Great Northern",
+    "city": "Manchester",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema770002oqpnvju64jqv",
+    "name": "The Exchange",
+    "city": "Ilford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema8x0003oqpnipotmcez",
+    "name": "Islington Square",
+    "city": "London (Angel)",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema9s0004oqpnesnblm5f",
+    "name": "The Aylesham Centre",
+    "city": "Peckham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemah50008oqpnzyzcvvdz",
+    "name": "Cardigan Fields",
+    "city": "Leeds",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemai40009oqpnfx0yl4nu",
+    "name": "Riverside Leisure Park",
+    "city": "Norwich",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemabo0005oqpnqszqmrxg",
+    "name": "The Pavilions",
+    "city": "Uxbridge",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l1t401vfmtpu8s8h0z1l",
+    "name": "The Bridges Shopping Centre",
+    "city": "Tyne And Wear",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb0q000eoqpn1xwkozz8",
+    "name": "The Priory",
+    "city": "Dartford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb4c000foqpn0euo1dpv",
+    "name": "Salford Shopping City",
+    "city": "Salford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemb9d000goqpnr8xvdenl",
+    "name": "The Spindles",
+    "city": "Oldham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemba8000hoqpnzlsmc2h4",
+    "name": "The Concourse",
+    "city": "Skelmersdale",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksembjo000loqpnyz6o7uyx",
+    "name": "Four Seasons Shopping Centre",
+    "city": "Mansfield",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksemay1000doqpnibvqlx6d",
+    "name": "Abbey Centre",
+    "city": "Belfast",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksembbs000ioqpnzt74yblc",
+    "name": "Arndale Centre",
+    "city": "Morecambe",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksembcq000joqpn6dzt4d6m",
+    "name": "Fishergate Centre",
+    "city": "Preston",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemc22000qoqpnh2z7hke7",
+    "name": "Eastgate Centre",
+    "city": "Inverness",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw8m6000aivpaao3g5ck4",
+    "name": "Wulfrun Centre",
+    "city": "Wolverhampton",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8n5000bivpad9njtzxi",
+    "name": "The Churchill Centre",
+    "city": "Dudley",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8qj000civpavu52mtd8",
+    "name": "Southwater Square",
+    "city": "Telford",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8rg000divpaw58re2mm",
+    "name": "The Octagon",
+    "city": "Burton upon Trent",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8vv000eivpaw96hpz9a",
+    "name": "Kennedy Way",
+    "city": "Immingham",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8f10006ivpa2p2t028t",
+    "name": "5 Rise Shopping Centre",
+    "city": "Bingley",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksembin000koqpnqb4ea7gp",
+    "name": "Hardshaw Centre",
+    "city": "St Helens",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8ho0007ivpa73g57zv0",
+    "name": "Cockhedge Retail Park",
+    "city": "Warrington",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw97m000kivpaw2c9dinh",
+    "name": "Gracechurch Centre",
+    "city": "Sutton Coldfield",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw93b000iivpahcxg6kr9",
+    "name": "Navan Town Centre",
+    "city": "Navan",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmkscly17000j9atsg01bg92x",
+    "name": "The Sovereign",
+    "city": "Weston-super-Mare",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw90z000givpa5ctvnq5v",
+    "name": "Baverstock",
+    "city": "Bristol",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8yh000fivpaft2h2tez",
+    "name": "Swadlincote Shopping Centre",
+    "city": "Swadlincote",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw96i000jivpadg0yxma2",
+    "name": "Old Square",
+    "city": "Walsall",
+    "score": 10,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclx8x00049ats438p9xex",
+    "name": "Elephant & Castle Shopping Centre",
+    "city": "London",
+    "score": 20,
+    "missing": [
+      "social",
+      "parking",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemaiz000aoqpnh9mahtp7",
+    "name": "Parrswood Leisure Park",
+    "city": "Manchester (Didsbury)",
+    "score": 20,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year",
+      "contact",
+      "base"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksanu6q0004zky05rxawa6a",
+    "name": "The Broadway",
+    "city": "Bradford",
+    "score": 30,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year",
+      "contact"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4qj001813hxaoq2y2y0",
+    "name": "Richmond Gardens Shopping Centre",
+    "city": "Bournemouth",
+    "score": 30,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year",
+      "base"
+    ],
+    "management": "Sam Cohen"
+  },
+  {
+    "id": "cmid0ksmz01m2mtpumexo1436",
+    "name": "Crystal Peaks Shopping Centre",
+    "city": "South Yorkshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kump01nwmtpukz34qy1h",
+    "name": "Guildhall Shopping Centre",
+    "city": "Devon",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kupf01nzmtpukhdbk16d",
+    "name": "Hale Leys Shopping Centre",
+    "city": "Buckinghamshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4z2001q13hx0eb11dwa",
+    "name": "Willows",
+    "city": "Wickford",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Claudia Gasparro"
+  },
+  {
+    "id": "cmid0krlq01l0mtpux2i1fl0p",
+    "name": "Charter Walk Shopping Centre",
+    "city": "Lancashire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kv6j01ohmtpumqpehi2d",
+    "name": "Horsefair Shopping Centre",
+    "city": "Cambridgeshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kvmh01oymtpun69lgw4f",
+    "name": "Kingsgate Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kqbr01jnmtpu07xzydqd",
+    "name": "Brewery Square",
+    "city": "Dorset",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kr4101khmtpu3tvpub6s",
+    "name": "Carlton Lanes Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0krt901l8mtpuslr6bvqm",
+    "name": "Christopher Place Shopping Centre",
+    "city": "Hertfordshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0ks2q01limtpu3vy3pjqh",
+    "name": "Clarendon Square Shopping Centre",
+    "city": "Greater Manchester",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0ksa101lpmtpujvbc7vev",
+    "name": "Coppergate Shopping Centre",
+    "city": "North Yorkshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kvln01oxmtpu134sj0n0",
+    "name": "Kingsgate Centre",
+    "city": "Fife",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kslq01m1mtpufmzifszm",
+    "name": "Crowngate Shopping Centre",
+    "city": "Worcestershire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kor101i5mtpuwxmqwqmt",
+    "name": "17&Central",
+    "city": "Greater London",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kug201npmtpug1to3gog",
+    "name": "Grays Shopping Centre",
+    "city": "Essex",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kotz01i8mtpuxrf6gumj",
+    "name": "Abbeygate Shopping Centre",
+    "city": "Warwickshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kw9c01pmmtpu162ga5o1",
+    "name": "Mander Centre",
+    "city": "West Midlands",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kpqh01j0mtpufhutbac4",
+    "name": "Beaumont Shopping Centre",
+    "city": "Leicestershire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kvbd01ommtpu6zn5ghrz",
+    "name": "Idlewells Shopping Centre",
+    "city": "Nottinghamshire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kpua01j4mtpu8cg8gfp8",
+    "name": "Belvoir Shopping Centre",
+    "city": "Leicestershire",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kvoe01p0mtpu5aevbmml",
+    "name": "Kingsway Shopping Centre",
+    "city": "Newport",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kuoj01nymtpui8amxojd",
+    "name": "Gyle Shopping Centre",
+    "city": "City Of Edinburgh",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0ku5201ngmtpuwwx3pe5p",
+    "name": "Galleries Shopping Centre",
+    "city": "Tyne And Wear",
+    "score": 35,
+    "missing": [
+      "social",
+      "parking",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4jq000t13hxgqkrk1zk",
+    "name": "Market Quay Shopping Centre",
+    "city": "Fareham",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw482000413hx6wu6uigt",
+    "name": "Beacons Place Shopping Centre",
+    "city": "Merthyr Tydfil",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "LCP Properties"
+  },
+  {
+    "id": "cmicxw4l3000w13hxpi1ja553",
+    "name": "Middleton Shopping Centre",
+    "city": "Middleton",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4q3001713hxwky54t3o",
+    "name": "Rainham Shopping Centre",
+    "city": "Rainham",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Adam Davies"
+  },
+  {
+    "id": "cmicxw4tl001e13hx7ae4i2db",
+    "name": "The Swan Centre",
+    "city": "Eastleigh",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmks95l1i0002fajkbhurjm5f",
+    "name": "Merry Hill",
+    "city": "Brierley Hill (Dudley)",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmks95lbi0006fajke474s7kn",
+    "name": "East Kilbride Shopping Centre",
+    "city": "East Kilbride",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmks95lcp0007fajkcfjgnu0m",
+    "name": "The Centre, Livingston",
+    "city": "Livingston",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclxr9000b9atsr7h3qpm6",
+    "name": "The Brunel",
+    "city": "Swindon",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxw8000f9atsoakm9akp",
+    "name": "The Malls Shopping Centre",
+    "city": "Basingstoke",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly1z000k9atsw07ou5v2",
+    "name": "The Stamford Quarter",
+    "city": "Altrincham",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclz73000z9atsl05u9ui4",
+    "name": "Piccadilly Train Station",
+    "city": "Manchester",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemc77000soqpnlf5gxgbk",
+    "name": "Broadmarsh Centre",
+    "city": "Nottingham",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksemc5i000roqpnc6dotqp1",
+    "name": "Freshney Place",
+    "city": "Grimsby",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksfw8b10004ivpajuj6k4br",
+    "name": "Cornmill Centre",
+    "city": "Darlington",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksfw8bx0005ivparetxlync",
+    "name": "The Pavilion",
+    "city": "Thornaby-on-Tees",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclxl100089atsodc6ubmb",
+    "name": "Quedam Shopping Centre",
+    "city": "Yeovil",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxsv000c9atsgcm3ieh3",
+    "name": "The Harvey Centre",
+    "city": "Harlow",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksfw8500002ivpawg7jnvek",
+    "name": "New Kirkgate",
+    "city": "Edinburgh (Leith)",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kr5d01kimtpuwycosi8n",
+    "name": "Cascades Shopping Centre",
+    "city": "Hampshire",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kxco01qsmtpul5jlehov",
+    "name": "Newkirkgate Shopping Centre",
+    "city": "City Of Edinburgh",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kxyr01rgmtpueex73tet",
+    "name": "Overgate Centre",
+    "city": "Dundee",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kyok01s5mtpuhnoxowjz",
+    "name": "Princes Square",
+    "city": "Glasgow City",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kyqa01s7mtpugziugzyx",
+    "name": "Princesshay",
+    "city": "Exeter",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kynn01s4mtpu9mfvybh5",
+    "name": "Princes Quay",
+    "city": "Hull",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l02q01tnmtpux785zt40",
+    "name": "Silverburn",
+    "city": "Glasgow (Pollok)",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kzor01t8mtpu9scvgeyv",
+    "name": "The Ryemarket Shopping Centre",
+    "city": "West Midlands",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l4i401y7mtpubsy0mecw",
+    "name": "The Pentagon Shopping Centre",
+    "city": "Kent",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l4kt01yamtpuhajtru6v",
+    "name": "The Potteries Centre",
+    "city": "Staffordshire",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l57b01yymtpukrln8bvy",
+    "name": "The Trafford Centre",
+    "city": "Manchester (Trafford)",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l5zp01zsmtpu8hplkg1a",
+    "name": "Vicar Lane Shopping Centre",
+    "city": "Chesterfield",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l6ga020amtpuhe54iqk3",
+    "name": "Wellgate Shopping Centre",
+    "city": "Dundee City",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l75y020xmtpu5n0vfpo8",
+    "name": "White Rose Shopping Centre",
+    "city": "Leeds",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l7ob021fmtpun4br2jct",
+    "name": "Yate Shopping Centre",
+    "city": "City Of Bristol",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l7ll021cmtpuuv5fw99k",
+    "name": "Woolshops Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4wf001k13hxq1rjn1no",
+    "name": "The Viking Centre",
+    "city": "Jarrow",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4sn001c13hx4ilp5yh6",
+    "name": "St Martin's Walk",
+    "city": "Dorking",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Kat Behbani"
+  },
+  {
+    "id": "cmks95kxp0000fajk1zegd3uf",
+    "name": "Festival Place",
+    "city": "Basingstoke",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmks9w2wy0001p2aauakdcyww",
+    "name": "Fosse Park",
+    "city": "Leicester",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4gi000m13hx9mghuxqm",
+    "name": "Kingsland Shopping Centre",
+    "city": "Thatcham",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclybn000o9atsyrhmkpjq",
+    "name": "Dundrum Town Centre",
+    "city": "Dublin",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksemaf80007oqpnob5teich",
+    "name": "Tower Park",
+    "city": "Poole",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemadh0006oqpn2jit3n3j",
+    "name": "West India Quay",
+    "city": "London (Docklands)",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4y7001o13hxp4niwnzx",
+    "name": "Weavers Wharf Shopping Park",
+    "city": "Kidderminster",
+    "score": 40,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksclxvf000e9atsl1syc0gh",
+    "name": "The Kingdom Centre",
+    "city": "Glenrothes",
+    "score": 50,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year",
+      "base"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4j7000s13hxzkrmasy0",
+    "name": "The Mailbox",
+    "city": "Birmingham",
+    "score": 50,
+    "missing": [
+      "social",
+      "reviews",
+      "demographics"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4c8000d13hxw8ui2frd",
+    "name": "Chelmsley Wood Shopping Centre",
+    "city": "Chelmsley Wood (Solihull)",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4is000r13hxavd7ijyw",
+    "name": "Swanley Shopping Centre",
+    "city": "Swanley",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Kat Behbani"
+  },
+  {
+    "id": "cmid0kph201iqmtpurqm3vuty",
+    "name": "Atria Watford",
+    "city": "Watford",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kq4d01jfmtpukfw1vzno",
+    "name": "Market Place Bolton",
+    "city": "Bolton",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0krjt01kymtpujb9ghsij",
+    "name": "Chantry Place",
+    "city": "Norwich",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0ktd201mnmtpu76e50jw2",
+    "name": "Eden Shopping Centre",
+    "city": "High Wycombe",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kvxm01pamtpug9dfc19m",
+    "name": "Lion Yard Shopping Centre",
+    "city": "Cambridge",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kudy01nnmtpur2kkuirs",
+    "name": "Grand Arcade",
+    "city": "Cambridge",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0ku1a01ncmtpu0vfednve",
+    "name": "Friars Square Shopping Centre",
+    "city": "Aylesbury",
+    "score": 55,
+    "missing": [
+      "social",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4i8000q13hxzukdlnbo",
+    "name": "Lower Precinct Shopping Centre",
+    "city": "Coventry",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmksanu3p0000zky099990ebj",
+    "name": "Eastgate Shopping Centre",
+    "city": "Basildon",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksanu4m0001zky0mjja7zw7",
+    "name": "The Mall Wood Green",
+    "city": "London (Wood Green)",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4nw001213hxg33cfetn",
+    "name": "The Parkway Centre",
+    "city": "Middlesbrough",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Dan Davies"
+  },
+  {
+    "id": "cmksclxnc00099atsn6ptzs4z",
+    "name": "St George's Shopping Centre",
+    "city": "Harrow",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclxum000d9atsbwospi7x",
+    "name": "The Idlewells Centre",
+    "city": "Sutton In Ashfield",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxxw000h9atsf5lv672y",
+    "name": "The Merrion Centre",
+    "city": "Leeds",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclxpo000a9atsg930t02a",
+    "name": "Swords Pavilions",
+    "city": "Dublin",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly7g000m9atsk5cpzu8z",
+    "name": "Willow Place & Corby Town Shopping",
+    "city": "Corby",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly0f000i9ats9p3kzm98",
+    "name": "The Regent Centre",
+    "city": "Kirkintilloch",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l1b101uymtpum3d9a7uy",
+    "name": "Telford Centre",
+    "city": "Shropshire",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksema3s0000oqpne5wngef6",
+    "name": "Arc Shopping Centre",
+    "city": "Bury St Edmunds",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmks95l3l0003fajklv13xjzk",
+    "name": "Kingfisher Shopping Centre",
+    "city": "Redditch",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclwy700009atsvppjfhe1",
+    "name": "Ankerside Shopping Centre",
+    "city": "Tamworth",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l4ml01ycmtpumksnmzfr",
+    "name": "The Quadrant Centre",
+    "city": "Swansea",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly2t000l9atsp99d0f4w",
+    "name": "The Thistles Shopping Centre",
+    "city": "Stirling",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l5tm01zmmtpusfeo6k3n",
+    "name": "Trinity Walk Shopping Centre",
+    "city": "West Yorkshire",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmkscly94000n9atsskthi9a3",
+    "name": "CastleCourt",
+    "city": "Belfast",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclxx3000g9ats4xhyetsk",
+    "name": "The Meadows",
+    "city": "Chelmsford",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0kyr701s8mtpuvnj7tz2h",
+    "name": "Priory Meadow Shopping Centre",
+    "city": "East Sussex",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksemajw000boqpn46fxb97w",
+    "name": "Xscape Milton Keynes",
+    "city": "Milton Keynes",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kt7j01mhmtpuwbu3mu50",
+    "name": "Eagles Meadow",
+    "city": "Wrexham",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l0k801u5mtpue2ghsou2",
+    "name": "St. Enoch Centre",
+    "city": "Glasgow",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmid0l5je01zbmtpur0n9pcyh",
+    "name": "Touchwood",
+    "city": "Solihull",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l5ik01zamtpuieaouutx",
+    "name": "Touchwood",
+    "city": "West Midlands",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l6cl0206mtpu02sm00xs",
+    "name": "Waterside Shopping Centre",
+    "city": "Lincolnshire",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kxko01r1mtpusjvxwaq7",
+    "name": "Ocean Terminal",
+    "city": "City Of Edinburgh",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw49t000813hxr6frnapt",
+    "name": "Borough Parade Shopping Centre",
+    "city": "Chippenham",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Rob Ault"
+  },
+  {
+    "id": "cmicxw4ab000913hxacpya41l",
+    "name": "The Britten Centre",
+    "city": "Lowestoft",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Adam Davies"
+  },
+  {
+    "id": "cmid0l2xy01wjmtpuya0m3m6d",
+    "name": "The Glades",
+    "city": "Bromley",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l3q401xdmtpu8jc8n7z8",
+    "name": "The Mall Maidstone",
+    "city": "Maidstone",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0l08f01ttmtpubx0xlwet",
+    "name": "The Spinning Gate Shopping Centre",
+    "city": "Greater Manchester",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4u4001f13hxatqekwgs",
+    "name": "The Bridges",
+    "city": "Sunderland",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4wu001l13hx7mkxg5q0",
+    "name": "The Walnuts",
+    "city": "Orpington",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kz6f01somtpuhy9sv03y",
+    "name": "Regent Arcade Shopping Centre",
+    "city": "Cheltenham",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksairx40000t03p9jxm39eu",
+    "name": "Bon Accord Centre",
+    "city": "Aberdeen",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksais0y0001t03phhqcnl5v",
+    "name": "St Johns Shopping Centre",
+    "city": "Liverpool",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmksclx9p00059atsvtvtjctf",
+    "name": "Erneside Shopping Centre",
+    "city": "Enniskillen",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclysp000r9atsah54ogcx",
+    "name": "Midsummer Place (formerly intu MK)",
+    "city": "Milton Keynes",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmksclyld000q9atsz1g1ihxe",
+    "name": "Queensgate Shopping Centre",
+    "city": "Peterborough",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmicxw4cn000e13hxq49ww240",
+    "name": "Cwmbran Centre",
+    "city": "Cwmbran",
+    "score": 60,
+    "missing": [
+      "reviews",
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmicxw4hd000o13hxkrkb8enf",
+    "name": "The Lexicon",
+    "city": "Bracknell",
+    "score": 70,
+    "missing": [
+      "reviews",
+      "demographics"
+    ],
+    "management": "Savills"
+  },
+  {
+    "id": "cmicxw4e2000h13hx4f2650mh",
+    "name": "The Grosvenor Centre",
+    "city": "Northampton",
+    "score": 75,
+    "missing": [
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0kv7j01oimtpugmn3jvfd",
+    "name": "Houndshill Shopping Centre",
+    "city": "Blackpool",
+    "score": 75,
+    "missing": [
+      "demographics",
+      "year"
+    ],
+    "management": "Workman LLP"
+  },
+  {
+    "id": "cmid0kwx901qcmtpuzo7cmg3o",
+    "name": "Middleton Grange Shopping Centre",
+    "city": "Durham",
+    "score": 75,
+    "missing": [
+      "demographics",
+      "year"
+    ],
+    "management": "M Core (LCP/Evolve)"
+  },
+  {
+    "id": "cmid0l6zd020rmtpusjb7tpf1",
+    "name": "Westwood Cross Shopping Centre",
+    "city": "Kent",
+    "score": 85,
+    "missing": [
+      "demographics"
+    ],
+    "management": "Landsec"
+  },
+  {
+    "id": "cmicxw4uj001g13hxwa88y750",
+    "name": "The Centre Margate, ",
+    "city": "Margate",
+    "score": 85,
+    "missing": [
+      "demographics"
+    ],
+    "management": "LCP Group / Clarke & Crittenden"
+  },
+  {
+    "id": "cmid0l76u020ymtpuixnytlvp",
+    "name": "Whitefriars Canterbury",
+    "city": "Kent",
+    "score": 85,
+    "missing": [
+      "demographics"
+    ],
+    "management": "Whitefriars Management Suite (Internal)"
+  },
+  {
+    "id": "cmid0l66601zzmtpuyevusp74",
+    "name": "Viking Centre",
+    "city": "Tyne And Wear",
+    "score": 85,
+    "missing": [
+      "demographics"
+    ],
+    "management": "LCP Properties"
+  }
+]

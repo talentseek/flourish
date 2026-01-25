@@ -4,10 +4,18 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const missingTargets = [
-    "Arcadian",
-    "Bay View",
-    "Cannon Park",
-    "Enterprise"
+    "Spinning Gate",
+    "Queensgate",
+    "Grosvenor",
+    "Chimes",
+    "Bon Accord",
+    "Darwin",
+    "Liberty",
+    "Royal Priors",
+    "Ashley",
+    "Grafton",
+    "Harpur",
+    "Howgate"
 ];
 
 async function main() {
