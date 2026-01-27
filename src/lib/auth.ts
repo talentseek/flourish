@@ -6,6 +6,21 @@ import { headers } from "next/headers";
 
 const prisma = new PrismaClient();
 
+// Type for email functions
+interface EmailData {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    emailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    image?: string | null;
+  };
+  url: string;
+  token: string;
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
@@ -25,16 +40,18 @@ export const auth = betterAuth({
   // Mock email for development
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(url: string) {
+    async sendResetPassword(data: EmailData) {
       console.log("----------------------------------------");
       console.log("🔗 RESET PASSWORD LINK:");
-      console.log(url);
+      console.log(`User: ${data.user.email}`);
+      console.log(`URL: ${data.url}`);
       console.log("----------------------------------------");
     },
-    async sendEmailVerification(url: string) {
+    async sendVerificationEmail(data: EmailData) {
       console.log("----------------------------------------");
       console.log("🔗 VERIFY EMAIL LINK:");
-      console.log(url);
+      console.log(`User: ${data.user.email}`);
+      console.log(`URL: ${data.url}`);
       console.log("----------------------------------------");
     }
   }
