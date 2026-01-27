@@ -29,7 +29,7 @@ export default async function DashboardPage() {
   });
 
   if (!session) {
-    redirect("/")
+    redirect("/login")
   }
 
   // Live metrics

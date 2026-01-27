@@ -2,35 +2,25 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  // Better Auth can use different cookie names depending on configuration
-  // Check for multiple possible session cookie names
-  const sessionCookie =
-    request.cookies.get("better-auth.session_token") ||
-    request.cookies.get("better-auth.session") ||
-    request.cookies.get("__session") ||
-    request.cookies.get("session_token");
-
-  // Log cookies for debugging (will show in Vercel logs)
-  const allCookies = request.cookies.getAll();
-  console.log("[Middleware] Path:", request.nextUrl.pathname);
-  console.log("[Middleware] Cookies:", allCookies.map(c => c.name).join(", "));
-  console.log("[Middleware] Session found:", !!sessionCookie);
+  // Better Auth uses this exact cookie name
+  const sessionCookie = request.cookies.get("better-auth.session_token");
 
   // Define protected routes
   const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/sign-up") ||
-    request.nextUrl.pathname.startsWith("/forgot-password");
+    request.nextUrl.pathname.startsWith("/forgot-password") ||
+    request.nextUrl.pathname.startsWith("/reset-password");
 
-  // Redirect unauthenticated users accessing dashboard
-  if (isDashboard && !sessionCookie) {
-    console.log("[Middleware] No session, redirecting to login");
-    return NextResponse.redirect(new URL("/login", request.url));
+  // For dashboard routes: let the page handle auth check
+  // Don't do middleware redirect - the page will check session validity
+  if (isDashboard) {
+    return NextResponse.next();
   }
 
-  // Redirect authenticated users trying to access auth pages
+  // For auth routes: if there's a session cookie, redirect to dashboard
+  // The dashboard page will verify if the session is actually valid
   if (isAuthRoute && sessionCookie) {
-    console.log("[Middleware] Session found, redirecting to dashboard");
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -38,5 +28,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/sign-up", "/forgot-password"]
+  matcher: ["/dashboard/:path*", "/login", "/sign-up", "/forgot-password", "/reset-password"]
 };
