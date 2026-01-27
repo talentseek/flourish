@@ -21,20 +21,28 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
 
-        const { error } = await authClient.signIn.email({
-            email,
-            password,
-            callbackURL: "/dashboard"
-        });
+        try {
+            const result = await authClient.signIn.email({
+                email,
+                password,
+            });
 
-        if (error) {
-            toast.error(error.message || "Invalid credentials");
+            console.log("[Login] Result:", result);
+
+            if (result.error) {
+                toast.error(result.error.message || "Invalid credentials");
+                setLoading(false);
+                return;
+            }
+
+            toast.success("Welcome back!");
+            // Use window.location for a hard redirect to ensure cookies are properly set
+            window.location.href = "/dashboard";
+        } catch (err) {
+            console.error("[Login] Exception:", err);
+            toast.error("An error occurred during login");
             setLoading(false);
-            return;
         }
-
-        toast.success("Welcome back!");
-        router.push("/dashboard");
     };
 
     return (
