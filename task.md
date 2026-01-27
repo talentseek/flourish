@@ -19,6 +19,16 @@
     - [x] Implement Login Page `src/app/(auth)/login/page.tsx` <!-- id: 12 -->
     - [x] Implement Signup Page `src/app/(auth)/sign-up/page.tsx` <!-- id: 13 -->
     - [x] Implement Forgot Password `src/app/(auth)/forgot-password/page.tsx` <!-- id: 14 -->
+- [x] Migrate Auth To Better Auth `task_active`
+    - [x] Replace Clerk `UserButton` with custom component <!-- id: 0 -->
+    - [x] Remove all remaining `@clerk` imports <!-- id: 1 -->
+    - [x] Ensure compilation success <!-- id: 2 -->
+    - [x] Verify Fixes
+        - [x] Verify Login/Dashboard Access <!-- id: 4 -->
+        - [x] Verify Sign Out <!-- id: 5 -->
+    - [x] Deploy to Production
+        - [x] Verify `package.json` and `auth.ts` config <!-- id: 6 -->
+        - [x] Push to GitHub <!-- id: 7 -->
 - [x] Phase 5: Switchover & Cleanup
     - [x] Update Navbar SignOut <!-- id: 15 -->
     - [x] Update Middleware strictness <!-- id: 16 -->

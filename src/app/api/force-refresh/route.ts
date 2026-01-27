@@ -1,39 +1,30 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
-import { clerkClient } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const user = await currentUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
-    }
-
-    // Update Clerk user's public metadata
-    const updatedClerkUser = await clerkClient.users.updateUser(user.id, {
-      publicMetadata: { role: 'ADMIN' }
+    const session = await auth.api.getSession({
+      headers: await headers()
     });
 
-    // Force session refresh by updating the user
-    await clerkClient.sessions.revokeSession(user.id);
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    // Better Auth handles session refresh automatically via client/headers.
+    // This endpoint can serve as a validity check.
 
     return NextResponse.json({
       success: true,
-      message: "Session refreshed! Please sign out and sign back in.",
-      user: {
-        id: updatedClerkUser.id,
-        publicMetadata: updatedClerkUser.publicMetadata
-      }
+      message: "Session is valid.",
+      user: session.user
     });
 
   } catch (error) {
-    console.error("Error refreshing session:", error);
+    console.error("Error checking session:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

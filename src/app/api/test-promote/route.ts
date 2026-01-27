@@ -1,40 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import { currentUser, auth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 
 export const runtime = 'nodejs';
-import { clerkClient } from "@clerk/nextjs/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const user = await currentUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+
+    if (!session) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const userId = session.user.id;
+
     // Update database
-    const updatedDbUser = await prisma.user.upsert({
-      where: { id: user.id },
-      update: { role: 'ADMIN' },
-      create: {
-        id: user.id,
-        email: user.emailAddresses[0]?.emailAddress || '',
-        role: 'ADMIN'
-      }
+    const updatedDbUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role: 'ADMIN' }
     });
-
-    // Update Clerk user's public metadata
-    const updatedClerkUser = await clerkClient.users.updateUser(user.id, {
-      publicMetadata: { role: 'ADMIN' }
-    });
-
-    // Check what the middleware sees
-    const { sessionClaims } = auth();
-    const middlewareRole = (sessionClaims?.publicMetadata as any)?.role?.toUpperCase?.() || "USER";
 
     return NextResponse.json({
       success: true,
@@ -44,10 +31,7 @@ export async function POST(request: NextRequest) {
         email: updatedDbUser.email,
         role: updatedDbUser.role
       },
-      clerkMetadata: updatedClerkUser.publicMetadata,
-      middlewareRole,
-      sessionClaims,
-      note: "You may need to sign out and sign back in for the role change to take effect in the middleware."
+      note: "Role updated in database."
     });
 
   } catch (error) {
