@@ -20,16 +20,7 @@ export const auth = betterAuth({
   ],
 
   plugins: [
-    organization({
-      roles: {
-        regional_manager: {
-          priority: 2,
-        },
-        centre_manager: {
-          priority: 1,
-        }
-      }
-    })
+    organization()
   ],
   // Mock email for development
   emailAndPassword: {
