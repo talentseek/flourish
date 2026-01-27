@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 import { flourishAssistantFunctions } from "@/lib/vapi-functions";
 
 export const runtime = 'nodejs';
@@ -15,15 +16,20 @@ const VAPI_API_URL = "https://api.vapi.ai";
 export async function POST(req: NextRequest) {
   try {
     // Validate Clerk authentication and admin role
-    const user = await getSessionUser();
-    if (!user) {
+    // Validate Clerk authentication and admin role
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
       );
     }
 
-    if (user.role !== "ADMIN") {
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser.id }
+    });
+
+    if (!user || user.role !== "ADMIN") {
       return NextResponse.json(
         { success: false, error: "Admin access required" },
         { status: 403 }
@@ -39,10 +45,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Get app URL from environment or use production domain
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ||
       (process.env.VERCEL_ENV === "production" ? "https://flourish-ai.vercel.app" : null) ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-      req.headers.get("origin") || 
+      req.headers.get("origin") ||
       "https://flourish-ai.vercel.app";
 
     // Assistant configuration (create assistant first, then add functions separately)

@@ -7,7 +7,19 @@ export const runtime = 'nodejs';
 export async function POST(request: NextRequest) {
   try {
     // Check if current user is admin
-    const currentUser = await getSessionUser();
+    // Check if current user is admin
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
+      return NextResponse.json(
+        { error: "Unauthorized - Admin access required" },
+        { status: 403 }
+      );
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { id: sessionUser.id }
+    });
+
     if (!currentUser || currentUser.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Unauthorized - Admin access required" },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 export const runtime = 'nodejs';
 
@@ -13,15 +14,19 @@ const VAPI_API_URL = "https://api.vapi.ai";
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const user = await getSessionUser();
-    if (!user) {
+    const sessionUser = await getSessionUser();
+    if (!sessionUser) {
       return NextResponse.json(
         { success: false, error: "Not authenticated" },
         { status: 401 }
       );
     }
 
-    if (user.role !== "ADMIN") {
+    const user = await prisma.user.findUnique({
+      where: { id: sessionUser.id }
+    });
+
+    if (!user || user.role !== "ADMIN") {
       return NextResponse.json(
         { success: false, error: "Admin access required" },
         { status: 403 }
@@ -36,7 +41,7 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || 
+    const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID ||
       new URL(req.url).searchParams.get("assistantId") ||
       "768a8d5b-23ab-4990-84c3-ef57e68c96cd";
 
@@ -81,9 +86,9 @@ export async function DELETE(req: NextRequest) {
           toolErrors.push({ id: toolId, error: errorText });
         }
       } catch (error) {
-        toolErrors.push({ 
-          id: toolId, 
-          error: error instanceof Error ? error.message : "Unknown error" 
+        toolErrors.push({
+          id: toolId,
+          error: error instanceof Error ? error.message : "Unknown error"
         });
       }
     }
@@ -100,8 +105,8 @@ export async function DELETE(req: NextRequest) {
     if (!deleteResponse.ok) {
       const errorText = await deleteResponse.text();
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: `Failed to delete assistant: ${errorText}`,
           toolsDeleted: deletedTools.length,
           toolErrors: toolErrors.length > 0 ? toolErrors : undefined,
