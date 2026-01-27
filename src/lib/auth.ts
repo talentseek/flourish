@@ -25,13 +25,13 @@ export const auth = betterAuth({
   // Mock email for development
   emailAndPassword: {
     enabled: true,
-    async sendResetPassword(url) {
+    async sendResetPassword(url: string) {
       console.log("----------------------------------------");
       console.log("🔗 RESET PASSWORD LINK:");
       console.log(url);
       console.log("----------------------------------------");
     },
-    async sendEmailVerification(url) {
+    async sendEmailVerification(url: string) {
       console.log("----------------------------------------");
       console.log("🔗 VERIFY EMAIL LINK:");
       console.log(url);
