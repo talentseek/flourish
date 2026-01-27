@@ -1,15 +1,19 @@
 "use server"
 
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 export async function signOutAction() {
-  const { userId } = auth()
-  
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
     redirect("/")
   }
 
-  // Clear the session by redirecting to Clerk's sign-out
-  redirect("/sign-out")
+  // Better Auth handles sign out on client side usually.
+  // This server action is effectively a no-op or just a redirect.
+  redirect("/")
 }

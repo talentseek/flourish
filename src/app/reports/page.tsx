@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
@@ -6,9 +7,9 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  FileText, 
-  Download, 
+import {
+  FileText,
+  Download,
   Calendar,
   Building2,
   Users,
@@ -18,9 +19,11 @@ import {
 import Link from "next/link"
 
 export default async function ReportsPage() {
-  const { userId } = auth()
-  
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
     redirect("/")
   }
 
@@ -49,7 +52,7 @@ export default async function ReportsPage() {
               {/* Available Reports */}
               <div className="space-y-6">
                 <h2 className="text-xl font-semibold">Available Reports</h2>
-                
+
                 {/* Queensgate Report */}
                 <Card className="hover:shadow-lg transition-all duration-200 border-2 hover:border-primary/20">
                   <CardHeader>

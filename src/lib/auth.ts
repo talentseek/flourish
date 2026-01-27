@@ -1,68 +1,49 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import { NextRequest } from "next/server";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { PrismaClient } from "@prisma/client";
+import { organization } from "better-auth/plugins";
 
-export async function getSessionUser() {
-  const { userId } = auth();
-  if (!userId) return null;
-  const user = await currentUser();
-  const role = (user?.publicMetadata?.role as string | undefined)?.toUpperCase() || "USER";
-  return { id: userId, role };
-}
+const prisma = new PrismaClient();
 
-/**
- * Authenticate requests from either Clerk (web) or Vapi (server-to-server)
- * Returns user info if authenticated, null otherwise
- * 
- * TEMPORARY: For demo purposes, allows Vapi requests without auth if no auth header is present
- * This will be tightened up after demo - proper solution is to configure Vapi with API key headers
- */
-export async function authenticateVapiRequest(req: NextRequest): Promise<{ id: string; role: string; source: 'clerk' | 'vapi' } | null> {
-  // Log all headers for debugging (helps us see what Vapi sends)
-  const allHeaders: Record<string, string> = {};
-  req.headers.forEach((value, key) => {
-    allHeaders[key] = value;
-  });
-  console.log('Vapi request headers:', JSON.stringify(allHeaders, null, 2));
-  
-  // Check for Vapi API key first (for server-to-server calls)
-  // Vapi sends Authorization header with Bearer token
-  const authHeader = req.headers.get('authorization');
-  const vapiApiKey = authHeader?.replace('Bearer ', '').trim();
-  const expectedVapiKey = process.env.VAPI_API_KEY || process.env.VAPI_PRIVATE_KEY;
-  
-  console.log('Auth check:', {
-    hasAuthHeader: !!authHeader,
-    authHeaderValue: authHeader ? `${authHeader.substring(0, 20)}...` : null,
-    hasApiKey: !!vapiApiKey,
-    hasExpectedKey: !!expectedVapiKey,
-    keyMatch: vapiApiKey === expectedVapiKey,
-    userAgent: req.headers.get('user-agent'),
-  });
-  
-  if (vapiApiKey && expectedVapiKey && vapiApiKey === expectedVapiKey) {
-    // Valid Vapi API key - allow access
-    console.log('✅ Authenticated via Vapi API key');
-    return { id: 'vapi-service', role: 'ADMIN', source: 'vapi' };
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  baseURL: process.env.BETTER_AUTH_URL,
+  basePath: "/api/auth",
+  trustedOrigins: [
+    "http://localhost:3000",
+    // Add Vercel preview URLs regex or specific domains if needed
+    // Better Auth might need specific configuration for wildcard subdomains
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [])
+  ],
+
+  plugins: [
+    organization({
+      roles: {
+        regional_manager: {
+          priority: 2,
+        },
+        centre_manager: {
+          priority: 1,
+        }
+      }
+    })
+  ],
+  // Mock email for development
+  emailAndPassword: {
+    enabled: true,
+    async sendResetPassword(url) {
+      console.log("----------------------------------------");
+      console.log("🔗 RESET PASSWORD LINK:");
+      console.log(url);
+      console.log("----------------------------------------");
+    },
+    async sendEmailVerification(url) {
+      console.log("----------------------------------------");
+      console.log("🔗 VERIFY EMAIL LINK:");
+      console.log(url);
+      console.log("----------------------------------------");
+    }
   }
-
-  // Fall back to Clerk authentication (for web requests)
-  const user = await getSessionUser();
-  if (user) {
-    console.log('✅ Authenticated via Clerk');
-    return { ...user, source: 'clerk' };
-  }
-
-  // TEMPORARY FIX FOR DEMO: Allow Vapi requests without auth
-  // Check if this looks like a Vapi request (no auth header, POST to /api/vapi/*)
-  const url = req.url;
-  const isVapiEndpoint = url.includes('/api/vapi/');
-  const method = req.method;
-  
-  if (isVapiEndpoint && method === 'POST' && !authHeader) {
-    console.log('⚠️  TEMPORARY: Allowing Vapi request without auth for demo purposes');
-    return { id: 'vapi-service', role: 'ADMIN', source: 'vapi' };
-  }
-
-  console.log('❌ Authentication failed');
-  return null;
-}
+});

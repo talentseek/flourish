@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { prisma } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -10,9 +11,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { 
-  FileText, 
-  Download, 
+import {
+  FileText,
+  Download,
   Calendar,
   TrendingUp,
   Building2,
@@ -48,15 +49,17 @@ function haversineMiles(lat1: number, lon1: number, lat2: number, lon2: number):
   const R = 3959
   const dLat = toRadians(lat2 - lat1)
   const dLon = toRadians(lon2 - lon1)
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return R * c
 }
 
 export default async function QueensgateReportPage() {
-  const { userId } = auth()
-  
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
     redirect("/")
   }
 
@@ -243,10 +246,10 @@ export default async function QueensgateReportPage() {
                     </div>
                     <CardTitle className="text-2xl">Executive Summary</CardTitle>
                     <CardDescription>
-                      Report Date: {new Date().toLocaleDateString('en-GB', { 
-                        day: 'numeric', 
-                        month: 'long', 
-                        year: 'numeric' 
+                      Report Date: {new Date().toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                       })}
                     </CardDescription>
                   </CardHeader>
@@ -283,13 +286,13 @@ export default async function QueensgateReportPage() {
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold">Overview</h3>
                       <p className="text-muted-foreground leading-relaxed">
-                        Queensgate Shopping Centre demonstrates strong performance with 9.5 million annual visitors 
-                        and a solid tenant mix. However, analysis reveals significant opportunities for revenue 
+                        Queensgate Shopping Centre demonstrates strong performance with 9.5 million annual visitors
+                        and a solid tenant mix. However, analysis reveals significant opportunities for revenue
                         growth through strategic tenant mix optimization. The centre&apos;s prime location in Peterborough,
-                        combined with strong anchor tenants and excellent accessibility, positions it well for 
+                        combined with strong anchor tenants and excellent accessibility, positions it well for
                         expansion and enhancement.
                       </p>
-                      
+
                       <h3 className="text-lg font-semibold">Key Findings</h3>
                       <ul className="space-y-2 text-muted-foreground">
                         <li className="flex items-center gap-2">
@@ -322,7 +325,7 @@ export default async function QueensgateReportPage() {
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm text-muted-foreground">
-                              Expand F&B offerings, particularly fast-casual dining options. Target 7 additional 
+                              Expand F&B offerings, particularly fast-casual dining options. Target 7 additional
                               food service establishments to match competitor density.
                             </p>
                           </CardContent>
@@ -333,7 +336,7 @@ export default async function QueensgateReportPage() {
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm text-muted-foreground">
-                              Enhance entertainment and leisure offerings. Consider adding family entertainment 
+                              Enhance entertainment and leisure offerings. Consider adding family entertainment
                               and experiential retail concepts.
                             </p>
                           </CardContent>
@@ -344,7 +347,7 @@ export default async function QueensgateReportPage() {
                           </CardHeader>
                           <CardContent>
                             <p className="text-sm text-muted-foreground">
-                              Develop luxury and premium retail segments. Explore partnerships with high-end 
+                              Develop luxury and premium retail segments. Explore partnerships with high-end
                               brands to diversify tenant mix.
                             </p>
                           </CardContent>
@@ -1151,7 +1154,7 @@ export default async function QueensgateReportPage() {
                           <CardContent className="p-4">
                             <h4 className="font-medium mb-2">SEO Optimization</h4>
                             <p className="text-sm text-muted-foreground">
-                              Focus on local search terms, improve content for high-volume keywords, 
+                              Focus on local search terms, improve content for high-volume keywords,
                               and enhance mobile user experience.
                             </p>
                           </CardContent>
@@ -1160,7 +1163,7 @@ export default async function QueensgateReportPage() {
                           <CardContent className="p-4">
                             <h4 className="font-medium mb-2">Social Media Engagement</h4>
                             <p className="text-sm text-muted-foreground">
-                              Increase Instagram and TikTok presence, create engaging content 
+                              Increase Instagram and TikTok presence, create engaging content
                               showcasing new tenants and events.
                             </p>
                           </CardContent>

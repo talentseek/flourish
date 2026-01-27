@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 export const runtime = 'nodejs';
@@ -8,12 +9,12 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Target, 
-  Building2, 
-  TrendingUp, 
-  Users, 
-  MapPin, 
+import {
+  Target,
+  Building2,
+  TrendingUp,
+  Users,
+  MapPin,
   FileText,
   ArrowRight,
   Search,
@@ -23,9 +24,11 @@ import Link from "next/link"
 import { prisma } from "@/lib/db"
 
 export default async function DashboardPage() {
-  const { userId } = auth()
-  
-  if (!userId) {
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+
+  if (!session) {
     redirect("/")
   }
 

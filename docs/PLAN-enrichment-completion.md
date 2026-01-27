@@ -1,47 +1,48 @@
-# Plan: Enrichment Completion (Batches 11-15)
 
-> **Goal:** Re-process the low-completeness locations (25-31%) using the new "Failure-Aware" robust workflow to bring them up to the maximum possible baseline (~40%) without relying on the unstable Search API.
+# PLAN-enrichment-completion
 
-## Analysis
-The Gap Analysis shows two tiers of "Incomplete" data:
-1.  **Tier 1 (25%):** Locations attempted in Batches 1-3 where search failed hard (Dukes Mill, Marsh Centre, Ridgeway).
-2.  **Tier 2 (31-38%):** Locations processed recently with fallback logic (Penicuik, Weavers Wharf).
+**Goal:** Achieve "Green" status for all 40+ attributes across 983 Shopping Centres using the established `location-enrichment` skill.
 
-**Objective:** Raise Tier 1 (25%) to Match Tier 2 (~40%).
+## 1. Skills & Tools
+We will utilize the pre-defined Python scripts in `.agent/skills/location-enrichment/scripts/`:
+*   `audit_location.py`: Identifies missing fields for a specific location.
+*   `generate_enrichment.py`: Performs the research (Tier 1/2) and generates a JSON update.
+*   `validate_data.py`: Ensures data quality (UK phone formats, rating ranges, etc.).
 
-## Batch Strategy
+## 2. Batch Execution Strategy
 
-### Batch 11 (The Low 5)
-1.  Dukes Mill (Romsey)
-2.  The Marsh Centre (Hythe)
-3.  The Ridgeway (Plympton)
-4.  Parc-y-Llyn (Aberystwyth)
-5.  Kingsland Centre (Thatcham)
+Since the scripts are designed for single-location execution, we will create a **Master Orchestrator Script** (`scripts/enrichment-orchestrator.ts`) to:
+1.  **Iterate** through all 983 Shopping Centres (from Prisma).
+2.  **Filter** for those with <80% completeness (Red/Amber status).
+3.  **Execute** `generate_enrichment.py` for each target.
+4.  **Parse** the JSON output.
+5.  **Write** the enrichment data back to the database.
 
-### Batch 12 (The Next 5)
-6.  Rainham Shopping Centre
-7.  The Quadrant (Dunstable?)
-8.  Penicuik (Review - maybe 31% is max?)
-9.  Eastgate (Review)
-10. Balmoral (Review)
+> [!NOTE]
+> We will respect the "Tier 3 Avoidance" rule. The scripts will use `search_web` and `read_url_content` only.
 
-### Batch 13-15
-*   Target any remaining locations < 40%.
-*   If all are > 40%, stop.
+## 3. Data Priority (Per Skill Protocol)
+The enrichment will strictly follow the Field Priority Matrix:
+1.  **Core:** Website, Phone, Open Hours.
+2.  **Operational:** Parking, Stores, EV Charging.
+3.  **Commercial:** Owner, Management, Year Opened.
+4.  **Digital:** Social & Reviews.
+5.  **Demographics:** (Census-based).
 
-## Implementation Steps
-For each Batch:
-1.  **Extract IDs:** Use `find-batchX-ids.ts`.
-2.  **Enrich:** Use `enrich-batchX.ts` with "Failure-Aware" logic:
-    *   Estimate Parking/Size.
-    *   Guess Website URL (if safe).
-    *   Apply Census Demographics (High Confidence).
-3.  **Verify:** Run `audit_location.py`.
-4.  **Merge:** Check for duplicates created by ID mismatches.
+## 4. Execution Phases
 
-## Verification
-*   **Success Metric:** All targeted locations reach > 35% completeness.
-*   **Manual Check:** Verify names are clean (no "Address needed" tags).
+### Phase 1: Infrastructure
+*   Create `scripts/enrichment-orchestrator.ts`.
+*   Verify Python environment dependencies for the skill scripts.
 
----
-**Status:** Ready to execute Batch 11.
+### Phase 2: Batch Execution (Top 50 Pilot)
+*   Run the orchestrator on the 50 largest "Red" status locations.
+*   Review success rate and data quality.
+
+### Phase 3: Full Rollout
+*   Run on remaining locations in batches of 100.
+*   Monitor for rate limits.
+
+### Phase 4: Final Verification
+*   Re-run the Health Index calculation.
+*   Confirm "Green" status in the dashboard.

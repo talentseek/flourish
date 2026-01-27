@@ -1,30 +1,25 @@
-# Task: Top 100 UK Shopping Centres (Market Data)
+# Task: Migrate Clerk to Better Auth
 
-## Goal
-Build a comprehensive dataset of the UK's Top 100 Shopping Centres to enable market statistics and competitive analysis. These locations will be **Unmanaged** (`isManaged: false`) but **Enriched**.
-
-## Status Overview
-| Metric | Count |
-| :--- | :--- |
-| **Identified Targets** | 45 (Phase 1) |
-| **Seeded/Matched** | 0 |
-| **Fully Enriched** | 0 |
-
-## Workstreams
-
-- [ ] **Phase 1: Identity & Seeding**
-    - [ ] [Create `task.md`](task_item_1)
-    - [ ] [Script: Seed Top 45 Giants](task_item_2)
-        - *Fixes Lakeside, Arndale, Merry Hill matches*
-        - *Creates missing centres (MK, St Davids, East Kilbride)*
-    - [ ] [Verify Canonical Records](task_item_3)
-
-- [ ] **Phase 2: Enrichment (Market Data)**
-    - [ ] [Update Enrichment Scripts to support Unmanaged](task_item_4)
-    - [ ] [Batch 13: London & South East Giants](task_item_5)
-    - [ ] [Batch 14: Midlands & North Giants](task_item_6)
-    - [ ] [Batch 15: Scotland, Wales & NI Giants](task_item_7)
-
-- [ ] **Phase 3: The Next 55**
-    - [ ] Identify Ranks 46-100
-    - [ ] Seed & Enrich
+- [/] Phase 1: Parallel Installation
+    - [x] Install dependencies (`better-auth`, `@better-auth/cli`) <!-- id: 0 -->
+    - [x] Configure Environment Variables (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`) <!-- id: 1 -->
+    - [x] Create `src/lib/auth.ts` with Organization Plugin <!-- id: 2 -->
+    - [x] Generate Schema (Manual Fallback) <!-- id: 3 -->
+    - [x] Run DB Migration (Used `db push` to handle drift) <!-- id: 4 -->
+- [x] Phase 2: Implementation
+    - [x] Create API Route (`src/app/api/auth/[...all]/route.ts`) <!-- id: 5 -->
+    - [x] Create Client Hook (`src/lib/auth-client.ts`) <!-- id: 6 -->
+    - [x] Update Middleware <!-- id: 7 -->
+- [/] Phase 3: Data Migration
+    - [x] proper migration script <!-- id: 8 -->
+    - [ ] Assign Roles <!-- id: 9 -->
+- [ ] Phase 4: Custom UI Implementation
+    - [x] Verify/Install Registry Components (Card, Input, Button, Label, Tabs, Sonner, Form) <!-- id: 10 -->
+    - [x] Create Auth Layout `src/app/(auth)/layout.tsx` <!-- id: 11 -->
+    - [x] Implement Login Page `src/app/(auth)/login/page.tsx` <!-- id: 12 -->
+    - [x] Implement Signup Page `src/app/(auth)/sign-up/page.tsx` <!-- id: 13 -->
+    - [x] Implement Forgot Password `src/app/(auth)/forgot-password/page.tsx` <!-- id: 14 -->
+- [x] Phase 5: Switchover & Cleanup
+    - [x] Update Navbar SignOut <!-- id: 15 -->
+    - [x] Update Middleware strictness <!-- id: 16 -->
+    - [x] Remove Clerk <!-- id: 17 -->

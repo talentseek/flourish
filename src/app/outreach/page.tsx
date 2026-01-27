@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/db"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -31,8 +32,10 @@ function serializeLocation(l: any): Location {
 }
 
 export default async function OutreachPage() {
-  const { userId } = auth()
-  if (!userId) redirect("/")
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
+  if (!session) redirect("/")
 
   const locations = await prisma.location.findMany({
     select: { id: true, name: true, type: true, address: true, city: true, county: true, postcode: true, latitude: true, longitude: true, numberOfStores: true },

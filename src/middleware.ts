@@ -1,20 +1,28 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
 
-// Enable Clerk middleware only when a plausibly valid publishable key is configured
-const hasValidClerkPk = Boolean(
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.startsWith("pk_")
-);
+import { NextResponse, type NextRequest } from "next/server";
 
-const noopMiddleware = () => NextResponse.next();
+export async function middleware(request: NextRequest) {
+  const sessionCookie = request.cookies.get("better-auth.session_token");
 
-export default (hasValidClerkPk ? clerkMiddleware() : noopMiddleware);
+  // Define protected routes
+  const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
+  const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/sign-up") ||
+    request.nextUrl.pathname.startsWith("/forgot-password");
+
+  // Redirect unauthenticated users accessing dashboard
+  if (isDashboard && !sessionCookie) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Redirect authenticated users trying to access auth pages
+  if (isAuthRoute && sessionCookie) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    "/((?!.+\\.[\\w]+$|_next).*)",
-    "/",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/dashboard/:path*", "/login", "/sign-up", "/forgot-password"]
 };

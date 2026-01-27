@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -9,9 +10,11 @@ import { FlourishAssistantClient } from "@/components/flourish-assistant-client"
 export const runtime = 'nodejs';
 
 export default async function AssistantPage() {
-  const { userId } = auth();
+  const session = await auth.api.getSession({
+    headers: await headers()
+  });
 
-  if (!userId) {
+  if (!session) {
     redirect("/");
   }
 

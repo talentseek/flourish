@@ -100,7 +100,7 @@ export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V
                 : "bg-white/10 backdrop-blur border-white/20 text-white hover:bg-white/20"
             )}
           >
-            <Link href="/sign-in">Sign In</Link>
+            <Link href="/login">Sign In</Link>
           </Button>
 
           {/* Mobile Menu */}
@@ -128,7 +128,7 @@ export function V2Navigation({ forceSolid = false, useAbsoluteLinks = false }: V
                 ))}
                 <div className="pt-4 border-t">
                   <Button variant="outline" asChild className="w-full">
-                    <Link href="/sign-in">Sign In</Link>
+                    <Link href="/login">Sign In</Link>
                   </Button>
                 </div>
               </nav>
