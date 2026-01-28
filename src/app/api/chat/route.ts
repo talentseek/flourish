@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     ).join('\n');
 
     const result = await streamText({
-        model: openRouter('google/gemini-2.0-flash-exp:free'),
+        model: openRouter('openai/gpt-4o-mini'),
         messages,
         system: `You are a helpful assistant for a Regional Manager at Flourish, a retail location intelligence platform.
 
