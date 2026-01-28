@@ -21,16 +21,17 @@ import {
 } from "@/components/ui/sidebar"
 import { NavMain } from "@/components/nav-main"
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  userRole?: string;
-}
-
-export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
-  const baseItems = [
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const navItems = [
     {
       title: "Dashboard",
       url: "/dashboard2",
       icon: LayoutDashboardIcon,
+    },
+    {
+      title: "Regional",
+      url: "/dashboard/regional",
+      icon: MapPinIcon,
     },
     {
       title: "Outreach",
@@ -43,19 +44,6 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
       icon: FileTextIcon,
     },
   ];
-
-  // Add Regional link for Regional Managers
-  const navItems = userRole === 'REGIONAL_MANAGER'
-    ? [
-      ...baseItems.slice(0, 1),
-      {
-        title: "Regional",
-        url: "/dashboard/regional",
-        icon: MapPinIcon,
-      },
-      ...baseItems.slice(1)
-    ]
-    : baseItems;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

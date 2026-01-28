@@ -3,15 +3,10 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-interface ClientSidebarShellProps {
-  children: React.ReactNode;
-  userRole?: string;
-}
-
-export default function ClientSidebarShell({ children, userRole }: ClientSidebarShellProps) {
+export default function ClientSidebarShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <AppSidebar variant="inset" userRole={userRole} />
+      <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
         {children}
