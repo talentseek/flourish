@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { getSessionUser } from '@/lib/auth';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -11,9 +12,16 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
     const { messages } = await req.json();
 
-    // Pre-fetch location data to include in system prompt
+    // Get current user's name to filter their locations
+    const sessionUser = await getSessionUser();
+    const userName = sessionUser?.name || '';
+
+    // Fetch only locations managed by this user
     const locations = await prisma.location.findMany({
-        where: { isManaged: true },
+        where: {
+            isManaged: true,
+            regionalManager: userName, // Filter by current user's name
+        },
         select: {
             name: true,
             city: true,
@@ -21,11 +29,15 @@ export async function POST(req: Request) {
             footfall: true,
             retailSpace: true,
             numberOfStores: true,
-            regionalManager: true,
+            parkingSpaces: true,
+            website: true,
+            tenants: {
+                select: { name: true, category: true }
+            }
         },
-        take: 50
     });
 
+    // Build detailed context for each location
     const locationContext = locations.map((l: {
         name: string;
         city: string;
@@ -33,23 +45,36 @@ export async function POST(req: Request) {
         footfall: number | null;
         retailSpace: number | null;
         numberOfStores: number | null;
-        regionalManager: string | null;
-    }) =>
-        `- ${l.name} (${l.city}, ${l.postcode}): ${l.footfall?.toLocaleString() || 'N/A'} footfall, ${l.retailSpace?.toLocaleString() || 'N/A'} sqft, ${l.numberOfStores || 'N/A'} stores. RM: ${l.regionalManager || 'Unassigned'}`
-    ).join('\n');
+        parkingSpaces: number | null;
+        website: string | null;
+        tenants: { name: string; category: string | null }[];
+    }) => {
+        const tenantList = l.tenants.length > 0
+            ? `Tenants: ${l.tenants.slice(0, 10).map(t => t.name).join(', ')}${l.tenants.length > 10 ? ` (+${l.tenants.length - 10} more)` : ''}`
+            : 'Tenants: Data not available';
 
-    const systemPrompt = `You are a helpful assistant for a Regional Manager at Flourish, a retail location intelligence platform.
+        return `- ${l.name} (${l.city}, ${l.postcode || 'N/A'}):
+    Footfall: ${l.footfall ? `${(l.footfall / 1000000).toFixed(1)}m` : 'N/A'}
+    Retail Space: ${l.retailSpace?.toLocaleString() || 'N/A'} sqft
+    Stores: ${l.numberOfStores || 'N/A'}
+    Parking: ${l.parkingSpaces?.toLocaleString() || 'N/A'} spaces
+    Website: ${l.website || 'N/A'}
+    ${tenantList}`;
+    }).join('\n\n');
 
-Here are the managed locations you can help with:
-${locationContext}
+    const systemPrompt = `You are a helpful assistant for ${userName || 'a Regional Manager'} at Flourish, a retail location intelligence platform.
+
+${locations.length > 0 ? `You manage ${locations.length} locations:
+
+${locationContext}` : 'No locations are currently assigned to you.'}
 
 When answering questions:
 - Reference specific locations by name when relevant
-- Provide footfall and size comparisons when asked
+- Provide footfall, parking, and size data when asked
 - If asked about surrounding areas, use your knowledge to describe nearby amenities, transport links, and demographics
-- Be concise and professional`;
+- Be concise and professional
+- If you don't have specific data, say so clearly`;
 
-    // Convert messages to simple format
     const formattedMessages = [
         { role: 'system' as const, content: systemPrompt },
         ...messages.map((m: { role: string; content: string }) => ({
@@ -64,7 +89,6 @@ When answering questions:
         stream: true,
     });
 
-    // Create a readable stream from the OpenAI response
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
         async start(controller) {
