@@ -1,6 +1,6 @@
 'use server';
 
-import { streamText } from 'ai';
+import { streamText, tool } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { getRegionalLocations } from '@/actions/regional-data';
@@ -15,7 +15,7 @@ export async function continueConversation(history: any[]) {
     'use server';
 
     const stream = await streamText({
-        model: openRouter('google/gemini-2.0-flash-exp:free'), // User requested model
+        model: openRouter('google/gemini-2.0-flash-exp:free'),
         messages: history,
         system: `You are a helpful assistant for a Regional Manager at Flourish.
     You have access to tools to query their managed locations and search the web.
@@ -23,7 +23,7 @@ export async function continueConversation(history: any[]) {
     If they ask about "surrounding area", use the web search tool to find coffee shops, competitors, or other amenities.
     Be concise and professional.`,
         tools: {
-            get_my_locations: {
+            get_my_locations: tool({
                 description: 'Get list of locations managed by the current user.',
                 parameters: z.object({}),
                 execute: async () => {
@@ -37,30 +37,18 @@ export async function continueConversation(history: any[]) {
                         tenants: l.tenants.length
                     }));
                 },
-            },
-            search_web: {
+            }),
+            search_web: tool({
                 description: 'Search the web for information about surrounding areas, competitors, or general knowledge.',
                 parameters: z.object({
                     query: z.string().describe('The search query'),
                 }),
                 execute: async ({ query }) => {
-                    // Simplistic web search simulation or use specialized tool if available.
-                    // Since we don't have a real web search API setup here (like Tavily), 
-                    // we will MOCK it or use a PLACEHOLDER. 
-                    // User asked for "OpenRouter" to be used, but OpenRouter is the LLM provider.
-                    // For web search, we usually need a separate API (Serper, Tavily).
-                    // I will return a placeholder message or use LLM's internal knowledge if it fails.
-                    // HOWEVER, the user said "can return information based upon the data... and the surrounding area".
-                    // The LLM (Gemini 2.0) has a huge context window but isn't necessarily "live" without a tool.
-                    // I will default to a message saying "Search Result: [ Simulated ]" or check if I can use a free search API.
-                    // Actually, I'll just let the LLM hallucinate plausibly or better yet, simply admit limitation if I can't search.
-                    // BUT, I can use the LLM to "infer" based on its training data for "surrounding area" if I give it the postcode.
-
                     return `(Web Search Simulated) Results for: ${query}. 
           Please note: Live web search requires a separate API key (e.g. Tavily). 
           I will answer based on my internal knowledge of the area around the postcode.`;
                 },
-            },
+            }),
         },
     });
 

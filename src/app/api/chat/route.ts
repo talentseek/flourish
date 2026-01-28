@@ -1,6 +1,5 @@
-
 import { createOpenAI } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { streamText, tool } from 'ai';
 import { getRegionalLocations } from '@/actions/regional-data';
 import { z } from 'zod';
 
@@ -20,7 +19,7 @@ export async function POST(req: Request) {
         messages,
         system: `You are a helper for a Regional Manager. You have access to their managed locations.`,
         tools: {
-            get_dashboard_data: {
+            get_dashboard_data: tool({
                 description: 'Get list of managed locations and their key stats.',
                 parameters: z.object({}),
                 execute: async () => {
@@ -33,14 +32,14 @@ export async function POST(req: Request) {
                         retailSpace: l.retailSpace
                     }));
                 },
-            },
-            search_web: {
+            }),
+            search_web: tool({
                 description: 'Search for surrounding area info (simulated).',
                 parameters: z.object({ query: z.string() }),
                 execute: async ({ query }) => {
                     return `(Simulated Web Search) Info for "${query}" near the location.`;
                 }
-            }
+            })
         },
     });
 
