@@ -1,20 +1,15 @@
 'use client';
 
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Message } from 'ai';
 
 export default function AiChat() {
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-        api: '/api/chat', // We will need to create this route handler or adjust logic to use Server Action in direct hook if using Vercel AI SDK 3.3+ "useChat" with server action
-        // BUT standard useChat expects an API route by default.
-        // Let's create an API route handler `src/app/api/chat/route.ts` instead of just a server action file OR configure useChat to use the action.
-        // Newer AI SDK supports server actions directly but useChat often defaults to fetch.
-        // Let's create the API route to be safe and standard.
-    });
+    const { messages, input, handleInputChange, handleSubmit, status } = useChat({});
+
+    const isLoading = status === 'streaming' || status === 'submitted';
 
     return (
         <Card className="h-[600px] flex flex-col">
@@ -29,7 +24,7 @@ export default function AiChat() {
                                 Ask me about your locations or the surrounding area.
                             </p>
                         )}
-                        {messages.map((m: Message) => (
+                        {messages.map((m) => (
                             <div
                                 key={m.id}
                                 className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -40,7 +35,9 @@ export default function AiChat() {
                                             : 'bg-muted text-foreground'
                                         }`}
                                 >
-                                    {m.content}
+                                    {m.parts?.map((part, i) =>
+                                        part.type === 'text' ? <span key={i}>{part.text}</span> : null
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -55,6 +52,7 @@ export default function AiChat() {
                 </ScrollArea>
                 <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
                     <Input
+                        name="prompt"
                         value={input}
                         onChange={handleInputChange}
                         placeholder="Ask about footfall, trends, or competitors..."
