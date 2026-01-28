@@ -1,0 +1,123 @@
+
+# Audit Report: Managed Locations
+
+**Date:** 1/27/2026, 4:43:29 PM
+**Summary:**
+- **Total Managed Locations:** 111
+- **✅ Healthy:** 15
+- **🛠️ Fixed:** 56
+- **⚠️ Orphaned:** 40
+
+## Details
+- **Weston Favell Shopping Centre** (NN3 8JZ): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Weston Favell)
+- **Carters Square** (ST14 8JN): ✅ Healthy (RM: Callum)
+- **Lower Precinct Shopping Centre** (CV1 1NQ): ✅ Healthy (RM: Callum)
+- **The Strand Shopping Centre** (L20 4SZ): ✅ Healthy (RM: Callum)
+- **Central Square Shopping Centre** (B23 6RY): ✅ Healthy (RM: Callum)
+- **Cascades Shopping Centre** (PO1 1DD): ⚠️ ORPHANED. No match found in JSON.
+- **Emery Gate Shopping Centre** (SN15 3JP): ⚠️ ORPHANED. No match found in JSON.
+- **Horsefair Shopping Centre** (PE13 1AR): ⚠️ ORPHANED. No match found in JSON.
+- **Lakeside Village Outlet Shopping** (DN4 5JH): ⚠️ ORPHANED. No match found in JSON.
+- **The Beacon** (BN21 3NW): ⚠️ ORPHANED. No match found in JSON.
+- **Burton Place Shopping Centre** (DE14 1BU): ⚠️ ORPHANED. No match found in JSON.
+- **Hillsborough Exchange (Hillsborough Shopping Centre)** (S6 4HL): ⚠️ ORPHANED. No match found in JSON.
+- **Kingsland Shopping Centre** (E8 2JP): ⚠️ ORPHANED. No match found in JSON.
+- **Market Quay Shopping Centre** (PO16 0LS): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Market Quay,Fareham)
+- **Middlesbrough Leisure Park** (TS4 2AF): ⚠️ ORPHANED. No match found in JSON.
+- **Monument Mall** (NE1 7AL): ⚠️ ORPHANED. No match found in JSON.
+- **Erith Riverside Shopping Centre** (DA8 1RE): ⚠️ ORPHANED. No match found in JSON.
+- **Willows Centre** (SS12 0RA): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Willows)
+- **Salford Shopping City** (M6 5JA): ⚠️ ORPHANED. No match found in JSON.
+- **Grand Arcade** (CB2 3BJ): ⚠️ ORPHANED. No match found in JSON.
+- **Carters Square** (ST14 7FN): ✅ Healthy (RM: Callum)
+- **Parc-y-Llyn Retail Park** (SY23 3TL): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Parc-t-Lyn Retail Park)
+- **Middleton Shopping Centre** (M24 4EL): ✅ Healthy (RM: Callum)
+- **Dukes Mill Shopping Centre** (SO51 8PJ): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Dukes Mill,Romsey)
+- **One Stop Shopping Centre** (B42 1AA): ✅ Healthy (RM: Callum)
+- **Armthorpe Shopping Centre** (DN3 3DL): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Armthorpe Shopping centre)
+- **Beacons Place Shopping Centre** (CF47 8DF): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Beacon Place)
+- **Chelmsley Wood Shopping Centre** (B37 5TT): ✅ Healthy (RM: Callum)
+- **The Swan Centre** (SO50 5SF): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Swan)
+- **Rainham Shopping Centre** (ME8 7HW): ⚠️ ORPHANED. No match found in JSON.
+- **St Katharine Docks** (E1W 1LA): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: St Katharine Docks)
+- **Windsor Royal Station** (SL4 1RH): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Windsor Royal)
+- **The Parkway Centre** (TS8 0TJ): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Parkway)
+- **The Shires Shopping Centre** (BA14 8AT): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: The Shires, Trowbridge)
+- **The Quadrant Shopping Centre** (LU5 4RH): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Quadrant Shopping Centre)
+- **Swanley** (BR8 7TG): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: M Swanley)
+- **Broadmarsh Centre** (NG1 7LF): ⚠️ ORPHANED. No match found in JSON.
+- **Telford Centre** (TF3 4BP): ⚠️ ORPHANED. No match found in JSON.
+- **Woolshops Shopping Centre** (HX1 1RU): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Woolshops)
+- **Weavers Wharf Retail Park** (DY10 1AA): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Weavers Wharf)
+- **Cwmbran Retail Park** (NP44 3JQ): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Cwmbran)
+- **Priory Meadow Shopping Centre** (TN34 1PH): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Priory)
+- **The Willows Retail Park** (TQ2 7HT): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Willows)
+- **Ropewalk Shopping Centre** (CV11 5TZ): ⚠️ ORPHANED. No match found in JSON.
+- **The Forge Retail Park** (G31 4BH): 🛠️ FIXED. Assigned to **Sharon O'Rourke** (Matched via: The Forge,Retail Park )
+- **West Park Farm Retail Park** (CT19 5SY): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Park Farm)
+- **Eastgate Shopping Centre** (SS14 1EB): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: 28 East Park Retail)
+- **Churchill Shopping Centre** (L10 6LB): ⚠️ ORPHANED. No match found in JSON.
+- **Richmond Gardens Shopping Centre** (BH1 1EN): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Richmond Gardens)
+- **Newcastle Quays Retail Park** (NE29 6DW): ⚠️ ORPHANED. No match found in JSON.
+- **Newkirkgate Shopping Centre** (EH6 6AA): ⚠️ ORPHANED. No match found in JSON.
+- **Templars Square Shopping Centre** (OX4 3UX): ⚠️ ORPHANED. No match found in JSON.
+- **The Belfry Shopping Centre** (RH1 1SE): ⚠️ ORPHANED. No match found in JSON.
+- **The Avenue Shopping Centre** (G77 6EY): ⚠️ ORPHANED. No match found in JSON.
+- **The Brunswick Shopping Centre** (YO11 1UE): ⚠️ ORPHANED. No match found in JSON.
+- **The Chilterns Shopping Centre** (HP13 5ES): ⚠️ ORPHANED. No match found in JSON.
+- **The Churchill Shopping Centre** (DY2 7BJ): ⚠️ ORPHANED. No match found in JSON.
+- **The Swan Centre** (DY10 2DP): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Swan)
+- **Trinity Square** (NE8 1AG): ⚠️ ORPHANED. No match found in JSON.
+- **The Riverside Shopping Centre** (NG34 7PD): ⚠️ ORPHANED. No match found in JSON.
+- **Royals** (SS1 1DE): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Royals)
+- **The Mailbox** (B1 1RS): ✅ Healthy (RM: Callum)
+- **Riverside Shopping Centre** (WR11 4BD): ⚠️ ORPHANED. No match found in JSON.
+- **Borough Parade Shopping Centre** (SN15 3WL): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Borough Parade)
+- **Birchwood Shopping Centre** (WA3 7PG): ✅ Healthy (RM: Callum)
+- **Hillsborough Exchange** (S6 2GB): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Hillsborough Barracks, Sheffield)
+- **Marlands** (SO14 7SJ): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Marlands)
+- **The Lexicon** (RG12 1AP): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Lexicon , Bracknell)
+- **Palace Gardens & Palace Exchange** (EN2 6SN): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Palace Shopping, Enfield )
+- **Penicuik Shopping Centre** (EH26 8LE): 🛠️ FIXED. Assigned to **Sharon O'Rourke** (Matched via: Penicuick)
+- **The Ridgeway Shopping Centre** (PL7 2ZN): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: St Stephens Place Plympton)
+- **Totton Base Shopping Centre** (SO40 3AG): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Totten Shopping Centre)
+- **The Viking Centre** (NE32 3LQ): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: The Viking Centre)
+- **Central Square Maghull** (L31 0AE): ✅ Healthy (RM: Callum)
+- **Royal Victoria Place** (TN1 2SS): ⚠️ ORPHANED. No match found in JSON.
+- **North Point Shopping Centre** (HU7 4EE): ⚠️ ORPHANED. No match found in JSON.
+- **Waterborne Walk** (LU7 1DH): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Waterborne Walk )
+- **9Yards (Meteor Centre Retail Park)** (DE21 4SY): ⚠️ ORPHANED. No match found in JSON.
+- **Woolshops** (HX1 1RU): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Woolshops)
+- **St Martin's Walk** (RH4 1EW): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: St Martins Walk)
+- **The Brooks Shopping Centre** (SO23 8QY): ⚠️ ORPHANED. No match found in JSON.
+- **Longton Exchange** (ST3 2JA): ✅ Healthy (RM: Callum)
+- **Parkgate Shopping (Rotherham Retail Park)** (S62 6EJ): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Rotherham Retail Park)
+- **Weavers Wharf Shopping Park** (DY10 1AA): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Weavers Wharf)
+- **Balmoral Shopping Centre** (YO11 1LP): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Balmoral Centre, Scarborough)
+- **Navan Town Centre** (C15 W2W7): ⚠️ ORPHANED. No match found in JSON.
+- **Castle Quay** (OX16 5UN): ⚠️ ORPHANED. No match found in JSON.
+- **Bowen Square** (NN11 4DR): ⚠️ ORPHANED. No match found in JSON.
+- **Cockhedge Shopping Park** (WA1 2QQ): ✅ Healthy (RM: Callum)
+- **Cornmill Centre** (DL1 1NH): ⚠️ ORPHANED. No match found in JSON.
+- **Riverside Shopping Centre** (HP1 1BT): ⚠️ ORPHANED. No match found in JSON.
+- **28 East Retail Park** (NP20 2NW): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: 28 East Park Retail)
+- **The Brunswick Centre** (WC1N 1AE): ⚠️ ORPHANED. No match found in JSON.
+- **One Stop Shopping Centre** (B42 1AA): ✅ Healthy (RM: Callum)
+- **Totton Shopping Centre** (SO40 3BX): ⚠️ ORPHANED. No match found in JSON.
+- **The Heart Shopping Centre** (KT12 1GH): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Heart)
+- **Pentagon Shopping Centre** (ME4 4HP): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Pentagon)
+- **The Bridges** (SR1 3DR): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: The Bridges)
+- **The Centre Margate, ** (CT9 1JG): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: The Centre Margate, )
+- **The Walnuts** (BR6 0TW): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: The Walnuts)
+- **Willows** (SS12 0RA): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Willows)
+- **Bell Walk Shopping Centre** (TN22 5DQ): 🛠️ FIXED. Assigned to **Giorgia Shepherd** (Matched via: Bell Walk)
+- **Billingham Shopping Centre** (TS23 2LS): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Billingham, Town Centre)
+- **The Britten Centre** (NR32 1LR): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Britten Centre)
+- **Highcross** (LE1 4SA): 🛠️ FIXED. Assigned to **Michelle Clark** (Matched via: Highcross)
+- **Byron Place Shopping Centre** (SR7 7DR): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Byron Place Shopping Centre)
+- **The Grosvenor Centre** (NN1 2EW): 🛠️ FIXED. Assigned to **Jemma Mills** (Matched via: Grosvenor)
+- **The Killingworth Centre** (NE12 6YT): 🛠️ FIXED. Assigned to **Paula Muers** (Matched via: Killingworth Centre)
+- **Kingsland Shopping Centre** (RG19 3HN): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Kingsland ,Thatcham)
+- **Norton Fitzwarren Retail Centre** (TA2 6NS): 🛠️ FIXED. Assigned to **Amanda Bishop** (Matched via: Naunton Fitzwarren Taunton)
+- **Ladysmith Shopping Centre** (OL6 7JY): ✅ Healthy (RM: Callum)
+  

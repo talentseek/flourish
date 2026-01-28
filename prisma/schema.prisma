@@ -46,6 +46,7 @@ model Location {
   anchorTenants   Int?
   publicTransit   String?
   owner           String?
+  regionalManager String?
   management      String?
   managementContact String?
   managementEmail   String?
@@ -193,6 +194,7 @@ model EnrichmentSnapshot {
 enum Role {
   USER
   ADMIN
+  REGIONAL_MANAGER
 }
 
 enum LocationType {
