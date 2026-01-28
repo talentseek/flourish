@@ -1,28 +1,33 @@
 'use server'
 
-import { auth, getSessionUser } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Role } from "@prisma/client";
 
 export async function getRegionalLocations() {
-    const user = await getSessionUser();
+    const sessionUser = await getSessionUser();
 
-    if (!user || user.role !== 'REGIONAL_MANAGER') {
+    if (!sessionUser) {
+        throw new Error("Unauthorized: Not logged in.");
+    }
+
+    // Fetch the full user from DB to get the role
+    const dbUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { role: true, name: true }
+    });
+
+    if (!dbUser || dbUser.role !== 'REGIONAL_MANAGER') {
         throw new Error("Unauthorized: Regional Manager access required.");
     }
 
-    // We match based on name "Giorgia Shepherd" or similar logic.
-    // Ideally, we'd link user ID to location, but currently we rely on name matching string.
-    // Let's use the user's name.
-
-    if (!user.name) {
+    if (!dbUser.name) {
         return [];
     }
 
     const locations = await prisma.location.findMany({
         where: {
             isManaged: true,
-            regionalManager: user.name // Matches "Giorgia Shepherd"
+            regionalManager: dbUser.name
         },
         select: {
             id: true,
@@ -35,8 +40,8 @@ export async function getRegionalLocations() {
             footfall: true,
             retailSpace: true,
             numberOfStores: true,
-            topPages: true, // For AI context
-            seoKeywords: true, // For AI context
+            topPages: true,
+            seoKeywords: true,
             tenants: {
                 select: {
                     name: true,
