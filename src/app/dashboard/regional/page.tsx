@@ -3,6 +3,8 @@ import AiChat from '@/components/regional/ai-chat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSessionUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { generateSlug } from '@/lib/slug-utils';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
@@ -54,17 +56,23 @@ export default async function RegionalDashboard() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {locations.map(loc => (
-                            <Card key={loc.id}>
-                                <CardHeader className="pb-2">
-                                    <CardTitle className="text-sm font-medium">{loc.name}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{loc.city}</div>
-                                    <p className="text-xs text-muted-foreground">
-                                        {loc.footfall ? `${(loc.footfall / 1000000).toFixed(1)}m Footfall` : 'Footfall N/A'}
-                                    </p>
-                                </CardContent>
-                            </Card>
+                            <Link
+                                key={loc.id}
+                                href={`/dashboard2/${generateSlug(loc.name)}`}
+                                className="block transition-transform hover:scale-[1.02]"
+                            >
+                                <Card className="h-full cursor-pointer hover:border-primary/50 hover:shadow-md transition-all">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm font-medium">{loc.name}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold">{loc.city}</div>
+                                        <p className="text-xs text-muted-foreground">
+                                            {loc.footfall ? `${(loc.footfall / 1000000).toFixed(1)}m Footfall` : 'Footfall N/A'}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
                         ))}
                     </div>
                 </div>
