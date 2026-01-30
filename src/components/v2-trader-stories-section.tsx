@@ -54,20 +54,25 @@ export function V2TraderStoriesSection() {
 
           <Card className="border-[#D8D8D6] overflow-hidden">
             <CardContent className="p-0">
-              <div className="aspect-video bg-[#F7F4F2] flex items-center justify-center border-b border-[#D8D8D6]">
-                <div className="text-center">
-                  <Play className="h-12 w-12 text-[#E6FB60] mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Trader video testimonial 2</p>
-                </div>
+              <div className="aspect-video bg-[#D8D8D6] border-b border-[#D8D8D6]">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/ruKSTU5UUSo"
+                  title="Affordable Luxury in Leicester: Michelle Interviews the Founder of Kiara Rose"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
               </div>
               <div className="p-6">
                 <Quote className="h-6 w-6 text-[#E6FB60] mb-2" />
                 <p className="text-muted-foreground italic mb-4">
-                  &quot;The flexibility and understanding Flourish showed made all the difference.
-                  They really care about making it work for everyone.&quot;
+                  &quot;Kiara Rose is redefining affordable luxury with tarnish-free gold vermeil and
+                  natural gemstones. Their honest pricing makes high-end jewelry accessible to everyone.&quot;
                 </p>
-                <p className="font-semibold text-[#E6FB60]">— Local Business Owner</p>
-                <p className="text-sm text-muted-foreground">Multiple Centre Operator</p>
+                <p className="font-semibold text-[#E6FB60]">— Michelle Clark, Sales Director</p>
+                <p className="text-sm text-muted-foreground">Highcross Leicester</p>
               </div>
             </CardContent>
           </Card>
