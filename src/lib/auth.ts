@@ -34,6 +34,17 @@ export const auth = betterAuth({
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : [])
   ],
 
+  // Include role in session data
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "USER",
+        input: false,
+      }
+    }
+  },
+
   plugins: [
     organization()
   ],

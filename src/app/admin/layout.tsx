@@ -22,7 +22,6 @@ export default async function AdminLayout({
     }
 
     // Check if user has ADMIN role
-    // @ts-expect-error - role exists on user from Prisma schema
     if (session.user.role !== 'ADMIN') {
         redirect("/dashboard")
     }

@@ -16,7 +16,6 @@ async function verifyAdmin() {
         throw new Error("Unauthorized: Not authenticated")
     }
 
-    // @ts-expect-error - role exists on user from Prisma schema
     if (session.user.role !== 'ADMIN') {
         throw new Error("Unauthorized: Admin access required")
     }
