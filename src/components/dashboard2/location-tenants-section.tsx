@@ -1,8 +1,10 @@
 "use client"
 
-import { Building2, Star } from "lucide-react"
+import { useState } from "react"
+import { Building2, Star, ChevronDown, ChevronUp } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Location } from "@/types/location"
 
 interface LocationTenantsSectionProps {
@@ -10,6 +12,8 @@ interface LocationTenantsSectionProps {
 }
 
 export function LocationTenantsSection({ location }: LocationTenantsSectionProps) {
+  const [showAllTenants, setShowAllTenants] = useState(false)
+
   if (!location.tenants || location.tenants.length === 0) {
     return null
   }
@@ -118,11 +122,33 @@ export function LocationTenantsSection({ location }: LocationTenantsSectionProps
           </div>
         )}
 
-        {/* Sample Tenants List */}
+        {/* All Tenants List */}
         <div className="space-y-3">
-          <h4 className="font-semibold">Sample Tenants</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-            {location.tenants.slice(0, 20).map((tenant) => (
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold">All Tenants</h4>
+            {location.tenants.length > 20 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAllTenants(!showAllTenants)}
+                className="gap-1"
+              >
+                {showAllTenants ? (
+                  <>
+                    Show Less
+                    <ChevronUp className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    Show All ({location.tenants.length})
+                    <ChevronDown className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
+          <div className={`grid grid-cols-1 md:grid-cols-2 gap-2 ${showAllTenants ? 'max-h-96' : 'max-h-64'} overflow-y-auto`}>
+            {(showAllTenants ? location.tenants : location.tenants.slice(0, 20)).map((tenant) => (
               <div
                 key={tenant.id}
                 className="flex items-center justify-between p-2 border rounded-lg text-sm"
@@ -139,9 +165,9 @@ export function LocationTenantsSection({ location }: LocationTenantsSectionProps
               </div>
             ))}
           </div>
-          {location.tenants.length > 20 && (
+          {!showAllTenants && location.tenants.length > 20 && (
             <p className="text-sm text-muted-foreground text-center">
-              + {location.tenants.length - 20} more tenants
+              Showing 20 of {location.tenants.length} tenants
             </p>
           )}
         </div>

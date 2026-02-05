@@ -33,25 +33,31 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
     }).format(amount)
   }
 
-  const hasDemographics = location.population || location.medianAge || 
-                          location.avgHouseholdIncome || location.homeownership ||
-                          location.carOwnership || location.familiesPercent ||
-                          location.seniorsPercent
+  const hasDemographics = location.population || location.medianAge ||
+    location.avgHouseholdIncome || location.homeownership ||
+    location.carOwnership || location.familiesPercent ||
+    location.seniorsPercent
 
   if (!hasDemographics) {
     return null
   }
 
-  const ComparisonBadge = ({ value, label }: { value: number | undefined | null, label: string }) => {
+  const ComparisonBadge = ({ value, isCurrency = false }: { value: number | undefined | null, isCurrency?: boolean }) => {
     if (value === undefined || value === null || isNaN(value)) return null
-    
+
     const isPositive = value > 0
     const Icon = isPositive ? TrendingUp : TrendingDown
-    
+    const displayValue = isCurrency
+      ? `${isPositive ? '+' : ''}${formatCurrency(value)}`
+      : `${isPositive ? '+' : ''}${value.toFixed(1)}%`
+
     return (
-      <Badge variant={isPositive ? "default" : "secondary"} className="gap-1">
+      <Badge
+        variant="outline"
+        className={`gap-1 ${isPositive ? 'border-green-500/50 text-green-700' : 'border-orange-500/50 text-orange-700'}`}
+      >
         <Icon className="h-3 w-3" />
-        {isPositive ? '+' : ''}{formatCurrency(value)} vs national avg
+        {displayValue} vs national
       </Badge>
     )
   }
@@ -75,26 +81,26 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
               <p className="text-sm text-muted-foreground mt-1">Population</p>
             </div>
           )}
-          
+
           {location.medianAge && (
             <div className="text-center p-4 border rounded-lg">
               <div className="text-3xl font-bold">{location.medianAge}</div>
               <p className="text-sm text-muted-foreground mt-1">Median Age</p>
             </div>
           )}
-          
+
           {location.avgHouseholdIncome !== undefined && (
             <div className="text-center p-4 border rounded-lg">
               <div className="text-2xl font-bold">{formatCurrency(location.avgHouseholdIncome)}</div>
               <p className="text-sm text-muted-foreground mt-1">Avg. Household Income</p>
               {location.incomeVsNational !== undefined && (
                 <div className="mt-2">
-                  <ComparisonBadge value={location.incomeVsNational} label="income" />
+                  <ComparisonBadge value={location.incomeVsNational} isCurrency />
                 </div>
               )}
             </div>
           )}
-          
+
           {location.familiesPercent !== undefined && (
             <div className="text-center p-4 border rounded-lg">
               <div className="text-3xl font-bold">{location.familiesPercent.toFixed(1)}%</div>
@@ -109,22 +115,19 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
               <p className="text-sm text-muted-foreground mt-1">Seniors</p>
             </div>
           )}
-          
+
           {location.homeownership !== undefined && (
             <div className="text-center p-4 border rounded-lg">
               <div className="text-3xl font-bold">{location.homeownership.toFixed(1)}%</div>
               <p className="text-sm text-muted-foreground mt-1">Homeownership</p>
               {location.homeownershipVsNational !== undefined && (
                 <div className="mt-2">
-                  <Badge variant="outline" className="gap-1">
-                    {location.homeownershipVsNational > 0 ? '+' : ''}
-                    {location.homeownershipVsNational.toFixed(1)}% vs national
-                  </Badge>
+                  <ComparisonBadge value={location.homeownershipVsNational} />
                 </div>
               )}
             </div>
           )}
-          
+
           {location.carOwnership !== undefined && (
             <div className="text-center p-4 border rounded-lg">
               <div className="flex items-center justify-center gap-2 mb-2">
@@ -134,10 +137,7 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
               <p className="text-sm text-muted-foreground">Car Ownership</p>
               {location.carOwnershipVsNational !== undefined && (
                 <div className="mt-2">
-                  <Badge variant="outline" className="gap-1">
-                    {location.carOwnershipVsNational > 0 ? '+' : ''}
-                    {location.carOwnershipVsNational.toFixed(1)}% vs national
-                  </Badge>
+                  <ComparisonBadge value={location.carOwnershipVsNational} />
                 </div>
               )}
             </div>
