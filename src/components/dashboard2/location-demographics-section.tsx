@@ -10,6 +10,25 @@ interface LocationDemographicsSectionProps {
 }
 
 export function LocationDemographicsSection({ location }: LocationDemographicsSectionProps) {
+  // UK National Averages (2023 data)
+  const UK_NATIONAL = {
+    avgHouseholdIncome: 34500, // ONS median
+    homeownership: 63.0,      // UK average
+    carOwnership: 78.0,       // UK households with car
+    seniorsPercent: 18.6,     // 65+ population %
+    medianAge: 40.7,          // UK median age
+  }
+
+  // Compute vs national (use stored value if exists, otherwise calculate)
+  const incomeVsNational = location.incomeVsNational ??
+    (location.avgHouseholdIncome ? location.avgHouseholdIncome - UK_NATIONAL.avgHouseholdIncome : null)
+  const homeownershipVsNational = location.homeownershipVsNational ??
+    (location.homeownership ? location.homeownership - UK_NATIONAL.homeownership : null)
+  const carOwnershipVsNational = location.carOwnershipVsNational ??
+    (location.carOwnership ? location.carOwnership - UK_NATIONAL.carOwnership : null)
+  const seniorsVsNational = location.seniorsPercent
+    ? location.seniorsPercent - UK_NATIONAL.seniorsPercent : null
+
   const formatNumber = (num: number | undefined | null) => {
     if (num === undefined || num === null || isNaN(num)) {
       return 'N/A'
@@ -93,9 +112,9 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
             <div className="text-center p-4 border rounded-lg">
               <div className="text-2xl font-bold">{formatCurrency(location.avgHouseholdIncome)}</div>
               <p className="text-sm text-muted-foreground mt-1">Avg. Household Income</p>
-              {location.incomeVsNational !== undefined && (
+              {incomeVsNational !== null && (
                 <div className="mt-2">
-                  <ComparisonBadge value={location.incomeVsNational} isCurrency />
+                  <ComparisonBadge value={incomeVsNational} isCurrency />
                 </div>
               )}
             </div>
@@ -112,7 +131,12 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
           {location.seniorsPercent !== undefined && (
             <div className="text-center p-4 border rounded-lg">
               <div className="text-3xl font-bold">{location.seniorsPercent.toFixed(1)}%</div>
-              <p className="text-sm text-muted-foreground mt-1">Seniors</p>
+              <p className="text-sm text-muted-foreground mt-1">Seniors (65+)</p>
+              {seniorsVsNational !== null && (
+                <div className="mt-2">
+                  <ComparisonBadge value={seniorsVsNational} />
+                </div>
+              )}
             </div>
           )}
 
@@ -120,9 +144,9 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
             <div className="text-center p-4 border rounded-lg">
               <div className="text-3xl font-bold">{location.homeownership.toFixed(1)}%</div>
               <p className="text-sm text-muted-foreground mt-1">Homeownership</p>
-              {location.homeownershipVsNational !== undefined && (
+              {homeownershipVsNational !== null && (
                 <div className="mt-2">
-                  <ComparisonBadge value={location.homeownershipVsNational} />
+                  <ComparisonBadge value={homeownershipVsNational} />
                 </div>
               )}
             </div>
@@ -135,9 +159,9 @@ export function LocationDemographicsSection({ location }: LocationDemographicsSe
                 <div className="text-3xl font-bold">{location.carOwnership.toFixed(1)}%</div>
               </div>
               <p className="text-sm text-muted-foreground">Car Ownership</p>
-              {location.carOwnershipVsNational !== undefined && (
+              {carOwnershipVsNational !== null && (
                 <div className="mt-2">
-                  <ComparisonBadge value={location.carOwnershipVsNational} />
+                  <ComparisonBadge value={carOwnershipVsNational} />
                 </div>
               )}
             </div>

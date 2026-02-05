@@ -90,7 +90,7 @@ export function LocationPropertyCard({ location }: LocationCardProps) {
     const openingHours = formatOpeningHours(location.openingHours)
 
     const hasData = location.openedYear || location.numberOfFloors ||
-        location.totalFloorArea || location.anchorTenants || openingHours
+        location.anchorTenants || openingHours
 
     if (!hasData) return null
 
@@ -113,12 +113,6 @@ export function LocationPropertyCard({ location }: LocationCardProps) {
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">Floors</span>
                         <span className="font-semibold">{location.numberOfFloors}</span>
-                    </div>
-                )}
-                {location.totalFloorArea && (
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Floor Area</span>
-                        <span className="font-semibold">{formatNumber(location.totalFloorArea)} sq ft</span>
                     </div>
                 )}
                 {location.anchorTenants !== undefined && (
