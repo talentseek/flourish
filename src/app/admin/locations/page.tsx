@@ -21,7 +21,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Search, MapPin, Loader2 } from "lucide-react"
+import { Search, MapPin, Loader2, Filter } from "lucide-react"
 import {
     getLocationsForAdmin,
     getRegionalManagers,
@@ -50,6 +50,7 @@ export default function LocationsPage() {
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(1)
     const [search, setSearch] = useState("")
+    const [rmFilter, setRmFilter] = useState("")
     const [loading, setLoading] = useState(true)
     const [isPending, startTransition] = useTransition()
 
@@ -58,7 +59,7 @@ export default function LocationsPage() {
         async function loadData() {
             setLoading(true)
             const [locationsData, managersData] = await Promise.all([
-                getLocationsForAdmin(page, 20, search),
+                getLocationsForAdmin(page, 20, search, rmFilter),
                 getRegionalManagers()
             ])
             setLocations(locationsData.locations)
@@ -67,11 +68,17 @@ export default function LocationsPage() {
             setLoading(false)
         }
         loadData()
-    }, [page, search])
+    }, [page, search, rmFilter])
 
     // Handle search
     const handleSearch = (value: string) => {
         setSearch(value)
+        setPage(1)
+    }
+
+    // Handle RM filter change
+    const handleRmFilterChange = (value: string) => {
+        setRmFilter(value === "all" ? "" : value)
         setPage(1)
     }
 
@@ -123,13 +130,13 @@ export default function LocationsPage() {
                         All Locations
                     </CardTitle>
                     <CardDescription>
-                        {total.toLocaleString()} locations in database
+                        {total.toLocaleString()} locations {rmFilter ? "(filtered)" : "in database"}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Search */}
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="relative flex-1 max-w-sm">
+                    {/* Filters */}
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                        <div className="relative flex-1 min-w-[200px] max-w-sm">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 placeholder="Search by name, city, or postcode..."
@@ -137,6 +144,25 @@ export default function LocationsPage() {
                                 onChange={(e) => handleSearch(e.target.value)}
                                 className="pl-10"
                             />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Filter className="h-4 w-4 text-muted-foreground" />
+                            <Select value={rmFilter || "all"} onValueChange={handleRmFilterChange}>
+                                <SelectTrigger className="w-[220px]">
+                                    <SelectValue placeholder="Filter by Regional Manager" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Locations</SelectItem>
+                                    <SelectItem value="managed">Managed Portfolio Only</SelectItem>
+                                    <SelectItem value="unassigned">Unassigned (Managed)</SelectItem>
+                                    <hr className="my-1" />
+                                    {managers.map((manager) => (
+                                        <SelectItem key={manager.id} value={manager.name || manager.email}>
+                                            {manager.name || manager.email}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 

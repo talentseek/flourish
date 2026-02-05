@@ -73,16 +73,34 @@ export async function updateUserRole(userId: string, role: Role) {
 }
 
 // Get all locations for admin table
-export async function getLocationsForAdmin(page = 1, pageSize = 20, search = "") {
+export async function getLocationsForAdmin(page = 1, pageSize = 20, search = "", regionalManagerFilter = "") {
     await verifyAdmin()
 
-    const where = search ? {
-        OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { city: { contains: search, mode: 'insensitive' as const } },
-            { postcode: { contains: search, mode: 'insensitive' as const } }
-        ]
-    } : {}
+    const whereConditions: Record<string, unknown>[] = []
+
+    // Search filter
+    if (search) {
+        whereConditions.push({
+            OR: [
+                { name: { contains: search, mode: 'insensitive' as const } },
+                { city: { contains: search, mode: 'insensitive' as const } },
+                { postcode: { contains: search, mode: 'insensitive' as const } }
+            ]
+        })
+    }
+
+    // Regional Manager filter
+    if (regionalManagerFilter) {
+        if (regionalManagerFilter === "unassigned") {
+            whereConditions.push({ regionalManager: null, isManaged: true })
+        } else if (regionalManagerFilter === "managed") {
+            whereConditions.push({ isManaged: true })
+        } else {
+            whereConditions.push({ regionalManager: regionalManagerFilter })
+        }
+    }
+
+    const where = whereConditions.length > 0 ? { AND: whereConditions } : {}
 
     const [locations, total] = await Promise.all([
         prisma.location.findMany({
