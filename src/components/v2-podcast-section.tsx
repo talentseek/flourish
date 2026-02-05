@@ -8,7 +8,7 @@ export function V2PodcastSection() {
                 {/* Header */}
                 <div className="text-center space-y-4 mb-12 max-w-3xl mx-auto">
                     <div className="flex items-center justify-center gap-3 mb-4">
-                        <Headphones className="h-8 w-8 text-[#E6FB60]" />
+                        <Headphones className="h-8 w-8 text-[#4D4A46]" />
                         <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-[#4D4A46]">
                             Flourish Podcast
                         </h2>

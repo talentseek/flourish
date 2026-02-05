@@ -46,7 +46,7 @@ export function V2TraderStoriesSection() {
                   &quot;Flourish helped us establish Oudvana and bring luxury oud fragrances to The Strand.
                   Their support made our vision of refined fragrance experiences a reality.&quot;
                 </p>
-                <p className="font-semibold text-[#E6FB60]">— Ayush Kundaria, Founder of Oudvana</p>
+                <p className="font-semibold text-[#4D4A46]">— Ayush Kundaria, Founder of Oudvana</p>
                 <p className="text-sm text-muted-foreground">The Strand Shopping Centre, Bootle</p>
               </div>
             </CardContent>
@@ -71,7 +71,7 @@ export function V2TraderStoriesSection() {
                   &quot;Kiara Rose is redefining affordable luxury with tarnish-free gold vermeil and
                   natural gemstones. Their honest pricing makes high-end jewelry accessible to everyone.&quot;
                 </p>
-                <p className="font-semibold text-[#E6FB60]">— Michelle Clark, Sales Director</p>
+                <p className="font-semibold text-[#4D4A46]">— Michelle Clark, Sales Director</p>
                 <p className="text-sm text-muted-foreground">Highcross Leicester</p>
               </div>
             </CardContent>
@@ -128,7 +128,7 @@ export function V2TraderStoriesSection() {
                 &quot;The team at Flourish made everything so simple. From finding the right space
                 to helping with compliance, they were there every step of the way.&quot;
               </p>
-              <p className="font-semibold text-[#E6FB60]">— Sarah M.</p>
+              <p className="font-semibold text-[#4D4A46]">— Sarah M.</p>
               <p className="text-sm text-muted-foreground">Pop-up Retailer</p>
             </CardContent>
           </Card>
@@ -142,7 +142,7 @@ export function V2TraderStoriesSection() {
                 &quot;We&apos;ve expanded to three locations thanks to Flourish. Their understanding of
                 our business and the spaces available is unmatched.&quot;
               </p>
-              <p className="font-semibold text-[#E6FB60]">— James T.</p>
+              <p className="font-semibold text-[#4D4A46]">— James T.</p>
               <p className="text-sm text-muted-foreground">Multi-location Trader</p>
             </CardContent>
           </Card>
@@ -156,7 +156,7 @@ export function V2TraderStoriesSection() {
                 &quot;Starting out was daunting, but Flourish made it feel achievable. The support
                 and guidance we received was invaluable.&quot;
               </p>
-              <p className="font-semibold text-[#E6FB60]">— Emma L.</p>
+              <p className="font-semibold text-[#4D4A46]">— Emma L.</p>
               <p className="text-sm text-muted-foreground">First-time Trader</p>
             </CardContent>
           </Card>

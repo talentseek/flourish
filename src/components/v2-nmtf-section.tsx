@@ -48,13 +48,13 @@ export function V2NMTFSection() {
             <CardContent className="space-y-4">
               <p className="text-white text-base leading-relaxed font-medium">
                 The National Market Traders Federation (NMTF) is the UK&apos;s leading trade association for market traders,
-                street traders, and small independent retailers. With over 100 years of history, NMTF represents and 
-                supports thousands of traders across the country, providing advocacy, advice, and resources to help 
+                street traders, and small independent retailers. With over 100 years of history, NMTF represents and
+                supports thousands of traders across the country, providing advocacy, advice, and resources to help
                 independent businesses thrive.
               </p>
               <p className="text-white text-base leading-relaxed font-medium">
-                NMTF champions the interests of market traders at local and national levels, working with councils, 
-                government bodies, and industry partners to create better trading environments and opportunities for 
+                NMTF champions the interests of market traders at local and national levels, working with councils,
+                government bodies, and industry partners to create better trading environments and opportunities for
                 independent retailers.
               </p>
             </CardContent>
@@ -67,7 +67,7 @@ export function V2NMTFSection() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-white text-base leading-relaxed font-medium">
-                Flourish and NMTF share a common mission: to support independent traders and create thriving retail 
+                Flourish and NMTF share a common mission: to support independent traders and create thriving retail
                 environments. Our partnership brings together Flourish&apos;s expertise in retail space activation with
                 NMTF&apos;s deep understanding of trader needs and market dynamics.
               </p>

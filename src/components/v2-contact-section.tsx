@@ -54,7 +54,7 @@ export function V2ContactSection() {
         <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
           <Card className="border-[#D8D8D6] text-center">
             <CardHeader>
-              <CardTitle className="text-xl text-[#E6FB60]">New Traders</CardTitle>
+              <CardTitle className="text-xl text-[#4D4A46]">New Traders</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
@@ -72,7 +72,7 @@ export function V2ContactSection() {
 
           <Card className="border-[#D8D8D6] text-center">
             <CardHeader>
-              <CardTitle className="text-xl text-[#E6FB60]">Landlords & Partnerships</CardTitle>
+              <CardTitle className="text-xl text-[#4D4A46]">Landlords & Partnerships</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
@@ -90,7 +90,7 @@ export function V2ContactSection() {
 
           <Card className="border-[#D8D8D6] text-center">
             <CardHeader>
-              <CardTitle className="text-xl text-[#E6FB60]">General Enquiries</CardTitle>
+              <CardTitle className="text-xl text-[#4D4A46]">General Enquiries</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground mb-4">
@@ -111,7 +111,7 @@ export function V2ContactSection() {
         <div id="contact-form" className="max-w-2xl mx-auto mb-12">
           <Card className="border-[#D8D8D6]">
             <CardHeader>
-              <CardTitle className="text-2xl text-[#E6FB60]">Get in Touch</CardTitle>
+              <CardTitle className="text-2xl text-[#4D4A46]">Get in Touch</CardTitle>
               <CardDescription>
                 Fill out the form below and we&apos;ll get back to you within 2 working days
               </CardDescription>
@@ -129,7 +129,7 @@ export function V2ContactSection() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-[#E6FB60]">Name *</Label>
+                      <Label htmlFor="name" className="text-[#4D4A46]">Name *</Label>
                       <Input
                         id="name"
                         required
@@ -139,7 +139,7 @@ export function V2ContactSection() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-[#E6FB60]">Email *</Label>
+                      <Label htmlFor="email" className="text-[#4D4A46]">Email *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -152,7 +152,7 @@ export function V2ContactSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-[#E6FB60]">Phone (optional)</Label>
+                    <Label htmlFor="phone" className="text-[#4D4A46]">Phone (optional)</Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -163,7 +163,7 @@ export function V2ContactSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="enquiryType" className="text-[#E6FB60]">Enquiry Type *</Label>
+                    <Label htmlFor="enquiryType" className="text-[#4D4A46]">Enquiry Type *</Label>
                     <Select
                       value={formData.enquiryType}
                       onValueChange={(value) => handleChange("enquiryType", value)}
@@ -181,7 +181,7 @@ export function V2ContactSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="text-[#E6FB60]">Message *</Label>
+                    <Label htmlFor="message" className="text-[#4D4A46]">Message *</Label>
                     <Textarea
                       id="message"
                       required
@@ -194,7 +194,7 @@ export function V2ContactSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="file" className="text-[#E6FB60]">
+                    <Label htmlFor="file" className="text-[#4D4A46]">
                       Upload File (optional) - For traders to share images of kiosk/product
                     </Label>
                     <Input

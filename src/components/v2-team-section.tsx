@@ -92,15 +92,15 @@ export function V2TeamSection() {
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="border-[#D8D8D6]">
             <CardHeader>
-              <CardTitle className="text-2xl text-[#E6FB60]">About Flourish</CardTitle>
+              <CardTitle className="text-2xl text-[#4D4A46]">About Flourish</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                The Flourish team is highly experienced in all aspects of shopping centre, high street 
+                The Flourish team is highly experienced in all aspects of shopping centre, high street
                 and town centre environments.
               </p>
               <p className="text-muted-foreground">
-                From sales, visual merchandising and finance to placemaking, brand, marketing and 
+                From sales, visual merchandising and finance to placemaking, brand, marketing and
                 communications — we bring comprehensive expertise to every project.
               </p>
             </CardContent>
@@ -135,8 +135,8 @@ export function V2TeamSection() {
                     />
                   </div>
                   <div className="flex-1">
-                    <CardTitle className="text-xl text-[#E6FB60] mb-1">{member.name}</CardTitle>
-                    <p className="text-sm text-[#E6FB60] font-semibold">{member.role}</p>
+                    <CardTitle className="text-xl text-[#4D4A46] mb-1">{member.name}</CardTitle>
+                    <p className="text-sm text-[#4D4A46] font-semibold">{member.role}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -144,7 +144,7 @@ export function V2TeamSection() {
                 <p className="text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
                 <div className="pt-3 border-t border-[#D8D8D6]">
                   <p className="text-xs text-muted-foreground italic">
-                    <strong className="text-[#E6FB60]">Fun fact:</strong> {member.funFact}
+                    <strong className="text-[#4D4A46]">Fun fact:</strong> {member.funFact}
                   </p>
                 </div>
               </CardContent>
