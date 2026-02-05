@@ -21,10 +21,6 @@ export default function HomePage() {
     const html = document.documentElement
     const body = document.body
 
-    // Force light mode on the homepage for consistent rendering
-    html.classList.remove('dark')
-    html.classList.add('light')
-
     html.classList.add('v2-page-active')
     body.classList.add('v2-page-active')
 
@@ -32,7 +28,6 @@ export default function HomePage() {
       // Restore when leaving page
       html.classList.remove('v2-page-active')
       body.classList.remove('v2-page-active')
-      html.classList.remove('light')
     }
   }, [])
 
