@@ -1,0 +1,191 @@
+{
+  "name": "Flourish-Enricher-Brain",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "flourish-enrich",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "webhook-trigger",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Please perform deep commercial enrichment for the following retail location: {{ $json.body.locationName }}. \n\n1. Scrape the tenant directory at {{ $json.body.websiteUrl }} to get a full list of actual retail brands.\n2. Find the annual footfall for 2024-2025.\n3. Identify the owner/management company.\n\nReturn the data in a clean JSON format compatible with a Prisma update script.",
+        "options": {
+          "systemMessage": "You are the Flourish Data Specialist. Use your Firecrawl and Perplexity tools for every request. Do not guess. If a website is provided, scrape it FIRST."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        250,
+        0
+      ],
+      "id": "ai-agent",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        200,
+        200
+      ],
+      "id": "chat-model",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "cmg4uqwrv0005ihelxjai36bt",
+          "name": "B2BEE OpenRouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "Firecrawl_Scraper",
+        "description": "Scrapes a website URL and returns content. Input: url",
+        "workflowId": {
+          "__rl": true,
+          "value": "8Tp4fUF6NZCndbrTc2NIL",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "schema": [
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": true,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        450,
+        200
+      ],
+      "id": "firecrawl-tool",
+      "name": "Website_Scraper"
+    },
+    {
+      "parameters": {
+        "name": "Perplexity_Search",
+        "description": "Searches for real-time news and data. Input: query",
+        "workflowId": {
+          "__rl": true,
+          "value": "l2A8d4cghcQq5W8F",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": true,
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        600,
+        200
+      ],
+      "id": "perplexity-tool",
+      "name": "News_Search"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "webhook-response",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "webhook-trigger": {
+      "main": [
+        [
+          {
+            "node": "ai-agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chat-model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ai-agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "firecrawl-tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "ai-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "perplexity-tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "ai-agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai-agent": {
+      "main": [
+        [
+          {
+            "node": "webhook-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

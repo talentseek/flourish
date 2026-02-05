@@ -19,6 +19,7 @@ const navigationItems = [
   { label: "Trader Stories", href: "#trader-stories" },
   { label: "About Us", href: "#team" },
   // { label: "Video Gallery", href: "#video-gallery" }, // TEMPORARILY DISABLED FOR LAUNCH
+  { label: "Podcast", href: "#podcast" },
   { label: "Contact Us", href: "#contact" },
 ]
 
