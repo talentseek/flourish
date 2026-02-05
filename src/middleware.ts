@@ -7,14 +7,15 @@ export async function middleware(request: NextRequest) {
 
   // Define protected routes
   const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
+  const isAdmin = request.nextUrl.pathname.startsWith("/admin");
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/sign-up") ||
     request.nextUrl.pathname.startsWith("/forgot-password") ||
     request.nextUrl.pathname.startsWith("/reset-password");
 
-  // For dashboard routes: let the page handle auth check
+  // For dashboard and admin routes: let the page handle auth check
   // Don't do middleware redirect - the page will check session validity
-  if (isDashboard) {
+  if (isDashboard || isAdmin) {
     return NextResponse.next();
   }
 
@@ -28,5 +29,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/sign-up", "/forgot-password", "/reset-password"]
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/sign-up", "/forgot-password", "/reset-password"]
 };
+

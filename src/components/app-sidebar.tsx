@@ -6,6 +6,7 @@ import {
   TargetIcon,
   FileTextIcon,
   MapPinIcon,
+  ShieldIcon,
 } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
 import { FlourishLogo } from "@/components/flourish-logo"
@@ -21,7 +22,11 @@ import {
 } from "@/components/ui/sidebar"
 import { NavMain } from "@/components/nav-main"
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  userRole?: string
+}
+
+export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
   const navItems = [
     {
       title: "Dashboard",
@@ -44,6 +49,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: FileTextIcon,
     },
   ];
+
+  // Add Admin link for ADMIN users
+  if (userRole === 'ADMIN') {
+    navItems.push({
+      title: "Admin",
+      url: "/admin",
+      icon: ShieldIcon,
+    })
+  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -80,3 +94,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   )
 }
+
