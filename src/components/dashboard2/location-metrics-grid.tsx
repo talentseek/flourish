@@ -62,8 +62,8 @@ export function LocationMetricsGrid({ location }: LocationMetricsGridProps) {
       value: location.largestCategory,
       formatted: location.largestCategory || "N/A",
       icon: Tag,
-      description: location.largestCategoryPercent 
-        ? `${location.largestCategoryPercent.toFixed(1)}% of stores`
+      description: location.largestCategoryPercent
+        ? `${(location.largestCategoryPercent * 100).toFixed(1)}% of stores`
         : "Primary tenant category",
     },
   ].filter(metric => metric.value !== undefined && metric.value !== null)

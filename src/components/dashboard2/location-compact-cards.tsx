@@ -59,9 +59,9 @@ export function LocationParkingCard({ location }: LocationCardProps) {
                     </div>
                 )}
                 {location.publicTransit && (
-                    <div className="flex items-center gap-2 text-blue-600">
-                        <Bus className="h-4 w-4" />
-                        <span className="text-sm truncate">{location.publicTransit}</span>
+                    <div className="flex items-start gap-2 text-blue-600">
+                        <Bus className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm">{location.publicTransit}</span>
                     </div>
                 )}
             </CardContent>
@@ -77,8 +77,20 @@ export function LocationPropertyCard({ location }: LocationCardProps) {
         return num.toLocaleString()
     }
 
+    // Format opening hours from JSON to display string
+    const formatOpeningHours = (hours: any) => {
+        if (!hours || typeof hours !== 'object') return null
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        const formatted = days
+            .filter(day => hours[day])
+            .map(day => `${day.slice(0, 3)}: ${hours[day]}`)
+        return formatted.length > 0 ? formatted : null
+    }
+
+    const openingHours = formatOpeningHours(location.openingHours)
+
     const hasData = location.openedYear || location.numberOfFloors ||
-        location.totalFloorArea || location.anchorTenants
+        location.totalFloorArea || location.anchorTenants || openingHours
 
     if (!hasData) return null
 
@@ -115,6 +127,16 @@ export function LocationPropertyCard({ location }: LocationCardProps) {
                         <span className="font-semibold">{location.anchorTenants}</span>
                     </div>
                 )}
+                {openingHours && (
+                    <div className="pt-2 border-t">
+                        <span className="text-xs text-muted-foreground block mb-1">Opening Hours</span>
+                        <div className="text-xs space-y-0.5">
+                            {openingHours.map((line, i) => (
+                                <div key={i}>{line}</div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </CardContent>
         </Card>
     )
@@ -122,7 +144,7 @@ export function LocationPropertyCard({ location }: LocationCardProps) {
 
 // Compact Ownership Card
 export function LocationOwnershipCard({ location }: LocationCardProps) {
-    const hasData = location.owner || location.management || location.phone
+    const hasData = location.owner || location.management
 
     if (!hasData) return null
 
@@ -145,12 +167,6 @@ export function LocationOwnershipCard({ location }: LocationCardProps) {
                     <div>
                         <span className="text-xs text-muted-foreground block">Management</span>
                         <span className="text-sm font-medium">{location.management}</span>
-                    </div>
-                )}
-                {location.phone && (
-                    <div>
-                        <span className="text-xs text-muted-foreground block">Phone</span>
-                        <span className="text-sm font-medium">{location.phone}</span>
                     </div>
                 )}
             </CardContent>

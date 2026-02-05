@@ -10,8 +10,8 @@ interface LocationCommercialKPIsProps {
 }
 
 export function LocationCommercialKPIs({ location }: LocationCommercialKPIsProps) {
-  const hasData = location.healthIndex || location.largestCategory || 
-                 location.percentMultiple !== undefined || location.percentIndependent !== undefined
+  const hasData = location.healthIndex || location.largestCategory ||
+    location.percentMultiple !== undefined || location.percentIndependent !== undefined
 
   if (!hasData) {
     return null
@@ -51,9 +51,9 @@ export function LocationCommercialKPIs({ location }: LocationCommercialKPIsProps
             <div className="text-xl font-bold">{location.largestCategory}</div>
             {location.largestCategoryPercent !== undefined && (
               <>
-                <Progress value={location.largestCategoryPercent} className="h-2" />
+                <Progress value={location.largestCategoryPercent * 100} className="h-2" />
                 <p className="text-xs text-muted-foreground">
-                  {location.largestCategoryPercent.toFixed(1)}% of total stores
+                  {(location.largestCategoryPercent * 100).toFixed(1)}% of total stores
                 </p>
               </>
             )}
