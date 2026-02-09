@@ -23,7 +23,7 @@ export function LocationSEOSection({ location }: LocationSEOSectionProps) {
   }
 
   const hasSEOData = (location.seoKeywords && location.seoKeywords.length > 0) ||
-                     (location.topPages && location.topPages.length > 0)
+    (location.topPages && location.topPages.length > 0)
 
   if (!hasSEOData) {
     return null
@@ -80,35 +80,45 @@ export function LocationSEOSection({ location }: LocationSEOSectionProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {location.topPages.slice(0, 10).map((page: any, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate flex items-center gap-2">
-                      {page.url}
-                      {location.website && (
-                        <a
-                          href={`${location.website}${page.url}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+              {location.topPages.slice(0, 10).map((page: any, index: number) => {
+                const isString = typeof page === 'string'
+                const label = isString ? page : page.url
+                const hasStats = !isString && page.traffic !== undefined
+
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate flex items-center gap-2">
+                        {label}
+                        {location.website && (
+                          <a
+                            href={isString ? location.website : `${location.website}${page.url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
+                      </div>
+                      {hasStats && (
+                        <div className="text-sm text-muted-foreground">
+                          {formatNumber(page.traffic)} visits • {page.percentage}% of total
+                        </div>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatNumber(page.traffic)} visits • {page.percentage}% of total
-                    </div>
+                    {hasStats && (
+                      <Badge variant="secondary" className="ml-2">
+                        {page.percentage}%
+                      </Badge>
+                    )}
                   </div>
-                  <Badge variant="secondary" className="ml-2">
-                    {page.percentage}%
-                  </Badge>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>
