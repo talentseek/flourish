@@ -137,7 +137,7 @@ export default async function RivingtonHarkPage() {
             name: true,
             town: true,
             numberOfStores: true,
-            vacancy: true,
+            totalFloorArea: true,
             footfall: true,
             googleRating: true,
             googleReviews: true,
