@@ -1571,6 +1571,24 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData, gapAnal
                                 ESG
                             </button>
                             <button
+                                onClick={() => setShowRegionalMode(true)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
+                                style={{
+                                    color: COLORS.accentCoral,
+                                    background: `${COLORS.accentCoral}15`,
+                                    border: `1px solid ${COLORS.accentCoral}30`,
+                                }}
+                                onMouseEnter={(e) =>
+                                    (e.currentTarget.style.background = `${COLORS.accentCoral}25`)
+                                }
+                                onMouseLeave={(e) =>
+                                    (e.currentTarget.style.background = `${COLORS.accentCoral}15`)
+                                }
+                            >
+                                <MapPin className="w-3.5 h-3.5" />
+                                Regional View
+                            </button>
+                            <button
                                 onClick={() => setShowVideo(true)}
                                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors"
                                 style={{
