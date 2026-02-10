@@ -191,7 +191,7 @@ export default async function RivingtonHarkPage() {
             name: palaceLocation.name,
             city: palaceLocation.town || "Enfield",
             stores: palaceLocation.numberOfStores || 0,
-            vacancy: palaceLocation.vacancy ? Number(palaceLocation.vacancy) : null,
+            floorArea: palaceLocation.totalFloorArea,
             footfall: palaceLocation.footfall,
             googleRating: palaceLocation.googleRating?.toString() || null,
             googleReviews: palaceLocation.googleReviews,

@@ -125,7 +125,7 @@ interface PalaceRegionalData {
         name: string
         city: string
         stores: number
-        vacancy: number | null
+        floorArea: number | null
         footfall: number | null
         googleRating: string | null
         googleReviews: number | null

@@ -37,7 +37,7 @@ interface PalaceData {
     name: string
     city: string
     stores: number
-    vacancy: number | null
+    floorArea: number | null
     footfall: number | null
     googleRating: string | null
     googleReviews: number | null
@@ -351,7 +351,7 @@ export default function RHRegionalPanel({
                                     <div className="grid grid-cols-2 gap-2.5">
                                         {[
                                             { label: "Stores", value: palaceData.stores.toString(), color: COLORS.textPrimary },
-                                            { label: "Vacancy", value: palaceData.vacancy != null ? `${palaceData.vacancy}%` : "N/A", color: palaceData.vacancy && palaceData.vacancy > 10 ? COLORS.accentCoral : COLORS.statusLive },
+                                            { label: "Floor Area", value: palaceData.floorArea ? `${(palaceData.floorArea / 1000).toFixed(0)}k sqft` : "N/A", color: COLORS.textPrimary },
                                             { label: "Footfall", value: palaceData.footfall ? `${(palaceData.footfall / 1000000).toFixed(1)}M` : "N/A", color: COLORS.accentLime },
                                             { label: "Google", value: palaceData.googleRating ? `${palaceData.googleRating}/5` : "N/A", color: COLORS.textPrimary },
                                             { label: "Reviews", value: palaceData.googleReviews?.toLocaleString() || "N/A", color: COLORS.textSecondary },
