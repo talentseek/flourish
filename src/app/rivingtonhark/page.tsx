@@ -148,6 +148,7 @@ export default async function RivingtonHarkPage() {
     const nearbyLocations = await prisma.location.findMany({
         where: {
             id: { not: PALACE_ID },
+            type: "SHOPPING_CENTRE",
             latitude: { gte: PALACE_LAT - LAT_OFF, lte: PALACE_LAT + LAT_OFF },
             longitude: { gte: PALACE_LNG - LNG_OFF, lte: PALACE_LNG + LNG_OFF },
         },
@@ -159,6 +160,7 @@ export default async function RivingtonHarkPage() {
             type: true,
             numberOfStores: true,
         },
+        take: 5,
     })
 
     // Group tenants by category

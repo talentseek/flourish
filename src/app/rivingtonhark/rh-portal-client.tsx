@@ -374,7 +374,7 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
         }
     }, [map, drawerOpen, selectedProject, isGuidedTour])
 
-    // Auto-show nearby centre InfoWindows during guided tour step 1
+    // Auto-show nearby centre markers during guided tour step 1
     useEffect(() => {
         // Clean up previous nearby markers/windows
         nearbyInfoWindowsRef.current.forEach((w) => w.close())
@@ -384,44 +384,64 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
 
         if (!map || !isGuidedTour || guideStep !== 1 || nearbyLocations.length === 0) return
 
-        nearbyLocations.forEach((loc) => {
-            // Small grey marker for nearby centres
-            const size = 28
-            const half = size / 2
-            const iconSvg = encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-                    <circle cx="${half}" cy="${half}" r="10" fill="#64748B" stroke="${COLORS.bgBase}" stroke-width="2" opacity="0.8"/>
-                </svg>`.trim()
-            )
+        // Belt-and-braces: ensure map is zoomed in for the guided tour
+        const palaceProject = rhProjects.find((p) => p.name === "Palace Shopping")
+        if (palaceProject) {
+            map.setZoom(14)
+            map.panTo({ lat: palaceProject.lat, lng: palaceProject.lng })
+            setTimeout(() => map.panBy(210, 0), 200)
+        }
 
-            const marker = new window.google.maps.Marker({
-                position: { lat: loc.lat, lng: loc.lng },
-                map,
-                title: loc.name,
-                icon: {
-                    url: `data:image/svg+xml;charset=UTF-8,${iconSvg}`,
-                    scaledSize: new window.google.maps.Size(size, size),
-                    anchor: new window.google.maps.Point(half, half),
-                },
+        // Add nearby centre markers with styled labels after a short delay
+        setTimeout(() => {
+            nearbyLocations.forEach((loc) => {
+                // Larger marker with pulsing ring for competing centres
+                const size = 32
+                const half = size / 2
+                const iconSvg = encodeURIComponent(
+                    `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                        <circle cx="${half}" cy="${half}" r="13" fill="none" stroke="#64748B" stroke-width="2" opacity="0.4"/>
+                        <circle cx="${half}" cy="${half}" r="8" fill="#64748B" stroke="${COLORS.bgBase}" stroke-width="2" opacity="0.9"/>
+                    </svg>`.trim()
+                )
+
+                const marker = new window.google.maps.Marker({
+                    position: { lat: loc.lat, lng: loc.lng },
+                    map,
+                    title: loc.name,
+                    icon: {
+                        url: `data:image/svg+xml;charset=UTF-8,${iconSvg}`,
+                        scaledSize: new window.google.maps.Size(size, size),
+                        anchor: new window.google.maps.Point(half, half),
+                    },
+                })
+
+                // Use a styled InfoWindow — override Google's default white bubble with CSS
+                const storeInfo = loc.stores ? `<div style="font-size:10px;color:${COLORS.accentCoral};margin-top:3px;font-weight:600">${loc.stores} stores</div>` : ""
+                const iw = new window.google.maps.InfoWindow({
+                    content: `
+                        <div class="rh-nearby-iw" style="font-family:'Inter',sans-serif">
+                            <div style="font-weight:700;font-size:12px;color:${COLORS.textPrimary}">${loc.name}</div>
+                            <div style="font-size:10px;color:${COLORS.textMuted}">${loc.city} • Shopping Centre</div>
+                            ${storeInfo}
+                        </div>
+                        <style>
+                            .gm-style-iw-c { background:${COLORS.bgSurface} !important; border:1px solid ${COLORS.borderDefault} !important; border-radius:10px !important; padding:0 !important; box-shadow:0 4px 16px rgba(0,0,0,0.5) !important; }
+                            .gm-style-iw-d { overflow:hidden !important; padding:10px 14px !important; }
+                            .gm-style-iw-tc::after { background:${COLORS.bgSurface} !important; }
+                            .gm-ui-hover-effect { display:none !important; }
+                            .gm-style-iw-chr { display:none !important; }
+                        </style>
+                    `,
+                    disableAutoPan: true,
+                })
+
+                iw.open(map, marker)
+
+                nearbyInfoWindowsRef.current.push(iw)
+                nearbyMarkersRef.current.push(marker)
             })
-
-            const iw = new window.google.maps.InfoWindow({
-                content: `
-                    <div style="background:${COLORS.bgSurface};color:${COLORS.textPrimary};padding:10px 14px;border-radius:8px;border:1px solid ${COLORS.borderDefault};font-family:'Inter',sans-serif;min-width:160px">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:2px">${loc.name}</div>
-                        <div style="font-size:11px;color:${COLORS.textMuted}">${loc.city} • ${loc.type}</div>
-                        ${loc.stores ? `<div style="font-size:11px;color:${COLORS.accentCoral};margin-top:4px">${loc.stores} stores</div>` : ""}
-                    </div>
-                `,
-                disableAutoPan: true,
-            })
-
-            // Open after a small stagger for visual effect
-            setTimeout(() => iw.open(map, marker), 400)
-
-            nearbyInfoWindowsRef.current.push(iw)
-            nearbyMarkersRef.current.push(marker)
-        })
+        }, 600)
 
         return () => {
             nearbyInfoWindowsRef.current.forEach((w) => w.close())
@@ -1547,8 +1567,8 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                 ═══════════════════════════════════════ */}
                     <div
                         className={`absolute top-0 bottom-0 w-[420px] z-40 transition-transform duration-300 ease-out ${demoStep === "guided"
-                                ? `left-0 ${activeProject ? "translate-x-0" : "-translate-x-full"}`
-                                : `right-0 ${activeProject ? "translate-x-0" : "translate-x-full"}`
+                            ? `left-0 ${activeProject ? "translate-x-0" : "-translate-x-full"}`
+                            : `right-0 ${activeProject ? "translate-x-0" : "translate-x-full"}`
                             }`}
                         style={{
                             background: `${COLORS.bgBase}F2`,
