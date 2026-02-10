@@ -85,6 +85,77 @@ export default async function RivingtonHarkPage() {
         },
     })
 
+    // ── Palace Shopping data for Regional Mode Panel ──
+    const PALACE_ID = "cmicxw4mg000z13hxqr5gzivf"
+    const PALACE_LAT = 51.6518
+    const PALACE_LNG = -0.0577
+    const RADIUS_KM = 5 * 1.60934
+    const LAT_OFF = RADIUS_KM / 111
+    const LNG_OFF = RADIUS_KM / (111 * Math.cos((PALACE_LAT * Math.PI) / 180))
+
+    const palaceLocation = await prisma.location.findUnique({
+        where: { id: PALACE_ID },
+        select: {
+            name: true,
+            town: true,
+            numberOfStores: true,
+            vacancy: true,
+            footfall: true,
+            googleRating: true,
+            googleReviews: true,
+            parkingSpaces: true,
+            tenants: { select: { category: true } },
+        },
+    })
+
+    const nearbyLocations = await prisma.location.findMany({
+        where: {
+            id: { not: PALACE_ID },
+            latitude: { gte: PALACE_LAT - LAT_OFF, lte: PALACE_LAT + LAT_OFF },
+            longitude: { gte: PALACE_LNG - LNG_OFF, lte: PALACE_LNG + LNG_OFF },
+        },
+        select: {
+            name: true,
+            town: true,
+            latitude: true,
+            longitude: true,
+            type: true,
+            numberOfStores: true,
+        },
+    })
+
+    // Group tenants by category
+    const tenantCategoryMap: Record<string, number> = {}
+    palaceLocation?.tenants.forEach((t) => {
+        const cat = t.category || "Uncategorised"
+        tenantCategoryMap[cat] = (tenantCategoryMap[cat] || 0) + 1
+    })
+    const tenantCategories = Object.entries(tenantCategoryMap)
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+
+    const palaceRegionalData = palaceLocation ? {
+        palace: {
+            name: palaceLocation.name,
+            city: palaceLocation.town || "Enfield",
+            stores: palaceLocation.numberOfStores || 0,
+            vacancy: palaceLocation.vacancy ? Number(palaceLocation.vacancy) : null,
+            footfall: palaceLocation.footfall,
+            googleRating: palaceLocation.googleRating?.toString() || null,
+            googleReviews: palaceLocation.googleReviews,
+            parkingSpaces: palaceLocation.parkingSpaces,
+            tenantCategories,
+        },
+        nearby: nearbyLocations.map((n) => ({
+            name: n.name,
+            city: n.town || "",
+            lat: Number(n.latitude || 0),
+            lng: Number(n.longitude || 0),
+            type: n.type || "Retail",
+            stores: n.numberOfStores,
+        })),
+    } : null
+
     // Map DB rows → RHProject shape for the client component
     const dbProjects: RHProject[] = locations.map((loc) => ({
         name: loc.name,
@@ -107,5 +178,11 @@ export default async function RivingtonHarkPage() {
     // Combine live DB data + static development schemes
     const allProjects = [...dbProjects, ...DEVELOPMENT_SCHEMES]
 
-    return <RHPortalClient rhProjects={allProjects} />
+    return (
+        <RHPortalClient
+            rhProjects={allProjects}
+            palaceRegionalData={palaceRegionalData}
+        />
+    )
 }
+

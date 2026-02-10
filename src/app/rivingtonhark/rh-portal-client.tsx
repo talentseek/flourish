@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef, useState, useCallback, ReactElement } from "react"
+import { useEffect, useRef, useState, useCallback, ReactElement, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { Wrapper, Status } from "@googlemaps/react-wrapper"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -30,7 +31,13 @@ import {
     ExternalLink,
     Lock,
     ArrowRight,
+    Building2,
+    Search,
+    MessageSquare,
+    SkipForward,
 } from "lucide-react"
+
+const RHRegionalPanel = dynamic(() => import("./rh-regional-panel"), { ssr: false })
 
 // ─────────────────────────────────────────────────
 // Design Tokens — WCAG AA validated contrast ratios
@@ -74,8 +81,31 @@ export interface RHProject {
     isFlourishManaged?: boolean
 }
 
+interface PalaceRegionalData {
+    palace: {
+        name: string
+        city: string
+        stores: number
+        vacancy: number | null
+        footfall: number | null
+        googleRating: string | null
+        googleReviews: number | null
+        parkingSpaces: number | null
+        tenantCategories: { category: string; count: number }[]
+    }
+    nearby: {
+        name: string
+        city: string
+        lat: number
+        lng: number
+        type: string
+        stores: number | null
+    }[]
+}
+
 interface RHPortalProps {
     rhProjects: RHProject[]
+    palaceRegionalData: PalaceRegionalData | null
 }
 
 // ── ESG Alignment Data ──
@@ -338,25 +368,404 @@ function KpiCell({
 }
 
 // ─────────────────────────────────────────────────
+// Animated Counter Hook
+// ─────────────────────────────────────────────────
+function useAnimatedCounter(target: number, duration: number = 1500, active: boolean = true) {
+    const [value, setValue] = useState(0)
+    useEffect(() => {
+        if (!active) { setValue(0); return }
+        let start = 0
+        const increment = target / (duration / 16)
+        const timer = setInterval(() => {
+            start += increment
+            if (start >= target) { setValue(target); clearInterval(timer) }
+            else setValue(Math.floor(start))
+        }, 16)
+        return () => clearInterval(timer)
+    }, [target, duration, active])
+    return value
+}
+
+// ─────────────────────────────────────────────────
+// Chapter Screens Component
+// ─────────────────────────────────────────────────
+const MATCHED_CENTRES = [
+    { name: "Palace Shopping", city: "Enfield", highlight: true },
+    { name: "Eldon Square", city: "Newcastle" },
+    { name: "St Johns", city: "Liverpool" },
+    { name: "Royal Victoria Place", city: "Tunbridge Wells" },
+    { name: "Castle Quarter", city: "Norwich" },
+    { name: "Rochdale Riverside", city: "Rochdale" },
+    { name: "Victoria Shopping Centre", city: "Southend" },
+    { name: "Fareham Shopping Centre", city: "Fareham" },
+]
+
+function ChapterScreens({
+    demoStep,
+    setDemoStep,
+    rhProjects,
+    matchedCount,
+    totalParking,
+    totalStores,
+    totalFootfall,
+    chapterAnimated,
+    setChapterAnimated,
+}: {
+    demoStep: DemoStep
+    setDemoStep: (s: DemoStep) => void
+    rhProjects: RHProject[]
+    matchedCount: number
+    totalParking: number
+    totalStores: number
+    totalFootfall: number
+    chapterAnimated: boolean
+    setChapterAnimated: (v: boolean) => void
+}) {
+    // Trigger entrance animation
+    useEffect(() => {
+        const t = setTimeout(() => setChapterAnimated(true), 100)
+        return () => clearTimeout(t)
+    }, [demoStep, setChapterAnimated])
+
+    const animProjects = useAnimatedCounter(rhProjects.length, 1200, demoStep === "chapter1" && chapterAnimated)
+    const animMatched = useAnimatedCounter(matchedCount, 1200, demoStep === "chapter1" && chapterAnimated)
+    const animStores = useAnimatedCounter(totalStores, 1500, demoStep === "chapter1" && chapterAnimated)
+    const animFootfall = useAnimatedCounter(Math.round(totalFootfall / 1000000), 1500, demoStep === "chapter1" && chapterAnimated)
+
+    const currentChapter = demoStep === "chapter1" ? 1 : demoStep === "chapter2" ? 2 : 3
+    const nextStep = (): DemoStep =>
+        demoStep === "chapter1" ? "chapter2" : demoStep === "chapter2" ? "chapter3" : "guided"
+
+    return (
+        <div
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+            style={{ background: COLORS.bgBase }}
+        >
+            {/* Ambient glow */}
+            <div
+                className="absolute inset-0"
+                style={{
+                    background: `radial-gradient(ellipse at 50% 40%, ${COLORS.accentCoral}08 0%, transparent 60%), radial-gradient(ellipse at 80% 60%, ${COLORS.accentLime}05 0%, transparent 50%)`,
+                }}
+            />
+            {/* Grid lines */}
+            <div
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                    backgroundImage: `linear-gradient(${COLORS.textMuted} 1px, transparent 1px), linear-gradient(90deg, ${COLORS.textMuted} 1px, transparent 1px)`,
+                    backgroundSize: "80px 80px",
+                }}
+            />
+
+            <div
+                className="relative z-10 flex flex-col items-center gap-8 max-w-5xl w-full px-8 transition-all duration-700"
+                style={{
+                    opacity: chapterAnimated ? 1 : 0,
+                    transform: chapterAnimated ? "translateY(0)" : "translateY(30px)",
+                }}
+            >
+                {/* Step indicator */}
+                <div className="flex items-center gap-2">
+                    {[1, 2, 3].map((n) => (
+                        <div
+                            key={n}
+                            className="rounded-full transition-all duration-300"
+                            style={{
+                                width: n === currentChapter ? 24 : 8,
+                                height: 8,
+                                background: n === currentChapter ? COLORS.accentCoral : `${COLORS.textMuted}40`,
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* ═══ CHAPTER 1: Portfolio Overview ═══ */}
+                {demoStep === "chapter1" && (
+                    <div className="flex flex-col items-center gap-10 w-full">
+                        <div className="text-center">
+                            <div
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
+                                style={{
+                                    background: `${COLORS.accentCoral}15`,
+                                    color: COLORS.accentCoral,
+                                    border: `1px solid ${COLORS.accentCoral}30`,
+                                }}
+                            >
+                                <Building2 className="w-3.5 h-3.5" />
+                                Portfolio Overview
+                            </div>
+                            <h1
+                                className="text-4xl md:text-5xl font-bold mb-4"
+                                style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}
+                            >
+                                Your Portfolio, Illuminated
+                            </h1>
+                            <p
+                                className="text-lg max-w-2xl mx-auto"
+                                style={{ color: COLORS.textMuted }}
+                            >
+                                We&apos;ve mapped your entire portfolio into the Flourish intelligence engine.
+                                Here&apos;s what we found.
+                            </p>
+                        </div>
+
+                        {/* Animated stat counters */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
+                            {[
+                                { label: "Total Projects", value: animProjects, color: COLORS.accentLime },
+                                { label: "Matched in DB", value: animMatched, color: COLORS.statusLive },
+                                { label: "Total Stores", value: animStores.toLocaleString(), color: COLORS.textPrimary },
+                                { label: "Annual Footfall", value: `${animFootfall}M`, color: COLORS.accentCoral },
+                            ].map((stat) => (
+                                <div
+                                    key={stat.label}
+                                    className="rounded-2xl p-5 text-center"
+                                    style={{
+                                        background: COLORS.bgSurface,
+                                        border: `1px solid ${COLORS.borderDefault}`,
+                                    }}
+                                >
+                                    <div
+                                        className="text-3xl md:text-4xl font-bold mb-1"
+                                        style={{
+                                            color: stat.color,
+                                            fontFamily: "'Roboto Mono', monospace",
+                                        }}
+                                    >
+                                        {stat.value}
+                                    </div>
+                                    <div
+                                        className="text-xs font-medium"
+                                        style={{ color: COLORS.textMuted }}
+                                    >
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Portfolio composition note */}
+                        <p className="text-sm text-center" style={{ color: COLORS.textMuted }}>
+                            <span style={{ color: COLORS.statusLive }}>8 prominent retail centres</span> already in our database •{" "}
+                            <span style={{ color: COLORS.textSecondary }}>4 development schemes</span> •{" "}
+                            <span style={{ color: COLORS.statusComing }}>1 closed centre</span> (Kennet Centre)
+                        </p>
+                    </div>
+                )}
+
+                {/* ═══ CHAPTER 2: Matched Centres ═══ */}
+                {demoStep === "chapter2" && (
+                    <div className="flex flex-col items-center gap-8 w-full">
+                        <div className="text-center">
+                            <div
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
+                                style={{
+                                    background: `${COLORS.statusLive}15`,
+                                    color: COLORS.statusLive,
+                                    border: `1px solid ${COLORS.statusLive}30`,
+                                }}
+                            >
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Already Matched
+                            </div>
+                            <h1
+                                className="text-4xl md:text-5xl font-bold mb-4"
+                                style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}
+                            >
+                                8 Centres. Zero Onboarding.
+                            </h1>
+                            <p
+                                className="text-lg max-w-2xl mx-auto"
+                                style={{ color: COLORS.textMuted }}
+                            >
+                                These prominent centres are already enriched with tenant data, vacancy rates,
+                                footfall metrics, and competitive intelligence.
+                            </p>
+                        </div>
+
+                        {/* Centre grid with staggered animation */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl">
+                            {MATCHED_CENTRES.map((centre, i) => (
+                                <div
+                                    key={centre.name}
+                                    className="rounded-xl p-4 transition-all duration-500"
+                                    style={{
+                                        background: centre.highlight ? `${COLORS.statusLive}10` : COLORS.bgSurface,
+                                        border: `1px solid ${centre.highlight ? COLORS.statusLive + "40" : COLORS.borderDefault}`,
+                                        opacity: chapterAnimated ? 1 : 0,
+                                        transform: chapterAnimated ? "translateY(0)" : "translateY(20px)",
+                                        transitionDelay: `${i * 100}ms`,
+                                    }}
+                                >
+                                    <div
+                                        className="text-sm font-semibold mb-1"
+                                        style={{ color: centre.highlight ? COLORS.statusLive : COLORS.textPrimary }}
+                                    >
+                                        {centre.name}
+                                    </div>
+                                    <div className="text-xs" style={{ color: COLORS.textMuted }}>
+                                        {centre.city}
+                                    </div>
+                                    {centre.highlight && (
+                                        <div
+                                            className="text-[10px] font-semibold mt-2 px-2 py-0.5 rounded-full inline-block"
+                                            style={{
+                                                background: `${COLORS.statusLive}20`,
+                                                color: COLORS.statusLive,
+                                            }}
+                                        >
+                                            Live Proof of Concept
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ═══ CHAPTER 3: What This Unlocks ═══ */}
+                {demoStep === "chapter3" && (
+                    <div className="flex flex-col items-center gap-8 w-full">
+                        <div className="text-center">
+                            <div
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
+                                style={{
+                                    background: `${COLORS.accentLime}15`,
+                                    color: COLORS.accentLime,
+                                    border: `1px solid ${COLORS.accentLime}30`,
+                                }}
+                            >
+                                <Zap className="w-3.5 h-3.5" />
+                                Platform Capabilities
+                            </div>
+                            <h1
+                                className="text-4xl md:text-5xl font-bold mb-4"
+                                style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}
+                            >
+                                What This Unlocks
+                            </h1>
+                            <p
+                                className="text-lg max-w-2xl mx-auto"
+                                style={{ color: COLORS.textMuted }}
+                            >
+                                From intelligence to action — three capabilities that transform how you manage your portfolio.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full max-w-4xl">
+                            {[
+                                {
+                                    icon: <Search className="w-6 h-6" />,
+                                    title: "Gap Analysis",
+                                    description: "AI identifies missing tenant categories and recommends brands based on local competition and demographics.",
+                                    color: COLORS.accentCoral,
+                                    delay: 0,
+                                },
+                                {
+                                    icon: <BarChart3 className="w-6 h-6" />,
+                                    title: "Tenant Intelligence",
+                                    description: "Real-time tenant tracking, vacancy monitoring, and competitive benchmarking across your entire portfolio.",
+                                    color: COLORS.accentLime,
+                                    delay: 150,
+                                },
+                                {
+                                    icon: <MessageSquare className="w-6 h-6" />,
+                                    title: "Regional Dashboard",
+                                    description: "Your managers get their own intelligence hub with AI chat, location maps, and actionable insights.",
+                                    color: COLORS.statusLive,
+                                    delay: 300,
+                                },
+                            ].map((feature) => (
+                                <div
+                                    key={feature.title}
+                                    className="rounded-2xl p-6 transition-all duration-600"
+                                    style={{
+                                        background: COLORS.bgSurface,
+                                        border: `1px solid ${COLORS.borderDefault}`,
+                                        opacity: chapterAnimated ? 1 : 0,
+                                        transform: chapterAnimated ? "translateY(0)" : "translateY(30px)",
+                                        transitionDelay: `${feature.delay}ms`,
+                                    }}
+                                >
+                                    <div
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                                        style={{
+                                            background: `${feature.color}15`,
+                                            color: feature.color,
+                                        }}
+                                    >
+                                        {feature.icon}
+                                    </div>
+                                    <h3
+                                        className="text-lg font-bold mb-2"
+                                        style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}
+                                    >
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-sm leading-relaxed" style={{ color: COLORS.textMuted }}>
+                                        {feature.description}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Navigation */}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => { setDemoStep(nextStep()); setChapterAnimated(false) }}
+                        className="flex items-center gap-3 px-8 py-4 rounded-xl text-sm font-bold cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+                        style={{
+                            background: COLORS.accentCoral,
+                            color: "#fff",
+                            fontFamily: "'Exo', sans-serif",
+                            boxShadow: `0 0 30px ${COLORS.accentCoral}40`,
+                        }}
+                    >
+                        {demoStep === "chapter3" ? "Explore the Portfolio" : "Continue"}
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => setDemoStep("explore")}
+                        className="flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-medium cursor-pointer transition-colors hover:opacity-80"
+                        style={{ color: COLORS.textMuted }}
+                    >
+                        <SkipForward className="w-3.5 h-3.5" />
+                        Skip to Map
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ─────────────────────────────────────────────────
 // Main Page Component
 // ─────────────────────────────────────────────────
 const GATE_PASSWORD = "flourish2026"
 const SESSION_KEY = "rh-portal-auth"
 
-export default function RHPortalClient({ rhProjects }: RHPortalProps) {
+type DemoStep = "idle" | "video" | "chapter1" | "chapter2" | "chapter3" | "guided" | "explore"
+
+export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPortalProps) {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [showIntroVideo, setShowIntroVideo] = useState(false)
+    const [demoStep, setDemoStep] = useState<DemoStep>("idle")
     const [passwordInput, setPasswordInput] = useState("")
     const [passwordError, setPasswordError] = useState(false)
     const [selectedProject, setSelectedProject] = useState<string | null>(null)
     const [showESG, setShowESG] = useState(false)
     const [showVideo, setShowVideo] = useState(false)
     const [statsCollapsed, setStatsCollapsed] = useState(false)
+    const [showRegionalMode, setShowRegionalMode] = useState(false)
+    const [guideStep, setGuideStep] = useState<number | null>(null)
+    const [chapterAnimated, setChapterAnimated] = useState(false)
 
     // Check session on mount
     useEffect(() => {
         if (typeof window !== "undefined" && sessionStorage.getItem(SESSION_KEY) === "true") {
             setIsAuthenticated(true)
+            setDemoStep("explore")
         }
     }, [])
 
@@ -365,7 +774,7 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
         if (passwordInput.toLowerCase() === GATE_PASSWORD.toLowerCase()) {
             sessionStorage.setItem(SESSION_KEY, "true")
             setIsAuthenticated(true)
-            setShowIntroVideo(true)
+            setDemoStep("video")
             setPasswordError(false)
         } else {
             setPasswordError(true)
@@ -385,6 +794,75 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
     const activeProject = selectedProject
         ? rhProjects.find((p) => p.name === selectedProject)
         : null
+
+    // Guide tour steps config
+    const GUIDE_STEPS = useMemo(() => [
+        {
+            title: "Portfolio at a Glance",
+            text: `Your portfolio: ${rhProjects.length} projects tracked, ${matchedProjects.length} matched in our database, ${totalStores.toLocaleString()} stores, and ${(totalFootfall / 1000000).toFixed(1)}M annual footfall.`,
+            action: "stats",
+        },
+        {
+            title: "Live Proof of Concept",
+            text: "Let's look at Palace Shopping — one of 8 centres already enriched with full tenant data, vacancy rates, and competitive intelligence.",
+            action: "zoom-palace",
+        },
+        {
+            title: "Real-Time Intelligence",
+            text: "Every matched centre has live data: vacancy rates, Google rating, footfall metrics, and a full tenant directory.",
+            action: "open-drawer",
+        },
+        {
+            title: "AI Gap Analysis",
+            text: "Run Gap Analysis to find which brands are missing vs. the local competition. This is AI-powered and unique to each centre.",
+            action: "highlight-gap",
+        },
+        {
+            title: "Regional Dashboard",
+            text: "Your regional managers get their own intelligence hub with an AI assistant, interactive maps, and actionable insights. Let's show you a live preview.",
+            action: "regional-cta",
+        },
+    ], [rhProjects.length, matchedProjects.length, totalStores, totalFootfall])
+
+    // Initialise guide when entering guided mode
+    useEffect(() => {
+        if (demoStep === "guided" && guideStep === null) {
+            setGuideStep(0)
+        }
+    }, [demoStep, guideStep])
+
+    // Guide step side-effects
+    useEffect(() => {
+        if (guideStep === null || demoStep !== "guided") return
+
+        if (guideStep === 1) {
+            // Auto-select Palace Shopping to zoom + open drawer
+            setSelectedProject("Palace Shopping")
+        }
+        if (guideStep === 2) {
+            // Keep Palace Shopping selected (drawer stays open)
+            if (selectedProject !== "Palace Shopping") {
+                setSelectedProject("Palace Shopping")
+            }
+        }
+    }, [guideStep, demoStep])
+
+    const advanceGuide = () => {
+        if (guideStep === null) return
+        if (guideStep < GUIDE_STEPS.length - 1) {
+            setGuideStep(guideStep + 1)
+        } else {
+            // End guide
+            setGuideStep(null)
+            setDemoStep("explore")
+        }
+    }
+
+    const skipGuide = () => {
+        setGuideStep(null)
+        setDemoStep("explore")
+        setSelectedProject(null)
+    }
 
     return (
         <>
@@ -515,7 +993,7 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
             {/* ═══════════════════════════════════════
                 VIDEO INTRO OVERLAY
             ═══════════════════════════════════════ */}
-            {isAuthenticated && showIntroVideo && (
+            {isAuthenticated && demoStep === "video" && (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center"
                     style={{ background: COLORS.bgBase }}
@@ -570,9 +1048,9 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
                             />
                         </div>
 
-                        {/* Explore button */}
+                        {/* Continue button */}
                         <button
-                            onClick={() => setShowIntroVideo(false)}
+                            onClick={() => { setDemoStep("chapter1"); setChapterAnimated(false) }}
                             className="flex items-center gap-3 px-8 py-4 rounded-xl text-sm font-bold cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
                             style={{
                                 background: COLORS.accentCoral,
@@ -581,7 +1059,7 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
                                 boxShadow: `0 0 30px ${COLORS.accentCoral}40`,
                             }}
                         >
-                            Explore the Portfolio
+                            Continue
                             <ArrowRight className="w-4 h-4" />
                         </button>
                     </div>
@@ -589,9 +1067,26 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
             )}
 
             {/* ═══════════════════════════════════════
-                MAIN PORTAL (only visible after auth + dismiss intro)
+                CHAPTER SCREENS
             ═══════════════════════════════════════ */}
-            {isAuthenticated && !showIntroVideo && (
+            {isAuthenticated && (demoStep === "chapter1" || demoStep === "chapter2" || demoStep === "chapter3") && (
+                <ChapterScreens
+                    demoStep={demoStep}
+                    setDemoStep={setDemoStep}
+                    rhProjects={rhProjects}
+                    matchedCount={matchedProjects.length}
+                    totalParking={totalParking}
+                    totalStores={totalStores}
+                    totalFootfall={totalFootfall}
+                    chapterAnimated={chapterAnimated}
+                    setChapterAnimated={setChapterAnimated}
+                />
+            )}
+
+            {/* ═══════════════════════════════════════
+                MAIN PORTAL (only visible after chapters complete)
+            ═══════════════════════════════════════ */}
+            {isAuthenticated && (demoStep === "guided" || demoStep === "explore") && (
                 <div
                     className="h-screen w-screen overflow-hidden relative"
                     style={{ background: COLORS.bgBase }}
@@ -1325,7 +1820,131 @@ export default function RHPortalClient({ rhProjects }: RHPortalProps) {
                             </div>
                         </div>
                     )}
+
+                    {/* ═══════════════════════════════════════
+                    LAYER 60 — Guided Tour Overlay
+                ═══════════════════════════════════════ */}
+                    {demoStep === "guided" && guideStep !== null && (
+                        <>
+                            {/* Dimming overlay */}
+                            <div
+                                className="absolute inset-0 z-[55] pointer-events-none transition-opacity duration-500"
+                                style={{
+                                    background: `${COLORS.bgBase}80`,
+                                    opacity: guideStep === 0 ? 0.6 : 0.3,
+                                }}
+                            />
+
+                            {/* Guide card */}
+                            <div
+                                className="absolute bottom-24 right-6 z-[60] w-[380px] rounded-2xl p-6 transition-all duration-500"
+                                style={{
+                                    background: `${COLORS.bgBase}F5`,
+                                    border: `1px solid ${COLORS.borderDefault}`,
+                                    backdropFilter: "blur(20px)",
+                                    boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px ${COLORS.borderDefault}`,
+                                }}
+                            >
+                                {/* Step counter */}
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div
+                                        className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                                        style={{
+                                            background: `${COLORS.accentCoral}20`,
+                                            color: COLORS.accentCoral,
+                                        }}
+                                    >
+                                        {guideStep + 1} of {GUIDE_STEPS.length}
+                                    </div>
+                                    {/* Step dots */}
+                                    <div className="flex gap-1 ml-auto">
+                                        {GUIDE_STEPS.map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="rounded-full transition-all duration-300"
+                                                style={{
+                                                    width: i === guideStep ? 16 : 6,
+                                                    height: 6,
+                                                    background: i === guideStep ? COLORS.accentCoral : i < guideStep ? COLORS.statusLive : `${COLORS.textMuted}30`,
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Content */}
+                                <h3
+                                    className="text-lg font-bold mb-2"
+                                    style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}
+                                >
+                                    {GUIDE_STEPS[guideStep].title}
+                                </h3>
+                                <p
+                                    className="text-sm leading-relaxed mb-5"
+                                    style={{ color: COLORS.textMuted }}
+                                >
+                                    {GUIDE_STEPS[guideStep].text}
+                                </p>
+
+                                {/* Regional Mode CTA on last step */}
+                                {guideStep === GUIDE_STEPS.length - 1 && (
+                                    <button
+                                        onClick={() => {
+                                            setShowRegionalMode(true)
+                                            setGuideStep(null)
+                                            setDemoStep("explore")
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold cursor-pointer transition-all hover:scale-[1.02] mb-3"
+                                        style={{
+                                            background: `linear-gradient(135deg, ${COLORS.accentCoral}, ${COLORS.statusLive})`,
+                                            color: "#fff",
+                                            fontFamily: "'Exo', sans-serif",
+                                            boxShadow: `0 0 20px ${COLORS.accentCoral}30`,
+                                            animation: "pulse 2s ease-in-out infinite",
+                                        }}
+                                    >
+                                        <Layers className="w-4 h-4" />
+                                        Enter Regional Mode
+                                    </button>
+                                )}
+
+                                {/* Nav buttons */}
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={advanceGuide}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all hover:opacity-90"
+                                        style={{
+                                            background: guideStep === GUIDE_STEPS.length - 1 ? COLORS.bgElevated : COLORS.accentCoral,
+                                            color: "#fff",
+                                            fontFamily: "'Exo', sans-serif",
+                                        }}
+                                    >
+                                        {guideStep === GUIDE_STEPS.length - 1 ? "Finish Tour" : "Next"}
+                                        <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={skipGuide}
+                                        className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-medium cursor-pointer transition-colors hover:opacity-80"
+                                        style={{ color: COLORS.textMuted }}
+                                    >
+                                        <SkipForward className="w-3 h-3" />
+                                        Skip
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
+            )}
+            {/* ═══════════════════════════════════════
+                REGIONAL MODE PANEL
+            ═══════════════════════════════════════ */}
+            {showRegionalMode && palaceRegionalData && (
+                <RHRegionalPanel
+                    palaceData={palaceRegionalData.palace}
+                    nearbyLocations={palaceRegionalData.nearby}
+                    onClose={() => setShowRegionalMode(false)}
+                />
             )}
         </>
     )
