@@ -2075,23 +2075,6 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData, gapAnal
 
                                             {/* Action Buttons */}
                                             <div className="space-y-2">
-                                                <button
-                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-colors"
-                                                    style={{
-                                                        background: `${COLORS.accentCoral}15`,
-                                                        color: COLORS.accentCoral,
-                                                        border: `1px solid ${COLORS.accentCoral}30`,
-                                                    }}
-                                                    onMouseEnter={(e) =>
-                                                        (e.currentTarget.style.background = `${COLORS.accentCoral}25`)
-                                                    }
-                                                    onMouseLeave={(e) =>
-                                                        (e.currentTarget.style.background = `${COLORS.accentCoral}15`)
-                                                    }
-                                                >
-                                                    <LineChart className="w-4 h-4" />
-                                                    Run Gap Analysis
-                                                </button>
                                                 {activeProject.website && (
                                                     <a
                                                         href={activeProject.website}
