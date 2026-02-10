@@ -1093,7 +1093,7 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                             <iframe
                                 width="100%"
                                 height="100%"
-                                src="https://www.youtube.com/embed/M-ALomLEtBk?autoplay=1"
+                                src="https://www.youtube.com/embed/F3ztU22OjQs?autoplay=1"
                                 title="Flourish — Transforming Retail Spaces"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -1863,7 +1863,7 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                                     <iframe
                                         width="100%"
                                         height="100%"
-                                        src="https://www.youtube.com/embed/M-ALomLEtBk?autoplay=1"
+                                        src="https://www.youtube.com/embed/F3ztU22OjQs?autoplay=1"
                                         title="Flourish — Transforming Retail Spaces"
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
