@@ -385,7 +385,7 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
         if (!map || !isGuidedTour || guideStep !== 1 || nearbyLocations.length === 0) return
 
         // Belt-and-braces: ensure map is zoomed in for the guided tour
-        const palaceProject = rhProjects.find((p) => p.name === "Palace Shopping")
+        const palaceProject = rhProjects.find((p) => p.name === "Palace Gardens & Palace Exchange")
         if (palaceProject) {
             map.setZoom(14)
             map.panTo({ lat: palaceProject.lat, lng: palaceProject.lng })
@@ -560,7 +560,7 @@ const CHAPTER_AUDIO: Record<string, string> = {
 // Chapter Screens Component
 // ─────────────────────────────────────────────────
 const MATCHED_CENTRES = [
-    { name: "Palace Shopping", city: "Enfield", highlight: true },
+    { name: "Palace Gardens & Palace Exchange", city: "Enfield", highlight: true },
     { name: "Eldon Square", city: "Newcastle" },
     { name: "St Johns", city: "Liverpool" },
     { name: "Royal Victoria Place", city: "Tunbridge Wells" },
@@ -977,7 +977,7 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
         },
         {
             title: "Live Proof of Concept",
-            text: "Let's look at Palace Shopping — one of 8 centres already enriched with full tenant data, vacancy rates, and competitive intelligence.",
+            text: "Let's look at Palace Gardens & Palace Exchange — one of 8 centres already enriched with full tenant data, vacancy rates, and competitive intelligence.",
             action: "zoom-palace",
         },
         {
@@ -1009,13 +1009,13 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
         if (guideStep === null || demoStep !== "guided") return
 
         if (guideStep === 1) {
-            // Auto-select Palace Shopping to zoom + open drawer
-            setSelectedProject("Palace Shopping")
+            // Auto-select Palace Gardens & Palace Exchange to zoom + open drawer
+            setSelectedProject("Palace Gardens & Palace Exchange")
         }
         if (guideStep === 2) {
-            // Keep Palace Shopping selected (drawer stays open)
-            if (selectedProject !== "Palace Shopping") {
-                setSelectedProject("Palace Shopping")
+            // Keep Palace Gardens & Palace Exchange selected (drawer stays open)
+            if (selectedProject !== "Palace Gardens & Palace Exchange") {
+                setSelectedProject("Palace Gardens & Palace Exchange")
             }
         }
     }, [guideStep, demoStep])
