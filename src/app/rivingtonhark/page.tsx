@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db"
+import { performGapAnalysis } from "@/lib/tenant-comparison"
 import RHPortalClient from "./rh-portal-client"
 import type { RHProject } from "./rh-portal-client"
 
@@ -153,6 +154,7 @@ export default async function RivingtonHarkPage() {
             longitude: { gte: PALACE_LNG - LNG_OFF, lte: PALACE_LNG + LNG_OFF },
         },
         select: {
+            id: true,
             name: true,
             town: true,
             latitude: true,
@@ -162,6 +164,17 @@ export default async function RivingtonHarkPage() {
         },
         take: 5,
     })
+
+    // Pre-compute gap analysis for the guided tour
+    const competitorIds = nearbyLocations.map((n) => n.id)
+    let gapAnalysisData = null
+    try {
+        if (competitorIds.length > 0) {
+            gapAnalysisData = await performGapAnalysis(PALACE_ID, competitorIds, true)
+        }
+    } catch (e) {
+        console.error("Gap analysis failed:", e)
+    }
 
     // Group tenants by category
     const tenantCategoryMap: Record<string, number> = {}
@@ -255,6 +268,7 @@ export default async function RivingtonHarkPage() {
         <RHPortalClient
             rhProjects={allProjects}
             palaceRegionalData={palaceRegionalData}
+            gapAnalysisData={gapAnalysisData}
         />
     )
 }

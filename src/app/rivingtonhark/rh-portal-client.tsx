@@ -35,6 +35,11 @@ import {
     Search,
     MessageSquare,
     SkipForward,
+    AlertTriangle,
+    TrendingDown,
+    ArrowUpRight,
+    ArrowDownRight,
+    Minus,
 } from "lucide-react"
 
 const RHRegionalPanel = dynamic(() => import("./rh-regional-panel"), { ssr: false })
@@ -140,6 +145,39 @@ interface PalaceRegionalData {
 interface RHPortalProps {
     rhProjects: RHProject[]
     palaceRegionalData: PalaceRegionalData | null
+    gapAnalysisData: GapAnalysisData | null
+}
+
+// Serialisable subset of GapAnalysis from lib/tenant-comparison
+export interface GapAnalysisData {
+    comparison: {
+        target: {
+            locationName: string
+            totalTenants: number
+            categories: { category: string; count: number; percentage: number }[]
+        }
+        competitors: {
+            totalLocations: number
+            totalTenants: number
+            averageTenantsPerLocation: number
+            categories: { category: string; count: number; percentage: number }[]
+        }
+        gaps: {
+            missingCategories: { category: string; competitorPercentage: number; gapScore: number }[]
+            overRepresented: { category: string; targetPercentage: number; competitorAverage: number; variance: number }[]
+            underRepresented: { category: string; targetPercentage: number; competitorAverage: number; variance: number; gapScore: number }[]
+        }
+    }
+    priorities: {
+        category: string
+        priority: "high" | "medium" | "low"
+        score: number
+        gapType: "missing" | "under-represented"
+        gapSize: number
+        competitorCoverage: number
+        recommendation: string
+    }[]
+    insights: string[]
 }
 
 // ── ESG Alignment Data ──
@@ -921,7 +959,7 @@ const SESSION_KEY = "rh-portal-auth"
 
 type DemoStep = "idle" | "video" | "chapter1" | "chapter2" | "chapter3" | "guided" | "explore"
 
-export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPortalProps) {
+export default function RHPortalClient({ rhProjects, palaceRegionalData, gapAnalysisData }: RHPortalProps) {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [demoStep, setDemoStep] = useState<DemoStep>("idle")
     const [passwordInput, setPasswordInput] = useState("")
@@ -933,6 +971,7 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
     const [showRegionalMode, setShowRegionalMode] = useState(false)
     const [guideStep, setGuideStep] = useState<number | null>(null)
     const [chapterAnimated, setChapterAnimated] = useState(false)
+    const [showGapOverlay, setShowGapOverlay] = useState(false)
 
     // Check session on mount
     useEffect(() => {
@@ -1017,6 +1056,12 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
             if (selectedProject !== "Palace Gardens & Palace Exchange") {
                 setSelectedProject("Palace Gardens & Palace Exchange")
             }
+        }
+        if (guideStep === 3) {
+            // Trigger gap analysis overlay
+            setShowGapOverlay(true)
+        } else {
+            setShowGapOverlay(false)
         }
     }, [guideStep, demoStep])
 
@@ -2274,6 +2319,291 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                                     opacity: guideStep === 0 ? 0.6 : 0.3,
                                 }}
                             />
+
+                            {/* Gap Analysis Overlay Panel */}
+                            {showGapOverlay && gapAnalysisData && (
+                                <div
+                                    className="absolute left-4 top-4 bottom-28 z-[58] w-[520px] rounded-2xl overflow-hidden transition-all duration-700"
+                                    style={{
+                                        background: `${COLORS.bgBase}F5`,
+                                        border: `1px solid ${COLORS.borderDefault}`,
+                                        backdropFilter: "blur(24px)",
+                                        boxShadow: `0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px ${COLORS.borderDefault}`,
+                                        animation: "slideInLeft 0.6s ease-out",
+                                    }}
+                                >
+                                    <style>{`
+                                        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+                                        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+                                        @keyframes pulseScore { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+                                    `}</style>
+
+                                    <div className="h-full overflow-y-auto px-6 py-5" style={{ scrollbarWidth: "thin", scrollbarColor: `${COLORS.textMuted}30 transparent` }}>
+                                        {/* Header */}
+                                        <div className="flex items-center gap-3 mb-5">
+                                            <div className="p-2 rounded-xl" style={{ background: `${COLORS.accentCoral}20` }}>
+                                                <Target className="w-5 h-5" style={{ color: COLORS.accentCoral }} />
+                                            </div>
+                                            <div>
+                                                <h2 className="text-base font-bold" style={{ color: COLORS.textPrimary, fontFamily: "'Exo', sans-serif" }}>
+                                                    Gap Analysis Report
+                                                </h2>
+                                                <p className="text-[11px]" style={{ color: COLORS.textMuted }}>
+                                                    Comparing {gapAnalysisData.comparison.target.locationName} with {gapAnalysisData.comparison.competitors.totalLocations} competitors
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Summary Cards */}
+                                        <div className="grid grid-cols-3 gap-3 mb-5">
+                                            {[
+                                                { label: "Target Location", value: gapAnalysisData.comparison.target.totalTenants, sub: gapAnalysisData.comparison.target.locationName.split(" ").slice(0, 3).join(" ") },
+                                                { label: "Competitors", value: gapAnalysisData.comparison.competitors.totalLocations, sub: `Avg ${Math.round(gapAnalysisData.comparison.competitors.averageTenantsPerLocation)} tenants each` },
+                                                { label: "Gaps Identified", value: gapAnalysisData.priorities.length, sub: `${gapAnalysisData.priorities.filter(p => p.gapType === "missing").length} missing, ${gapAnalysisData.priorities.filter(p => p.gapType === "under-represented").length} under-represented` },
+                                            ].map((card, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="rounded-xl p-3"
+                                                    style={{
+                                                        background: `${COLORS.bgElevated}80`,
+                                                        border: `1px solid ${COLORS.borderDefault}`,
+                                                        animation: `fadeInUp 0.5s ease-out ${0.2 + i * 0.1}s both`,
+                                                    }}
+                                                >
+                                                    <div className="text-[10px] font-medium mb-1" style={{ color: COLORS.textMuted }}>{card.label}</div>
+                                                    <div className="text-2xl font-bold" style={{ color: COLORS.textPrimary }}>{card.value}</div>
+                                                    <div className="text-[10px] mt-1" style={{ color: COLORS.textMuted }}>{card.sub}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Priority Gaps */}
+                                        {(() => {
+                                            const highPriority = gapAnalysisData.priorities.filter(p => p.priority === "high")
+                                            const mediumPriority = gapAnalysisData.priorities.filter(p => p.priority === "medium")
+
+                                            return (
+                                                <>
+                                                    {highPriority.length > 0 && (
+                                                        <div
+                                                            className="rounded-xl p-4 mb-3"
+                                                            style={{
+                                                                background: `rgba(239, 68, 68, 0.06)`,
+                                                                border: `1px solid rgba(239, 68, 68, 0.2)`,
+                                                                animation: `fadeInUp 0.5s ease-out 0.5s both`,
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center gap-2 mb-3">
+                                                                <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#ef4444" }} />
+                                                                <span className="text-xs font-bold" style={{ color: "#ef4444" }}>
+                                                                    High Priority Gaps ({highPriority.length})
+                                                                </span>
+                                                                <span className="text-[10px] ml-auto" style={{ color: COLORS.textMuted }}>Immediate action recommended</span>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                {highPriority.map((gap, i) => (
+                                                                    <div
+                                                                        key={i}
+                                                                        className="rounded-lg p-3"
+                                                                        style={{
+                                                                            background: `${COLORS.bgBase}80`,
+                                                                            border: `1px solid ${COLORS.borderDefault}`,
+                                                                        }}
+                                                                    >
+                                                                        <div className="flex items-center justify-between mb-1.5">
+                                                                            <span className="text-sm font-bold" style={{ color: COLORS.textPrimary }}>{gap.category}</span>
+                                                                            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `rgba(239, 68, 68, 0.15)`, color: "#ef4444" }}>
+                                                                                Score: {gap.score.toFixed(1)}
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="text-[11px] mb-2" style={{ color: COLORS.textMuted }}>{gap.recommendation}</p>
+                                                                        <div className="flex gap-4">
+                                                                            <div>
+                                                                                <div className="text-[9px] font-medium" style={{ color: COLORS.textMuted }}>Gap Type</div>
+                                                                                <div className="text-[11px] font-semibold" style={{ color: COLORS.textPrimary }}>
+                                                                                    {gap.gapType === "missing" ? "Missing" : "Under Represented"}
+                                                                                </div>
+                                                                            </div>
+                                                                            {gap.gapSize > 0 && (
+                                                                                <div>
+                                                                                    <div className="text-[9px] font-medium" style={{ color: COLORS.textMuted }}>Gap Size</div>
+                                                                                    <div className="text-[11px] font-semibold" style={{ color: COLORS.textPrimary }}>~{gap.gapSize} stores</div>
+                                                                                </div>
+                                                                            )}
+                                                                            <div>
+                                                                                <div className="text-[9px] font-medium" style={{ color: COLORS.textMuted }}>Priority Score</div>
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <div className="h-1.5 rounded-full" style={{ width: 60, background: `${COLORS.textMuted}20` }}>
+                                                                                        <div className="h-full rounded-full" style={{ width: `${Math.min(gap.score * 1.2, 100)}%`, background: "#ef4444" }} />
+                                                                                    </div>
+                                                                                    <span className="text-[11px] font-bold" style={{ color: COLORS.textPrimary }}>{gap.score.toFixed(1)}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {mediumPriority.length > 0 && (
+                                                        <div
+                                                            className="rounded-xl p-4 mb-3"
+                                                            style={{
+                                                                background: `rgba(245, 158, 11, 0.06)`,
+                                                                border: `1px solid rgba(245, 158, 11, 0.2)`,
+                                                                animation: `fadeInUp 0.5s ease-out 0.7s both`,
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center gap-2 mb-3">
+                                                                <AlertTriangle className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} />
+                                                                <span className="text-xs font-bold" style={{ color: "#f59e0b" }}>
+                                                                    Medium Priority Gaps ({mediumPriority.length})
+                                                                </span>
+                                                                <span className="text-[10px] ml-auto" style={{ color: COLORS.textMuted }}>Should be addressed soon</span>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                {mediumPriority.map((gap, i) => (
+                                                                    <div
+                                                                        key={i}
+                                                                        className="rounded-lg p-3"
+                                                                        style={{
+                                                                            background: `${COLORS.bgBase}80`,
+                                                                            border: `1px solid ${COLORS.borderDefault}`,
+                                                                        }}
+                                                                    >
+                                                                        <div className="flex items-center justify-between mb-1">
+                                                                            <span className="text-sm font-bold" style={{ color: COLORS.textPrimary }}>{gap.category}</span>
+                                                                            <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: `rgba(245, 158, 11, 0.15)`, color: "#f59e0b" }}>
+                                                                                Score: {gap.score.toFixed(1)}
+                                                                            </span>
+                                                                        </div>
+                                                                        <p className="text-[11px]" style={{ color: COLORS.textMuted }}>{gap.recommendation}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )
+                                        })()}
+
+                                        {/* Detailed Category Breakdown Table */}
+                                        <div
+                                            className="rounded-xl overflow-hidden"
+                                            style={{
+                                                border: `1px solid ${COLORS.borderDefault}`,
+                                                animation: `fadeInUp 0.5s ease-out 0.9s both`,
+                                            }}
+                                        >
+                                            <div className="px-4 py-3" style={{ background: `${COLORS.bgElevated}60` }}>
+                                                <div className="text-xs font-bold" style={{ color: COLORS.textPrimary }}>Detailed Category Breakdown</div>
+                                                <div className="text-[10px]" style={{ color: COLORS.textMuted }}>Side-by-side comparison of category percentages</div>
+                                            </div>
+
+                                            {/* Table header */}
+                                            <div className="grid grid-cols-[1fr_80px_80px_70px_90px] gap-1 px-4 py-2" style={{ borderBottom: `1px solid ${COLORS.borderDefault}` }}>
+                                                {["Category", "Target", "Comp. Avg", "Diff", "Status"].map((h) => (
+                                                    <div key={h} className="text-[9px] font-semibold uppercase tracking-wider" style={{ color: COLORS.textMuted }}>{h}</div>
+                                                ))}
+                                            </div>
+
+                                            {/* Table rows */}
+                                            {(() => {
+                                                const targetCats = gapAnalysisData.comparison.target.categories
+                                                const compCats = gapAnalysisData.comparison.competitors.categories
+
+                                                // Build a merged view of all categories
+                                                const allCategoryNames = new Set([
+                                                    ...targetCats.map(c => c.category),
+                                                    ...compCats.map(c => c.category),
+                                                ])
+
+                                                const rows = Array.from(allCategoryNames).map(cat => {
+                                                    const target = targetCats.find(c => c.category === cat)
+                                                    const comp = compCats.find(c => c.category === cat)
+                                                    const tPct = target?.percentage ?? 0
+                                                    const cPct = comp?.percentage ?? 0
+                                                    const diff = tPct - cPct
+
+                                                    let status: "Over-represented" | "Under-represented" | "Balanced" | "Missing"
+                                                    if (tPct === 0 && cPct > 0) status = "Missing"
+                                                    else if (diff > 5) status = "Over-represented"
+                                                    else if (diff < -5) status = "Under-represented"
+                                                    else status = "Balanced"
+
+                                                    return { category: cat, tPct, tCount: target?.count ?? 0, cPct, diff, status }
+                                                }).sort((a, b) => b.tPct - a.tPct || b.cPct - a.cPct)
+
+                                                // Show top 10
+                                                return rows.slice(0, 10).map((row, i) => {
+                                                    const statusColors: Record<string, { bg: string; text: string }> = {
+                                                        "Over-represented": { bg: "rgba(34, 197, 94, 0.12)", text: "#22c55e" },
+                                                        "Under-represented": { bg: "rgba(239, 68, 68, 0.12)", text: "#ef4444" },
+                                                        "Balanced": { bg: `${COLORS.textMuted}15`, text: COLORS.textMuted },
+                                                        "Missing": { bg: "rgba(239, 68, 68, 0.12)", text: "#ef4444" },
+                                                    }
+                                                    const sc = statusColors[row.status]
+
+                                                    return (
+                                                        <div
+                                                            key={row.category}
+                                                            className="grid grid-cols-[1fr_80px_80px_70px_90px] gap-1 px-4 py-2 items-center"
+                                                            style={{
+                                                                borderBottom: i < 9 ? `1px solid ${COLORS.borderDefault}40` : "none",
+                                                            }}
+                                                        >
+                                                            <div className="text-[11px] font-medium truncate" style={{ color: COLORS.textPrimary }}>{row.category}</div>
+                                                            <div className="text-[11px]" style={{ color: COLORS.textPrimary }}>
+                                                                {row.tPct.toFixed(1)}% ({row.tCount})
+                                                            </div>
+                                                            <div className="text-[11px]" style={{ color: COLORS.textMuted }}>
+                                                                {row.cPct > 0 ? `${row.cPct.toFixed(1)}%` : "—"}
+                                                            </div>
+                                                            <div className="flex items-center gap-1">
+                                                                {row.diff > 0 ? (
+                                                                    <ArrowUpRight className="w-3 h-3" style={{ color: "#22c55e" }} />
+                                                                ) : row.diff < 0 ? (
+                                                                    <ArrowDownRight className="w-3 h-3" style={{ color: "#ef4444" }} />
+                                                                ) : (
+                                                                    <Minus className="w-3 h-3" style={{ color: COLORS.textMuted }} />
+                                                                )}
+                                                                <span className="text-[11px] font-medium" style={{ color: row.diff > 0 ? "#22c55e" : row.diff < 0 ? "#ef4444" : COLORS.textMuted }}>
+                                                                    {row.diff > 0 ? "+" : ""}{row.diff.toFixed(1)}%
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <span
+                                                                    className="text-[9px] font-semibold px-2 py-0.5 rounded-full"
+                                                                    style={{ background: sc.bg, color: sc.text }}
+                                                                >
+                                                                    {row.status}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            })()}
+                                        </div>
+
+                                        {/* Insights */}
+                                        {gapAnalysisData.insights.length > 0 && (
+                                            <div className="mt-4 space-y-2" style={{ animation: `fadeInUp 0.5s ease-out 1.1s both` }}>
+                                                {gapAnalysisData.insights.slice(0, 3).map((insight, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className="flex items-start gap-2 text-[11px] leading-relaxed"
+                                                        style={{ color: COLORS.textMuted }}
+                                                    >
+                                                        <Sparkles className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: COLORS.accentCoral }} />
+                                                        <span>{insight}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Guide card */}
                             <div
