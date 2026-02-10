@@ -331,12 +331,12 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
                 onProjectSelect(project.name)
                 infoWindowRef.current?.close()
 
-                // Pan map to marker position, offset for drawer
+                // Zoom in and pan to marker, offset for drawer
                 const pos = marker.getPosition()
                 if (pos) {
+                    map.setZoom(14)
                     map.panTo(pos)
-                    // Offset left to account for drawer width (420px / 2 ~= 210px)
-                    setTimeout(() => map.panBy(-210, 0), 100)
+                    setTimeout(() => map.panBy(-210, 0), 150)
                 }
             })
 
@@ -349,13 +349,20 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
         })
     }, [map, selectedProject, onProjectSelect])
 
-    // When drawer opens/closes, re-center if a project is selected
+    // When drawer opens/closes, zoom and re-center
     useEffect(() => {
-        if (!map || !selectedProject) return
-        const project = rhProjects.find((p) => p.name === selectedProject)
-        if (project && drawerOpen) {
-            map.panTo({ lat: project.lat, lng: project.lng })
-            setTimeout(() => map.panBy(-210, 0), 100)
+        if (!map) return
+        if (selectedProject && drawerOpen) {
+            const project = rhProjects.find((p) => p.name === selectedProject)
+            if (project) {
+                map.setZoom(14)
+                map.panTo({ lat: project.lat, lng: project.lng })
+                setTimeout(() => map.panBy(-210, 0), 150)
+            }
+        } else if (!selectedProject) {
+            // Zoom back to UK overview when drawer closes
+            map.setZoom(6)
+            map.panTo({ lat: 53.0, lng: -1.5 })
         }
     }, [map, drawerOpen, selectedProject])
 
