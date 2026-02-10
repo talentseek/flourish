@@ -24,12 +24,30 @@ export function V2ContactSection() {
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Form submission logic would go here
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 5000)
+    setIsSubmitting(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) throw new Error("Failed to submit")
+
+      setSubmitted(true)
+      setFormData({ name: "", email: "", phone: "", enquiryType: "", message: "" })
+    } catch {
+      setError("Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (field: string, value: string) => {
@@ -205,12 +223,17 @@ export function V2ContactSection() {
                     />
                   </div>
 
+                  {error && (
+                    <p className="text-sm text-red-600 font-medium">{error}</p>
+                  )}
+
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#E6FB60] text-[#4D4A46] hover:bg-[#E6FB60]/90 font-semibold disabled:opacity-50"
                   >
-                    Send Message
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               )}
