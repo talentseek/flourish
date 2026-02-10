@@ -79,6 +79,40 @@ export interface RHProject {
     googleReviews?: number | null
     phone?: string | null
     isFlourishManaged?: boolean
+    // Comprehensive detail fields
+    openingHours?: Record<string, string> | null
+    numberOfFloors?: number | null
+    anchorTenants?: number | null
+    openedYear?: number | null
+    retailSpace?: number | null
+    totalFloorArea?: number | null
+    carParkPrice?: number | null
+    evCharging?: boolean | null
+    evChargingSpaces?: number | null
+    publicTransit?: string | null
+    owner?: string | null
+    management?: string | null
+    facebookRating?: string | null
+    facebookReviews?: number | null
+    largestCategory?: string | null
+    largestCategoryPercent?: number | null
+    population?: number | null
+    medianAge?: number | null
+    avgHouseholdIncome?: number | null
+    incomeVsNational?: number | null
+    familiesPercent?: number | null
+    seniorsPercent?: number | null
+    homeownership?: number | null
+    homeownershipVsNational?: number | null
+    carOwnership?: number | null
+    carOwnershipVsNational?: number | null
+    tenants?: {
+        name: string
+        category: string
+        isAnchorTenant: boolean
+        floor: number | null
+        unitNumber: string | null
+    }[]
 }
 
 interface PalaceRegionalData {
@@ -1543,47 +1577,401 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                                         )}
                                     </div>
 
-                                    {/* KPI Grid — only for matched/live */}
+                                    {/* ───── Section 1: Key Metrics ───── */}
                                     {activeProject.status !== "coming_soon" && (
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {activeProject.parkingSpaces && (
-                                                <KpiCell
-                                                    label="Parking"
-                                                    value={activeProject.parkingSpaces.toLocaleString()}
-                                                />
+                                        <>
+                                            <div className="space-y-3">
+                                                <h3
+                                                    className="text-xs font-semibold uppercase tracking-wider"
+                                                    style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                >
+                                                    Key Metrics
+                                                </h3>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    {activeProject.stores && (
+                                                        <KpiCell label="Stores" value={activeProject.stores.toString()} />
+                                                    )}
+                                                    {activeProject.footfall && (
+                                                        <KpiCell label="Annual Footfall" value={`${(activeProject.footfall / 1000000).toFixed(1)}M`} />
+                                                    )}
+                                                    {(activeProject.retailSpace || activeProject.totalFloorArea) && (
+                                                        <KpiCell
+                                                            label="Retail Space"
+                                                            value={`${(((activeProject.retailSpace || activeProject.totalFloorArea)!) / 1000).toFixed(1)}K sq ft`}
+                                                        />
+                                                    )}
+                                                    {activeProject.largestCategory && (
+                                                        <KpiCell
+                                                            label="Largest Category"
+                                                            value={activeProject.largestCategory}
+                                                            valueColor={COLORS.accentCoral}
+                                                        />
+                                                    )}
+                                                    {activeProject.vacancy != null && (
+                                                        <KpiCell
+                                                            label="Vacancy Rate"
+                                                            value={`${(activeProject.vacancy * 100).toFixed(1)}%`}
+                                                            valueColor={activeProject.vacancy > 0.15 ? "#F87171" : COLORS.statusLive}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+
+                                            {/* ───── Section 2: Parking & Transport ───── */}
+                                            {(activeProject.parkingSpaces || activeProject.publicTransit) && (
+                                                <div className="space-y-3">
+                                                    <h3
+                                                        className="text-xs font-semibold uppercase tracking-wider"
+                                                        style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                    >
+                                                        Parking & Transport
+                                                    </h3>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        {activeProject.parkingSpaces && (
+                                                            <KpiCell label="Spaces" value={activeProject.parkingSpaces.toLocaleString()} />
+                                                        )}
+                                                        {activeProject.carParkPrice != null && (
+                                                            <KpiCell label="0-2 hrs" value={`£${activeProject.carParkPrice.toFixed(2)}`} />
+                                                        )}
+                                                        {activeProject.evCharging && (
+                                                            <KpiCell
+                                                                label="EV Charging"
+                                                                value={activeProject.evChargingSpaces ? `${activeProject.evChargingSpaces} bays` : "Available"}
+                                                                valueColor={COLORS.statusLive}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    {activeProject.publicTransit && (
+                                                        <p className="text-xs leading-relaxed" style={{ color: COLORS.textMuted }}>
+                                                            {activeProject.publicTransit}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             )}
-                                            {activeProject.stores && (
-                                                <KpiCell
-                                                    label="Stores"
-                                                    value={activeProject.stores.toString()}
-                                                />
+
+                                            {(activeProject.parkingSpaces || activeProject.publicTransit) && (
+                                                <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
                                             )}
-                                            {activeProject.footfall && (
-                                                <KpiCell
-                                                    label="Footfall"
-                                                    value={`${(activeProject.footfall / 1000000).toFixed(0)}M`}
-                                                />
+
+                                            {/* ───── Section 3: Property Details ───── */}
+                                            <div className="space-y-3">
+                                                <h3
+                                                    className="text-xs font-semibold uppercase tracking-wider"
+                                                    style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                >
+                                                    Property Details
+                                                </h3>
+                                                <div className="space-y-2">
+                                                    {activeProject.openedYear && (
+                                                        <div className="flex justify-between text-sm">
+                                                            <span style={{ color: COLORS.textMuted }}>Opened</span>
+                                                            <span style={{ color: COLORS.textPrimary }}>{activeProject.openedYear}</span>
+                                                        </div>
+                                                    )}
+                                                    {activeProject.numberOfFloors && (
+                                                        <div className="flex justify-between text-sm">
+                                                            <span style={{ color: COLORS.textMuted }}>Floors</span>
+                                                            <span style={{ color: COLORS.textPrimary }}>{activeProject.numberOfFloors}</span>
+                                                        </div>
+                                                    )}
+                                                    {activeProject.anchorTenants && (
+                                                        <div className="flex justify-between text-sm">
+                                                            <span style={{ color: COLORS.textMuted }}>Anchor Tenants</span>
+                                                            <span style={{ color: COLORS.textPrimary }}>{activeProject.anchorTenants}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {activeProject.openingHours && (
+                                                    <div
+                                                        className="rounded-lg p-3 mt-2"
+                                                        style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                    >
+                                                        <p className="text-xs font-semibold mb-2" style={{ color: COLORS.textSecondary }}>
+                                                            Opening Hours
+                                                        </p>
+                                                        <div className="space-y-1">
+                                                            {Object.entries(activeProject.openingHours).map(([day, hours]) => (
+                                                                <div key={day} className="flex justify-between text-xs">
+                                                                    <span style={{ color: COLORS.textMuted }}>{day}</span>
+                                                                    <span style={{ color: COLORS.textSecondary }}>{hours}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+
+                                            {/* ───── Section 4: Ownership & Contact ───── */}
+                                            {(activeProject.owner || activeProject.management) && (
+                                                <>
+                                                    <div className="space-y-3">
+                                                        <h3
+                                                            className="text-xs font-semibold uppercase tracking-wider"
+                                                            style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                        >
+                                                            Ownership & Contact
+                                                        </h3>
+                                                        <div className="space-y-2">
+                                                            {activeProject.owner && (
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span style={{ color: COLORS.textMuted }}>Owner</span>
+                                                                    <span className="text-right max-w-[220px]" style={{ color: COLORS.textPrimary }}>{activeProject.owner}</span>
+                                                                </div>
+                                                            )}
+                                                            {activeProject.management && (
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span style={{ color: COLORS.textMuted }}>Management</span>
+                                                                    <span style={{ color: COLORS.textPrimary }}>{activeProject.management}</span>
+                                                                </div>
+                                                            )}
+                                                            {activeProject.phone && (
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span style={{ color: COLORS.textMuted }}>Phone</span>
+                                                                    <span style={{ color: COLORS.textSecondary }}>{activeProject.phone}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+                                                </>
                                             )}
-                                            {activeProject.googleRating && (
-                                                <KpiCell
-                                                    label="Google Rating"
-                                                    value={`${activeProject.googleRating} ★`}
-                                                    valueColor={Number(activeProject.googleRating) >= 4.0 ? COLORS.statusLive : COLORS.textPrimary}
-                                                />
+
+                                            {/* ───── Section 5: Online Reviews ───── */}
+                                            {(activeProject.googleRating || activeProject.facebookRating) && (
+                                                <>
+                                                    <div className="space-y-3">
+                                                        <h3
+                                                            className="text-xs font-semibold uppercase tracking-wider"
+                                                            style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                        >
+                                                            Online Reviews
+                                                        </h3>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            {activeProject.googleRating && (
+                                                                <div
+                                                                    className="rounded-xl p-3 text-center"
+                                                                    style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                                >
+                                                                    <p className="text-lg font-bold" style={{ color: Number(activeProject.googleRating) >= 4.0 ? COLORS.statusLive : COLORS.textPrimary }}>
+                                                                        {activeProject.googleRating} ★
+                                                                    </p>
+                                                                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Google</p>
+                                                                    {activeProject.googleReviews && (
+                                                                        <p className="text-xs mt-1" style={{ color: COLORS.textMuted }}>
+                                                                            {activeProject.googleReviews.toLocaleString()} reviews
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {activeProject.facebookRating && (
+                                                                <div
+                                                                    className="rounded-xl p-3 text-center"
+                                                                    style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                                >
+                                                                    <p className="text-lg font-bold" style={{ color: Number(activeProject.facebookRating) >= 4.0 ? COLORS.statusLive : COLORS.textPrimary }}>
+                                                                        {activeProject.facebookRating} ★
+                                                                    </p>
+                                                                    <p className="text-xs" style={{ color: COLORS.textMuted }}>Facebook</p>
+                                                                    {activeProject.facebookReviews && (
+                                                                        <p className="text-xs mt-1" style={{ color: COLORS.textMuted }}>
+                                                                            {activeProject.facebookReviews.toLocaleString()} reviews
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+                                                </>
                                             )}
-                                            {activeProject.googleReviews && (
-                                                <KpiCell
-                                                    label="Reviews"
-                                                    value={activeProject.googleReviews.toLocaleString()}
-                                                />
+
+                                            {/* ───── Section 6: Catchment Demographics ───── */}
+                                            {activeProject.population && (
+                                                <>
+                                                    <div className="space-y-3">
+                                                        <h3
+                                                            className="text-xs font-semibold uppercase tracking-wider"
+                                                            style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                        >
+                                                            Catchment Demographics
+                                                        </h3>
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <KpiCell label="Population" value={`${(activeProject.population / 1000).toFixed(1)}K`} />
+                                                            {activeProject.medianAge && (
+                                                                <KpiCell label="Median Age" value={activeProject.medianAge.toString()} />
+                                                            )}
+                                                            {activeProject.avgHouseholdIncome && (
+                                                                <div
+                                                                    className="rounded-xl p-3"
+                                                                    style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                                >
+                                                                    <p className="text-xs mb-1" style={{ color: COLORS.textMuted }}>Avg. Household Income</p>
+                                                                    <p className="text-sm font-bold" style={{ color: COLORS.textPrimary }}>
+                                                                        £{activeProject.avgHouseholdIncome.toLocaleString()}
+                                                                    </p>
+                                                                    {activeProject.incomeVsNational != null && (
+                                                                        <p className="text-xs mt-0.5" style={{
+                                                                            color: activeProject.incomeVsNational >= 0 ? COLORS.statusLive : "#F87171"
+                                                                        }}>
+                                                                            {activeProject.incomeVsNational >= 0 ? "+" : ""}£{activeProject.incomeVsNational} vs national
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {activeProject.familiesPercent != null && (
+                                                                <KpiCell label="Families" value={`${activeProject.familiesPercent}%`} />
+                                                            )}
+                                                            {activeProject.seniorsPercent != null && (
+                                                                <KpiCell label="Seniors (65+)" value={`${activeProject.seniorsPercent}%`} />
+                                                            )}
+                                                            {activeProject.homeownership != null && (
+                                                                <div
+                                                                    className="rounded-xl p-3"
+                                                                    style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                                >
+                                                                    <p className="text-xs mb-1" style={{ color: COLORS.textMuted }}>Homeownership</p>
+                                                                    <p className="text-sm font-bold" style={{ color: COLORS.textPrimary }}>
+                                                                        {activeProject.homeownership}%
+                                                                    </p>
+                                                                    {activeProject.homeownershipVsNational != null && (
+                                                                        <p className="text-xs mt-0.5" style={{
+                                                                            color: activeProject.homeownershipVsNational >= 0 ? COLORS.statusLive : "#F87171"
+                                                                        }}>
+                                                                            {activeProject.homeownershipVsNational >= 0 ? "+" : ""}{activeProject.homeownershipVsNational}% vs national
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {activeProject.carOwnership != null && (
+                                                                <div
+                                                                    className="rounded-xl p-3"
+                                                                    style={{ background: COLORS.bgSurface, border: `1px solid ${COLORS.borderDefault}` }}
+                                                                >
+                                                                    <p className="text-xs mb-1" style={{ color: COLORS.textMuted }}>Car Ownership</p>
+                                                                    <p className="text-sm font-bold" style={{ color: COLORS.textPrimary }}>
+                                                                        {activeProject.carOwnership}%
+                                                                    </p>
+                                                                    {activeProject.carOwnershipVsNational != null && (
+                                                                        <p className="text-xs mt-0.5" style={{
+                                                                            color: activeProject.carOwnershipVsNational >= 0 ? COLORS.statusLive : "#F87171"
+                                                                        }}>
+                                                                            {activeProject.carOwnershipVsNational >= 0 ? "+" : ""}{activeProject.carOwnershipVsNational}% vs national
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+                                                </>
                                             )}
-                                            {activeProject.phone && (
-                                                <KpiCell
-                                                    label="Phone"
-                                                    value={activeProject.phone}
-                                                />
+
+                                            {/* ───── Section 7: Tenant Directory ───── */}
+                                            {activeProject.tenants && activeProject.tenants.length > 0 && (
+                                                <div className="space-y-3">
+                                                    <h3
+                                                        className="text-xs font-semibold uppercase tracking-wider"
+                                                        style={{ color: COLORS.textMuted, fontFamily: "'Roboto Mono', monospace" }}
+                                                    >
+                                                        Tenant Directory ({activeProject.tenants.length})
+                                                    </h3>
+                                                    {(() => {
+                                                        const grouped: Record<string, typeof activeProject.tenants> = {}
+                                                        activeProject.tenants!.forEach((t) => {
+                                                            const cat = t.category || "Other"
+                                                            if (!grouped[cat]) grouped[cat] = []
+                                                            grouped[cat]!.push(t)
+                                                        })
+                                                        return Object.entries(grouped)
+                                                            .sort(([, a], [, b]) => (b?.length || 0) - (a?.length || 0))
+                                                            .map(([category, tenants]) => (
+                                                                <div key={category} className="mb-3">
+                                                                    <div className="flex items-center justify-between mb-1.5">
+                                                                        <p className="text-xs font-semibold" style={{ color: COLORS.accentCoral }}>
+                                                                            {category}
+                                                                        </p>
+                                                                        <span
+                                                                            className="text-xs px-2 py-0.5 rounded-full"
+                                                                            style={{ background: `${COLORS.accentCoral}15`, color: COLORS.accentCoral }}
+                                                                        >
+                                                                            {tenants?.length}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="space-y-1">
+                                                                        {tenants?.map((t) => (
+                                                                            <div
+                                                                                key={t.name}
+                                                                                className="flex items-center justify-between text-xs py-1.5 px-2 rounded-lg"
+                                                                                style={{ background: COLORS.bgSurface }}
+                                                                            >
+                                                                                <span style={{ color: t.isAnchorTenant ? COLORS.textPrimary : COLORS.textSecondary }}>
+                                                                                    {t.isAnchorTenant && "★ "}{t.name}
+                                                                                </span>
+                                                                                {(t.floor != null || t.unitNumber) && (
+                                                                                    <span style={{ color: COLORS.textMuted }}>
+                                                                                        {t.unitNumber && `Unit ${t.unitNumber}`}
+                                                                                        {t.unitNumber && t.floor != null && " · "}
+                                                                                        {t.floor != null && `Floor ${t.floor}`}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                    })()}
+                                                </div>
                                             )}
-                                        </div>
+
+                                            <div className="w-full h-px" style={{ background: COLORS.borderDefault }} />
+
+                                            {/* Action Buttons */}
+                                            <div className="space-y-2">
+                                                <button
+                                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-colors"
+                                                    style={{
+                                                        background: `${COLORS.accentCoral}15`,
+                                                        color: COLORS.accentCoral,
+                                                        border: `1px solid ${COLORS.accentCoral}30`,
+                                                    }}
+                                                    onMouseEnter={(e) =>
+                                                        (e.currentTarget.style.background = `${COLORS.accentCoral}25`)
+                                                    }
+                                                    onMouseLeave={(e) =>
+                                                        (e.currentTarget.style.background = `${COLORS.accentCoral}15`)
+                                                    }
+                                                >
+                                                    <LineChart className="w-4 h-4" />
+                                                    Run Gap Analysis
+                                                </button>
+                                                {activeProject.website && (
+                                                    <a
+                                                        href={activeProject.website}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer transition-colors"
+                                                        style={{
+                                                            background: `${COLORS.bgElevated}60`,
+                                                            color: COLORS.textMuted,
+                                                            border: `1px solid ${COLORS.borderDefault}`,
+                                                        }}
+                                                        onMouseEnter={(e) =>
+                                                            (e.currentTarget.style.background = COLORS.bgElevated)
+                                                        }
+                                                        onMouseLeave={(e) =>
+                                                            (e.currentTarget.style.background = `${COLORS.bgElevated}60`)
+                                                        }
+                                                    >
+                                                        <ExternalLink className="w-4 h-4" />
+                                                        Open Website
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </>
                                     )}
 
                                     {/* Coming Soon message */}
@@ -1612,106 +2000,6 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                                                 We can enrich this location with vacancy rates, tenant
                                                 mix analysis, footfall data, and gap analysis within
                                                 48 hours.
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {/* Divider */}
-                                    <div
-                                        className="w-full h-px"
-                                        style={{ background: COLORS.borderDefault }}
-                                    />
-
-                                    {/* Action Buttons */}
-                                    <div className="space-y-2">
-                                        <button
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-colors"
-                                            style={{
-                                                background: `${COLORS.accentCoral}15`,
-                                                color: COLORS.accentCoral,
-                                                border: `1px solid ${COLORS.accentCoral}30`,
-                                            }}
-                                            onMouseEnter={(e) =>
-                                                (e.currentTarget.style.background = `${COLORS.accentCoral}25`)
-                                            }
-                                            onMouseLeave={(e) =>
-                                                (e.currentTarget.style.background = `${COLORS.accentCoral}15`)
-                                            }
-                                        >
-                                            <LineChart className="w-4 h-4" />
-                                            Run Gap Analysis
-                                        </button>
-                                        <button
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold cursor-pointer transition-colors"
-                                            style={{
-                                                background: `${COLORS.bgElevated}80`,
-                                                color: COLORS.textSecondary,
-                                                border: `1px solid ${COLORS.borderDefault}`,
-                                            }}
-                                            onMouseEnter={(e) =>
-                                                (e.currentTarget.style.background = COLORS.bgElevated)
-                                            }
-                                            onMouseLeave={(e) =>
-                                                (e.currentTarget.style.background = `${COLORS.bgElevated}80`)
-                                            }
-                                        >
-                                            <Users className="w-4 h-4" />
-                                            View Tenant Recommendations
-                                        </button>
-                                        {activeProject.website && (
-                                            <a
-                                                href={activeProject.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium cursor-pointer transition-colors"
-                                                style={{
-                                                    background: `${COLORS.bgElevated}60`,
-                                                    color: COLORS.textMuted,
-                                                    border: `1px solid ${COLORS.borderDefault}`,
-                                                }}
-                                                onMouseEnter={(e) =>
-                                                (e.currentTarget.style.background =
-                                                    COLORS.bgElevated)
-                                                }
-                                                onMouseLeave={(e) =>
-                                                    (e.currentTarget.style.background = `${COLORS.bgElevated}60`)
-                                                }
-                                            >
-                                                <ExternalLink className="w-4 h-4" />
-                                                Open Website
-                                            </a>
-                                        )}
-                                    </div>
-
-                                    {/* Palace Shopping special callout */}
-                                    {activeProject.isFlourishManaged && (
-                                        <div
-                                            className="rounded-xl p-4 space-y-2"
-                                            style={{
-                                                background: `${COLORS.statusLive}10`,
-                                                border: `1px solid ${COLORS.statusLive}30`,
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <CheckCircle2
-                                                    className="w-4 h-4"
-                                                    style={{ color: COLORS.statusLive }}
-                                                />
-                                                <span
-                                                    className="text-sm font-semibold"
-                                                    style={{ color: COLORS.statusLive }}
-                                                >
-                                                    Already Managed on Flourish
-                                                </span>
-                                            </div>
-                                            <p
-                                                className="text-xs"
-                                                style={{ color: COLORS.textMuted }}
-                                            >
-                                                Palace Shopping is a live Flourish location with active
-                                                tenant tracking, gap analysis, and real-time
-                                                intelligence. This is a working proof of concept for
-                                                your entire portfolio.
                                             </p>
                                         </div>
                                     )}
