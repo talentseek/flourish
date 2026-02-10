@@ -387,6 +387,50 @@ function useAnimatedCounter(target: number, duration: number = 1500, active: boo
 }
 
 // ─────────────────────────────────────────────────
+// Narration Audio Hook
+// ─────────────────────────────────────────────────
+function useNarration(src: string | null) {
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+
+    useEffect(() => {
+        if (!src) {
+            if (audioRef.current) {
+                audioRef.current.pause()
+                audioRef.current = null
+            }
+            return
+        }
+
+        const audio = new Audio(src)
+        audio.volume = 0
+        audioRef.current = audio
+
+        // Fade in
+        audio.play().catch(() => { })
+        const fadeIn = setInterval(() => {
+            if (audio.volume < 0.9) audio.volume = Math.min(1, audio.volume + 0.1)
+            else clearInterval(fadeIn)
+        }, 50)
+
+        return () => {
+            clearInterval(fadeIn)
+            // Fade out
+            const fadeOut = setInterval(() => {
+                if (audio.volume > 0.1) audio.volume = Math.max(0, audio.volume - 0.15)
+                else { clearInterval(fadeOut); audio.pause() }
+            }, 40)
+        }
+    }, [src])
+}
+
+// Chapter audio mapping
+const CHAPTER_AUDIO: Record<string, string> = {
+    chapter1: "/chapter1.mp3",
+    chapter2: "/chapter2.mp3",
+    chapter3: "/chapter3.mp3",
+}
+
+// ─────────────────────────────────────────────────
 // Chapter Screens Component
 // ─────────────────────────────────────────────────
 const MATCHED_CENTRES = [
@@ -421,6 +465,9 @@ function ChapterScreens({
     chapterAnimated: boolean
     setChapterAnimated: (v: boolean) => void
 }) {
+    // Audio narration
+    useNarration(CHAPTER_AUDIO[demoStep] || null)
+
     // Trigger entrance animation
     useEffect(() => {
         const t = setTimeout(() => setChapterAnimated(true), 100)
@@ -846,6 +893,12 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
             }
         }
     }, [guideStep, demoStep])
+
+    // Guide narration audio
+    const guideAudioSrc = demoStep === "guided" && guideStep !== null
+        ? `/g${guideStep + 1}.mp3`
+        : null
+    useNarration(guideAudioSrc)
 
     const advanceGuide = () => {
         if (guideStep === null) return
