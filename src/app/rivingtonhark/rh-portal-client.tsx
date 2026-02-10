@@ -213,13 +213,18 @@ interface MapProps {
     onProjectSelect: (name: string | null) => void
     drawerOpen: boolean
     rhProjects: RHProject[]
+    isGuidedTour: boolean
+    guideStep: number | null
+    nearbyLocations: { name: string; city: string; lat: number; lng: number; type: string; stores: number | null }[]
 }
 
-function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects }: MapProps) {
+function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects, isGuidedTour, guideStep, nearbyLocations }: MapProps) {
     const ref = useRef<HTMLDivElement>(null)
     const [map, setMap] = useState<google.maps.Map>()
     const markersRef = useRef<google.maps.Marker[]>([])
     const infoWindowRef = useRef<google.maps.InfoWindow>()
+    const nearbyInfoWindowsRef = useRef<google.maps.InfoWindow[]>([])
+    const nearbyMarkersRef = useRef<google.maps.Marker[]>([])
 
     useEffect(() => {
         if (ref.current && !map) {
@@ -336,7 +341,9 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
                 if (pos) {
                     map.setZoom(14)
                     map.panTo(pos)
-                    setTimeout(() => map.panBy(-210, 0), 150)
+                    // Offset away from drawer: left for right-side drawer, right for left-side (guided)
+                    const panX = isGuidedTour ? 210 : -210
+                    setTimeout(() => map.panBy(panX, 0), 150)
                 }
             })
 
@@ -357,14 +364,72 @@ function PortfolioMap({ selectedProject, onProjectSelect, drawerOpen, rhProjects
             if (project) {
                 map.setZoom(14)
                 map.panTo({ lat: project.lat, lng: project.lng })
-                setTimeout(() => map.panBy(-210, 0), 150)
+                const panX = isGuidedTour ? 210 : -210
+                setTimeout(() => map.panBy(panX, 0), 150)
             }
         } else if (!selectedProject) {
             // Zoom back to UK overview when drawer closes
             map.setZoom(6)
             map.panTo({ lat: 53.0, lng: -1.5 })
         }
-    }, [map, drawerOpen, selectedProject])
+    }, [map, drawerOpen, selectedProject, isGuidedTour])
+
+    // Auto-show nearby centre InfoWindows during guided tour step 1
+    useEffect(() => {
+        // Clean up previous nearby markers/windows
+        nearbyInfoWindowsRef.current.forEach((w) => w.close())
+        nearbyInfoWindowsRef.current = []
+        nearbyMarkersRef.current.forEach((m) => m.setMap(null))
+        nearbyMarkersRef.current = []
+
+        if (!map || !isGuidedTour || guideStep !== 1 || nearbyLocations.length === 0) return
+
+        nearbyLocations.forEach((loc) => {
+            // Small grey marker for nearby centres
+            const size = 28
+            const half = size / 2
+            const iconSvg = encodeURIComponent(
+                `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                    <circle cx="${half}" cy="${half}" r="10" fill="#64748B" stroke="${COLORS.bgBase}" stroke-width="2" opacity="0.8"/>
+                </svg>`.trim()
+            )
+
+            const marker = new window.google.maps.Marker({
+                position: { lat: loc.lat, lng: loc.lng },
+                map,
+                title: loc.name,
+                icon: {
+                    url: `data:image/svg+xml;charset=UTF-8,${iconSvg}`,
+                    scaledSize: new window.google.maps.Size(size, size),
+                    anchor: new window.google.maps.Point(half, half),
+                },
+            })
+
+            const iw = new window.google.maps.InfoWindow({
+                content: `
+                    <div style="background:${COLORS.bgSurface};color:${COLORS.textPrimary};padding:10px 14px;border-radius:8px;border:1px solid ${COLORS.borderDefault};font-family:'Inter',sans-serif;min-width:160px">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:2px">${loc.name}</div>
+                        <div style="font-size:11px;color:${COLORS.textMuted}">${loc.city} • ${loc.type}</div>
+                        ${loc.stores ? `<div style="font-size:11px;color:${COLORS.accentCoral};margin-top:4px">${loc.stores} stores</div>` : ""}
+                    </div>
+                `,
+                disableAutoPan: true,
+            })
+
+            // Open after a small stagger for visual effect
+            setTimeout(() => iw.open(map, marker), 400)
+
+            nearbyInfoWindowsRef.current.push(iw)
+            nearbyMarkersRef.current.push(marker)
+        })
+
+        return () => {
+            nearbyInfoWindowsRef.current.forEach((w) => w.close())
+            nearbyInfoWindowsRef.current = []
+            nearbyMarkersRef.current.forEach((m) => m.setMap(null))
+            nearbyMarkersRef.current = []
+        }
+    }, [map, isGuidedTour, guideStep, nearbyLocations])
 
     return <div ref={ref} className="w-full h-full" />
 }
@@ -1198,6 +1263,9 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                                 onProjectSelect={handleProjectSelect}
                                 drawerOpen={!!activeProject}
                                 rhProjects={rhProjects}
+                                isGuidedTour={demoStep === "guided"}
+                                guideStep={guideStep}
+                                nearbyLocations={palaceRegionalData?.nearby || []}
                             />
                         </Wrapper>
                     </div>
@@ -1475,16 +1543,20 @@ export default function RHPortalClient({ rhProjects, palaceRegionalData }: RHPor
                     </header>
 
                     {/* ═══════════════════════════════════════
-                    LAYER 40 — Side Drawer (slides from right)
+                    LAYER 40 — Side Drawer (slides from right, or left during guided tour)
                 ═══════════════════════════════════════ */}
                     <div
-                        className={`absolute top-0 right-0 bottom-0 w-[420px] z-40 transition-transform duration-300 ease-out ${activeProject ? "translate-x-0" : "translate-x-full"
+                        className={`absolute top-0 bottom-0 w-[420px] z-40 transition-transform duration-300 ease-out ${demoStep === "guided"
+                                ? `left-0 ${activeProject ? "translate-x-0" : "-translate-x-full"}`
+                                : `right-0 ${activeProject ? "translate-x-0" : "translate-x-full"}`
                             }`}
                         style={{
                             background: `${COLORS.bgBase}F2`,
                             backdropFilter: "blur(24px)",
                             WebkitBackdropFilter: "blur(24px)",
-                            borderLeft: `1px solid ${COLORS.borderDefault}`,
+                            ...(demoStep === "guided"
+                                ? { borderRight: `1px solid ${COLORS.borderDefault}` }
+                                : { borderLeft: `1px solid ${COLORS.borderDefault}` }),
                         }}
                     >
                         {activeProject && (
