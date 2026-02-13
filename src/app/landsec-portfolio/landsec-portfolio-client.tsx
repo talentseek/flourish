@@ -724,6 +724,7 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
                 width: `${scrollProgress}%`,
                 background: `linear-gradient(90deg, ${C.blue}, ${C.lime})`,
                 transition: "width 0.1s linear",
+                pointerEvents: "none",
             }} />
 
             {/* ─── Top bar ─── */}
@@ -757,7 +758,13 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
                             ))}
                         </div>
                         <button
-                            onClick={() => window.print()}
+                            onClick={() => {
+                                try {
+                                    setTimeout(() => window.print(), 100)
+                                } catch {
+                                    window.print()
+                                }
+                            }}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all hover:opacity-90"
                             style={{ background: `${C.lime}`, color: C.navy }}
                         >
