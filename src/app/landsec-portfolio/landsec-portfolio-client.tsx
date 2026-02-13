@@ -759,11 +759,54 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
                         </div>
                         <button
                             onClick={() => {
-                                try {
-                                    setTimeout(() => window.print(), 100)
-                                } catch {
-                                    window.print()
+                                // Iframe-based print: more reliable than window.print() in production
+                                const printFrame = document.createElement("iframe")
+                                printFrame.style.position = "fixed"
+                                printFrame.style.right = "0"
+                                printFrame.style.bottom = "0"
+                                printFrame.style.width = "0"
+                                printFrame.style.height = "0"
+                                printFrame.style.border = "none"
+                                document.body.appendChild(printFrame)
+
+                                const frameDoc = printFrame.contentDocument || printFrame.contentWindow?.document
+                                if (!frameDoc) { window.print(); return }
+
+                                // Copy all stylesheets
+                                const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+                                    .map(el => el.outerHTML).join("\n")
+
+                                // Get main content (skip sticky header)
+                                const mainContent = document.querySelector("main")?.innerHTML || document.body.innerHTML
+
+                                frameDoc.open()
+                                frameDoc.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Landsec Portfolio Report</title>${styles}
+                                    <style>
+                                        body { background: #0B1628 !important; color: #F1F5F9 !important; font-family: 'Inter', sans-serif; padding: 2rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                        .print\\:hidden { display: none !important; }
+                                        img { max-width: 100%; }
+                                        @media print {
+                                            body { background: white !important; color: black !important; }
+                                            * { break-inside: avoid; }
+                                        }
+                                    </style>
+                                </head><body>${mainContent}</body></html>`)
+                                frameDoc.close()
+
+                                // Wait for content to render then print
+                                printFrame.onload = () => {
+                                    setTimeout(() => {
+                                        printFrame.contentWindow?.print()
+                                        // Clean up after print dialog closes
+                                        setTimeout(() => document.body.removeChild(printFrame), 1000)
+                                    }, 500)
                                 }
+
+                                // Fallback: if onload doesn't fire (already loaded)
+                                setTimeout(() => {
+                                    try { printFrame.contentWindow?.print() } catch { }
+                                    setTimeout(() => { try { document.body.removeChild(printFrame) } catch { } }, 1000)
+                                }, 1500)
                             }}
                             className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all hover:opacity-90"
                             style={{ background: `${C.lime}`, color: C.navy }}
