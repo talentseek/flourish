@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useReactToPrint } from "react-to-print"
+import html2canvas from "html2canvas"
+import { jsPDF } from "jspdf"
 import Image from "next/image"
 import {
     MapPin, Building2, Users, BarChart3, Star, Car, Zap, ShoppingBag,
@@ -682,11 +683,47 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
     const [unlocked, setUnlocked] = useState(false)
     const [activeTab, setActiveTab] = useState(0)
     const [scrollProgress, setScrollProgress] = useState(0)
+    const [generating, setGenerating] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
-    const handlePrint = useReactToPrint({
-        contentRef,
-        documentTitle: "Landsec Portfolio Report",
-    })
+
+    const handleDownloadPDF = async () => {
+        if (!contentRef.current || generating) return
+        setGenerating(true)
+        try {
+            const canvas = await html2canvas(contentRef.current, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#0B1628",
+                logging: false,
+            })
+            const imgData = canvas.toDataURL("image/jpeg", 0.85)
+            const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
+            const pageWidth = pdf.internal.pageSize.getWidth()
+            const pageHeight = pdf.internal.pageSize.getHeight()
+            const imgWidth = pageWidth
+            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            let heightLeft = imgHeight
+            let position = 0
+
+            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight)
+            heightLeft -= pageHeight
+
+            while (heightLeft > 0) {
+                position -= pageHeight
+                pdf.addPage()
+                pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight)
+                heightLeft -= pageHeight
+            }
+
+            pdf.save("Landsec-Portfolio-Report.pdf")
+        } catch (err) {
+            console.error("PDF generation failed:", err)
+            alert("PDF generation failed. Please try again.")
+        } finally {
+            setGenerating(false)
+        }
+    }
 
     // Scroll progress bar & auto-tab update
     useEffect(() => {
@@ -764,12 +801,16 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
                             ))}
                         </div>
                         <button
-                            onClick={() => handlePrint()}
-                            className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all hover:opacity-90"
+                            onClick={handleDownloadPDF}
+                            disabled={generating}
+                            className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all hover:opacity-90 disabled:opacity-60"
                             style={{ background: `${C.lime}`, color: C.navy }}
                         >
-                            <Download className="w-3.5 h-3.5" />
-                            Download Report
+                            {generating ? (
+                                <><span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />Generating...</>
+                            ) : (
+                                <><Download className="w-3.5 h-3.5" />Download Report</>
+                            )}
                         </button>
                     </div>
                 </div>
