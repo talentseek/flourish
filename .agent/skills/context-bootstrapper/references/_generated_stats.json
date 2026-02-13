@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-02-13T13:49:12.531706",
+  "api_route_count": 31,
+  "page_route_count": 32,
+  "ui_component_count": 34,
+  "feature_component_count": 72,
+  "lib_module_count": 16,
+  "db_model_count": 12,
+  "script_count": 559,
+  "package_name": "flourish",
+  "node_version": "20.x"
+}
