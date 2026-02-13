@@ -696,6 +696,27 @@ export default function LandsecPortfolioClient({ locations, competitors, gapAnal
                 allowTaint: true,
                 backgroundColor: "#0B1628",
                 logging: false,
+                onclone: (clonedDoc) => {
+                    // html2canvas doesn't support oklch() — strip from all elements
+                    const allEls = clonedDoc.querySelectorAll("*")
+                    allEls.forEach((el) => {
+                        const style = (el as HTMLElement).style
+                        const computed = clonedDoc.defaultView?.getComputedStyle(el)
+                        if (!computed) return
+                        const props = ["color", "backgroundColor", "borderColor", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor", "outlineColor", "textDecorationColor", "caretColor", "columnRuleColor"]
+                        props.forEach((prop) => {
+                            const val = computed.getPropertyValue(prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`))
+                            if (val && val.includes("oklch")) {
+                                style.setProperty(prop.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`), "transparent", "important")
+                            }
+                        })
+                        // Also strip CSS custom properties with oklch
+                        const inlineStyle = (el as HTMLElement).getAttribute("style") || ""
+                        if (inlineStyle.includes("oklch")) {
+                            (el as HTMLElement).setAttribute("style", inlineStyle.replace(/oklch\([^)]*\)/g, "transparent"))
+                        }
+                    })
+                },
             })
             const imgData = canvas.toDataURL("image/jpeg", 0.85)
             const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
