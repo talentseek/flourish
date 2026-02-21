@@ -160,6 +160,7 @@ model Category {
   id               String     @id @default(cuid())
   name             String     @unique
   description      String?
+  tier             Int        @default(3) // 1=Sector, 2=Category, 3=Subcategory
   parentCategoryId String?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt

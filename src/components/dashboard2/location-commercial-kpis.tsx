@@ -72,18 +72,18 @@ export function LocationCommercialKPIs({ location }: LocationCommercialKPIsProps
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Multiple Retailers</span>
-                    <span className="font-semibold">{location.percentMultiple.toFixed(1)}%</span>
+                    <span className="font-semibold">{(location.percentMultiple * 100).toFixed(1)}%</span>
                   </div>
-                  <Progress value={location.percentMultiple} className="h-2" />
+                  <Progress value={location.percentMultiple * 100} className="h-2" />
                 </div>
               )}
               {location.percentIndependent !== undefined && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Independent Retailers</span>
-                    <span className="font-semibold">{location.percentIndependent.toFixed(1)}%</span>
+                    <span className="font-semibold">{(location.percentIndependent * 100).toFixed(1)}%</span>
                   </div>
-                  <Progress value={location.percentIndependent} className="h-2" />
+                  <Progress value={location.percentIndependent * 100} className="h-2" />
                 </div>
               )}
             </div>

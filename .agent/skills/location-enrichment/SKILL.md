@@ -38,6 +38,48 @@ description: |
 
 ---
 
+## Tenant Categorisation (LDC 3-Tier Taxonomy)
+
+> 🔴 **MANDATORY:** All tenant categories MUST use the canonical LDC taxonomy.
+> See **[ldc-taxonomy.md](references/ldc-taxonomy.md)** for the full list of valid values.
+
+### Rules
+
+1. **`category`** = canonical **T2** name (e.g., `Clothing & Footwear`, `Cafes & Restaurants`)
+2. **`subcategory`** = canonical **T3** name (e.g., `Womenswear`, `Coffee Shop`)
+3. **Never invent** new category/subcategory strings — pick the closest match from the taxonomy
+4. **Resolve `categoryId`** at insert time using `getCategoryId()` from `@/lib/category-lookup`
+
+### Template: Tenant Insert with categoryId
+
+```typescript
+import { getCategoryId } from "../src/lib/category-lookup";
+
+// Inside insertTenants():
+const categoryId = await getCategoryId(prisma, t.category, t.subcategory);
+await prisma.tenant.create({
+  data: {
+    locationId: LOCATION_ID,
+    name: t.name,
+    category: t.category,
+    subcategory: t.subcategory || null,
+    categoryId,  // ← resolved from canonical taxonomy
+    isAnchorTenant: t.isAnchorTenant || false,
+  },
+});
+```
+
+### Common Mistakes
+
+| ❌ Wrong | ✅ Correct |
+|----------|----------|
+| `category: "Restaurant"` | `category: "Cafes & Restaurants", subcategory: "Restaurant"` |
+| `category: "Fashion & Clothing"` | `category: "Clothing & Footwear"` |
+| `category: "Food & Beverage"` | `category: "Cafes & Restaurants"` |
+| `category: "Other"` | Find closest T2 match, or `category: "General Retail"` |
+
+---
+
 ## Research Workflow
 
 ### Step 1: Find Official Website
@@ -153,12 +195,16 @@ Before submitting enrichment:
 - [ ] Footfall is annual (not weekly/monthly)
 - [ ] Demographics match LTLA district
 - [ ] Social URLs are official accounts
+- [ ] All tenant `category` values are canonical LDC T2 names
+- [ ] All tenant `subcategory` values are canonical LDC T3 names
+- [ ] `categoryId` resolved via `getCategoryId()` for all tenants
 
 ---
 
 ## Reference Files
 
 For detailed guidance:
+- **[ldc-taxonomy.md](references/ldc-taxonomy.md)** - Canonical LDC 3-tier category taxonomy
 - **[research-workflow.md](references/research-workflow.md)** - Step-by-step procedures
 - **[data-sources.md](references/data-sources.md)** - Authoritative sources list
 - **[uk-demographics.md](references/uk-demographics.md)** - Census data extraction
