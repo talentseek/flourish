@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { MapPin, Building2, Store, CheckCircle2, Filter } from "lucide-react"
+import { MapPin, Building2, Store, CheckCircle2, Filter, AlertTriangle } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -33,12 +33,18 @@ export function ComparisonSetupStage({
   onCompetitorsChange,
   onGenerateReport,
 }: ComparisonSetupStageProps) {
-  // State for location type filters (default: exclude High Streets)
+  // State for location type filters (default: Shopping Centres only)
   const [selectedTypes, setSelectedTypes] = useState<LocationType[]>([
-    'SHOPPING_CENTRE',
-    'RETAIL_PARK',
-    'OUTLET_CENTRE'
+    'SHOPPING_CENTRE'
   ])
+
+  // Enrichment gating — minimum tenants for comparison
+  const MIN_TENANTS = 5
+  const isSelectable = (location: Location) => location.tenants.length >= MIN_TENANTS
+  const getDisabledReason = (location: Location) => {
+    if (location.tenants.length === 0) return "No Tenant Data"
+    return "Insufficient Data"
+  }
 
   // Calculate distances and filter nearby locations
   const nearbyLocations = useMemo(() => {
@@ -46,11 +52,11 @@ export function ComparisonSetupStage({
       const R = 3959 // Earth's radius in miles
       const dLat = (lat2 - lat1) * Math.PI / 180
       const dLon = (lon2 - lon1) * Math.PI / 180
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2)
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
       return R * c
     }
 
@@ -80,16 +86,16 @@ export function ComparisonSetupStage({
       OUTLET_CENTRE: 0,
       HIGH_STREET: 0,
     }
-    
+
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
       const R = 3959
       const dLat = (lat2 - lat1) * Math.PI / 180
       const dLon = (lon2 - lon1) * Math.PI / 180
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2)
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
       return R * c
     }
 
@@ -114,7 +120,7 @@ export function ComparisonSetupStage({
   }, [targetLocation, allLocations, radius])
 
   const handleTypeToggle = (type: LocationType) => {
-    setSelectedTypes(prev => 
+    setSelectedTypes(prev =>
       prev.includes(type)
         ? prev.filter(t => t !== type)
         : [...prev, type]
@@ -130,6 +136,8 @@ export function ComparisonSetupStage({
   }
 
   const handleToggleCompetitor = (locationId: string) => {
+    const location = nearbyLocations.find(l => l.id === locationId)
+    if (location && !isSelectable(location)) return
     if (selectedCompetitors.includes(locationId)) {
       onCompetitorsChange(selectedCompetitors.filter(id => id !== locationId))
     } else {
@@ -138,7 +146,7 @@ export function ComparisonSetupStage({
   }
 
   const handleSelectAll = () => {
-    onCompetitorsChange(nearbyLocations.map(loc => loc.id))
+    onCompetitorsChange(nearbyLocations.filter(loc => isSelectable(loc)).map(loc => loc.id))
   }
 
   const handleClearAll = () => {
@@ -379,12 +387,14 @@ export function ComparisonSetupStage({
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
                     {nearbyLocations.map((location) => {
                       const isSelected = selectedCompetitors.includes(location.id)
+                      const selectable = isSelectable(location)
                       return (
                         <Card
                           key={location.id}
                           className={cn(
-                            "cursor-pointer transition-all",
-                            isSelected && "ring-2 ring-primary"
+                            "transition-all",
+                            selectable ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+                            isSelected && selectable && "ring-2 ring-primary"
                           )}
                           onClick={() => handleToggleCompetitor(location.id)}
                         >
@@ -392,33 +402,44 @@ export function ComparisonSetupStage({
                             <div className="flex items-start gap-3">
                               <Checkbox
                                 checked={isSelected}
+                                disabled={!selectable}
                                 onCheckedChange={() => handleToggleCompetitor(location.id)}
                                 onClick={(e) => e.stopPropagation()}
                               />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold">{location.name}</h3>
-                                  {isSelected && (
+                                  <h3 className={cn("font-semibold", !selectable && "text-muted-foreground")}>{location.name}</h3>
+                                  {isSelected && selectable && (
                                     <CheckCircle2 className="h-4 w-4 text-primary" />
                                   )}
                                 </div>
-                                <div className="flex items-center gap-2 mb-2">
+                                <div className="flex items-center gap-2 flex-wrap mb-2">
                                   <Badge variant={getTypeBadgeVariant(location.type)} className="text-xs">
                                     {getTypeLabel(location.type)}
                                   </Badge>
                                   <Badge variant="outline" className="text-xs">
                                     {location.distance.toFixed(1)} miles
                                   </Badge>
+                                  {!selectable && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1">
+                                      <AlertTriangle className="h-3 w-3" />
+                                      {getDisabledReason(location)}
+                                    </Badge>
+                                  )}
                                 </div>
                                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                                   <MapPin className="h-3 w-3" />
                                   {location.city}, {location.county}
                                 </p>
-                                {location.numberOfStores && (
+                                {selectable && location.numberOfStores ? (
                                   <p className="text-sm text-muted-foreground mt-1">
                                     {location.numberOfStores} stores
                                   </p>
-                                )}
+                                ) : !selectable ? (
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Not enough data for comparison
+                                  </p>
+                                ) : null}
                               </div>
                             </div>
                           </CardContent>
