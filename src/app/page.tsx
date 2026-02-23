@@ -9,8 +9,8 @@ import { V2LookingForSpaceSection } from "@/components/v2-looking-for-space-sect
 import { V2JoinPortfolioSection } from "@/components/v2-join-portfolio-section"
 import { V2TraderStoriesSection } from "@/components/v2-trader-stories-section"
 import { V2TeamSection } from "@/components/v2-team-section"
+import { V2VideoSection } from "@/components/v2-video-section"
 import { V2PodcastSection } from "@/components/v2-podcast-section"
-// import { V2VideoGallerySection } from "@/components/v2-video-gallery-section" // TEMPORARILY DISABLED FOR LAUNCH
 import { V2ContactSection } from "@/components/v2-contact-section"
 import { V2Footer } from "@/components/v2-footer"
 import "./v2-styles.css"
@@ -60,8 +60,8 @@ export default function HomePage() {
           {/* Team/About Us Section */}
           <V2TeamSection />
 
-          {/* Video Gallery Section - TEMPORARILY DISABLED FOR LAUNCH */}
-          {/* <V2VideoGallerySection /> */}
+          {/* Video Section */}
+          <V2VideoSection />
 
           {/* Podcast Section */}
           <V2PodcastSection />

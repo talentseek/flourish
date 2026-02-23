@@ -18,7 +18,7 @@ const navigationItems = [
   { label: "Join our portfolio", href: "#join-portfolio" },
   { label: "Trader Stories", href: "#trader-stories" },
   { label: "About Us", href: "#team" },
-  // { label: "Video Gallery", href: "#video-gallery" }, // TEMPORARILY DISABLED FOR LAUNCH
+  { label: "Watch the Video", href: "#video" },
   { label: "Podcast", href: "#podcast" },
   { label: "Contact Us", href: "#contact" },
 ]
