@@ -7,6 +7,7 @@ import {
   FileTextIcon,
   MapPinIcon,
   ShieldIcon,
+  CalendarDaysIcon,
 } from "lucide-react"
 import { UserButtonClient } from "@/components/user-button-client"
 import { FlourishLogo } from "@/components/flourish-logo"
@@ -49,6 +50,15 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
       icon: FileTextIcon,
     },
   ];
+
+  // Add Spaces link for Regional Managers and Admins
+  if (userRole === 'REGIONAL_MANAGER' || userRole === 'ADMIN') {
+    navItems.splice(2, 0, {
+      title: "Spaces",
+      url: "/dashboard/regional/spaces",
+      icon: CalendarDaysIcon,
+    })
+  }
 
   // Add Admin link for ADMIN users
   if (userRole === 'ADMIN') {

@@ -67,7 +67,7 @@ const CATEGORY_ALIASES: Record<string, string> = {
     "Bar & Restaurant": "Cafes & Restaurants",
     "Groceries": "Food & Grocery",
     "Grocery Stores": "Food & Grocery",
-    "Convenience Stores": "General Retail",
+    "Convenience Stores": "Food & Grocery",
     "Pets": "General Retail",
     "Media": "General Retail",
     "Miscellaneous": "General Retail",

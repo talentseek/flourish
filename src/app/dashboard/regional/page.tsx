@@ -1,6 +1,8 @@
 import { getRegionalLocations } from '@/actions/regional-data';
+import { getBookingsForRegionalManager } from '@/actions/space-actions';
 import AiChat from '@/components/regional/ai-chat';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UpcomingBookingsWidget } from '@/components/spaces/upcoming-bookings-widget';
 import { getSessionUser } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { generateSlug } from '@/lib/slug-utils';
@@ -31,7 +33,25 @@ export default async function RegionalDashboard() {
         redirect('/dashboard');
     }
 
-    const locations = await getRegionalLocations();
+    const [locations, upcomingBookings] = await Promise.all([
+        getRegionalLocations(),
+        getBookingsForRegionalManager().catch(() => [])
+    ]);
+
+    // Serialize booking dates for client component
+    const serializedBookings = upcomingBookings.map((b: any) => ({
+        id: b.id,
+        reference: b.reference,
+        companyName: b.companyName,
+        brand: b.brand,
+        startDate: b.startDate.toISOString(),
+        endDate: b.endDate.toISOString(),
+        status: b.status,
+        space: {
+            name: b.space.name,
+            location: b.space.location,
+        }
+    }));
 
     return (
         <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
@@ -43,7 +63,7 @@ export default async function RegionalDashboard() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Content (Map + Stats) - Spans 2 cols */}
+                {/* Main Content (Map + Stats + Bookings) - Spans 2 cols */}
                 <div className="lg:col-span-2 space-y-6">
                     <Card>
                         <CardHeader>
@@ -75,6 +95,9 @@ export default async function RegionalDashboard() {
                             </Link>
                         ))}
                     </div>
+
+                    {/* Upcoming Bookings Widget */}
+                    <UpcomingBookingsWidget bookings={serializedBookings} />
                 </div>
 
                 {/* Sidebar (AI Chat) - Spans 1 col */}
@@ -85,3 +108,4 @@ export default async function RegionalDashboard() {
         </div>
     );
 }
+

@@ -1,12 +1,16 @@
 /**
- * Liverpool ONE Enrichment
+ * Liverpool ONE — Full Enrichment (Feb 2026)
  *
- * ~170 tenants — major open-air shopping/dining destination.
- * Owner: Grosvenor. Opened 2008. 42 acres, 5 districts.
- * 30M+ annual footfall. 130,000m² retail space.
+ * Open-air shopping/dining/leisure destination. 42 acres, 5 districts.
+ * Owner: Grosvenor Group. Opened 2008.
+ * ~30M annual footfall. 130,000 m² (≈1.4M sqft) retail/leisure space.
  *
- * Sources: liverpool-one.com/shopping/ (official directory, Feb 2026)
- *          liverpool-one.com food/drink listings, web search
+ * Sources:
+ *   - liverpool-one.com/store-sitemap.xml
+ *   - liverpool-one.com/food-and-drink-sitemap.xml
+ *   - liverpool-one.com/leisure-sitemap.xml
+ *   - liverpool-one.com/hotels-sitemap.xml
+ *   - Wikipedia, press releases (metadata)
  *
  * Run: npx tsx scripts/enrich-liverpool-one.ts
  */
@@ -44,8 +48,8 @@ const tenants: TenantInput[] = [
     { name: "Bravissimo", category: "Clothing & Footwear", subcategory: "Lingerie" },
     { name: "Dirty", category: "Clothing & Footwear", subcategory: "Streetwear" },
     { name: "Dr Martens", category: "Clothing & Footwear", subcategory: "Footwear" },
-    { name: "Foot Locker", category: "Clothing & Footwear", subcategory: "Sportswear" },
-    { name: "Footasylum", category: "Clothing & Footwear", subcategory: "Sportswear" },
+    { name: "Foot Locker", category: "Clothing & Footwear", subcategory: "Trainers" },
+    { name: "Footasylum", category: "Clothing & Footwear", subcategory: "Trainers" },
     { name: "Fred Perry", category: "Clothing & Footwear", subcategory: "Casual" },
     { name: "Hobbs, Whistles, Phase Eight", category: "Clothing & Footwear", subcategory: "Womenswear" },
     { name: "Hollister", category: "Clothing & Footwear", subcategory: "Casual" },
@@ -103,25 +107,25 @@ const tenants: TenantInput[] = [
     // ═══════════════════════════════════
     // JEWELLERY & WATCHES
     // ═══════════════════════════════════
-    { name: "Breitling", category: "Jewellery & Watches", subcategory: "Watches" },
+    { name: "Breitling", category: "Jewellery & Watches", subcategory: "Luxury Watches" },
     { name: "David M Robinson", category: "Jewellery & Watches", subcategory: "Jewellery" },
     { name: "Ernest Jones", category: "Jewellery & Watches", subcategory: "Jewellery" },
     { name: "Goldsmiths", category: "Jewellery & Watches", subcategory: "Jewellery" },
     { name: "H. Samuel", category: "Jewellery & Watches", subcategory: "Jewellery" },
-    { name: "OMEGA", category: "Jewellery & Watches", subcategory: "Watches" },
-    { name: "Pandora", category: "Jewellery & Watches", subcategory: "Jewellery" },
+    { name: "OMEGA", category: "Jewellery & Watches", subcategory: "Luxury Watches" },
+    { name: "Pandora", category: "Jewellery & Watches", subcategory: "Fashion Jewellery" },
     { name: "Rox", category: "Jewellery & Watches", subcategory: "Jewellery" },
-    { name: "Swarovski", category: "Jewellery & Watches", subcategory: "Jewellery" },
+    { name: "Swarovski", category: "Jewellery & Watches", subcategory: "Crystal Jewellery" },
     { name: "Swatch", category: "Jewellery & Watches", subcategory: "Watches" },
-    { name: "TAG Heuer", category: "Jewellery & Watches", subcategory: "Watches" },
-    { name: "Watch Lab", category: "Jewellery & Watches", subcategory: "Watches" },
+    { name: "TAG Heuer", category: "Jewellery & Watches", subcategory: "Luxury Watches" },
+    { name: "Watch Lab", category: "Jewellery & Watches", subcategory: "Watch Repair" },
     { name: "Vincentius", category: "Jewellery & Watches", subcategory: "Art & Jewellery" },
 
     // ═══════════════════════════════════
     // ELECTRICAL & TECHNOLOGY
     // ═══════════════════════════════════
     { name: "Apple", category: "Electrical & Technology", subcategory: "Consumer Electronics", isAnchorTenant: true },
-    { name: "CEX", category: "Electrical & Technology", subcategory: "Entertainment Retail" },
+    { name: "CEX", category: "Electrical & Technology", subcategory: "Second Hand Electronics" },
     { name: "EE Store", category: "Electrical & Technology", subcategory: "Mobile Network" },
     { name: "iSmash", category: "Electrical & Technology", subcategory: "Mobile Repair" },
     { name: "Nespresso", category: "Electrical & Technology", subcategory: "Home Appliances" },
@@ -135,8 +139,10 @@ const tenants: TenantInput[] = [
     // ═══════════════════════════════════
     { name: "Build A Bear Workshop", category: "Gifts & Stationery", subcategory: "Toys" },
     { name: "Card Factory", category: "Gifts & Stationery", subcategory: "Cards & Gifts" },
+    { name: "Cass Art", category: "Gifts & Stationery", subcategory: "Art Supplies" },
     { name: "Claire's Accessories", category: "Gifts & Stationery", subcategory: "Accessories" },
     { name: "Clarendon Fine Art", category: "Gifts & Stationery", subcategory: "Art Gallery" },
+    { name: "LEGO Shop", category: "Gifts & Stationery", subcategory: "Toys" },
     { name: "Lindt", category: "Gifts & Stationery", subcategory: "Chocolatier" },
     { name: "Menkind Store", category: "Gifts & Stationery", subcategory: "Gadgets & Gifts" },
     { name: "MINISO", category: "Gifts & Stationery", subcategory: "Lifestyle" },
@@ -155,13 +161,14 @@ const tenants: TenantInput[] = [
     // ═══════════════════════════════════
     // FOOD & GROCERY
     // ═══════════════════════════════════
-    { name: "Home Bargains", category: "General Retail", subcategory: "Discount Store" },
     { name: "Tesco", category: "Food & Grocery", subcategory: "Supermarket" },
-    { name: "Hotel Chocolat", category: "Food & Grocery", subcategory: "Chocolatier" },
+    { name: "Hotel Chocolat", category: "Food & Grocery", subcategory: "Chocolate Shop" },
 
     // ═══════════════════════════════════
-    // SPORTS (separate stores)
+    // GENERAL RETAIL
     // ═══════════════════════════════════
+    { name: "Home Bargains", category: "General Retail", subcategory: "Discount Store" },
+    { name: "Poundland", category: "General Retail", subcategory: "Discount Store" },
     { name: "Liverpool FC Store", category: "General Retail", subcategory: "Sport Merchandise" },
     { name: "Everton Two Shop", category: "General Retail", subcategory: "Sport Merchandise" },
     { name: "Michael Franks", category: "General Retail", subcategory: "Specialist" },
@@ -179,6 +186,7 @@ const tenants: TenantInput[] = [
     { name: "Kuoni", category: "Services", subcategory: "Travel Agency" },
     { name: "Virgin Holidays", category: "Services", subcategory: "Travel Agency" },
     { name: "S&S News", category: "Services", subcategory: "Newsagent" },
+    { name: "Post Office", category: "Services", subcategory: "Post Office" },
 
     // ═══════════════════════════════════
     // LEISURE & ENTERTAINMENT
@@ -189,55 +197,70 @@ const tenants: TenantInput[] = [
     { name: "Flight Club", category: "Leisure & Entertainment", subcategory: "Social Gaming" },
     { name: "Junkyard Golf Club", category: "Leisure & Entertainment", subcategory: "Social Gaming" },
     { name: "Roxy Ball Room", category: "Leisure & Entertainment", subcategory: "Social Gaming" },
+    { name: "Upside Down House", category: "Leisure & Entertainment", subcategory: "Attraction" },
 
     // ═══════════════════════════════════
     // CAFES & RESTAURANTS
     // ═══════════════════════════════════
-    { name: "Nando's", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Five Guys", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Wagamama", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Pizza Express", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Pizza Hut", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "TGI Fridays", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Côte Brasserie", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Las Iguanas", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "The Botanist", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
+    { name: "Auntie Anne's Pretzels", category: "Cafes & Restaurants", subcategory: "Fast Food" },
+    { name: "Bagel Factory", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "Barburrito", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "Bean Coffee Roasters", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Bem Brasil", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Bierkeller", category: "Cafes & Restaurants", subcategory: "Bar" },
+    { name: "Black Sheep Coffee", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Brewski", category: "Cafes & Restaurants", subcategory: "Bar" },
     { name: "Browns Brasserie & Bar", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
+    { name: "Byron", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Café W", category: "Cafes & Restaurants", subcategory: "Cafe" },
+    { name: "Caffè Nero", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Chopstix", category: "Cafes & Restaurants", subcategory: "Fast Food" },
+    { name: "COSMO", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Costa Coffee", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
     { name: "Cosy Club", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
-    { name: "Lunya", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Piccolino", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Mamasan Bar & Brasserie", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
+    { name: "Côte Brasserie", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Five Guys", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
     { name: "Gordon Ramsay Bread Street Kitchen", category: "Cafes & Restaurants", subcategory: "Restaurant" },
     { name: "Gordon Ramsay Street Pizza", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Wahaca", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Turtle Bay", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
-    { name: "Thaikhun", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Maggie Fu", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Bem Brasil", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "COSMO", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Smashburger", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Heavenly Desserts", category: "Cafes & Restaurants", subcategory: "Dessert" },
-    { name: "KFC", category: "Cafes & Restaurants", subcategory: "Fast Food" },
-    { name: "Chopstix", category: "Cafes & Restaurants", subcategory: "Fast Food" },
     { name: "Greggs", category: "Cafes & Restaurants", subcategory: "Bakery" },
-    { name: "Barburrito", category: "Cafes & Restaurants", subcategory: "Fast Food" },
-    { name: "Jerk Junction", category: "Cafes & Restaurants", subcategory: "Fast Food" },
-    { name: "Auntie Anne's Pretzels", category: "Cafes & Restaurants", subcategory: "Fast Food" },
-    { name: "Mooboo", category: "Cafes & Restaurants", subcategory: "Bubble Tea" },
-    { name: "Costa Coffee", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
-    { name: "Caffè Nero", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
-    { name: "Pret a Manger", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Heavenly Desserts", category: "Cafes & Restaurants", subcategory: "Dessert Shop" },
+    { name: "Iced", category: "Cafes & Restaurants", subcategory: "Dessert Shop" },
+    { name: "Jerk Junction", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
     { name: "JOE & THE JUICE", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
-    { name: "Black Sheep Coffee", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "KFC", category: "Cafes & Restaurants", subcategory: "Fast Food" },
+    { name: "Las Iguanas", category: "Cafes & Restaurants", subcategory: "Restaurant" },
     { name: "Loretta's Parkside Tavern", category: "Cafes & Restaurants", subcategory: "Pub" },
-    { name: "Bierkeller", category: "Cafes & Restaurants", subcategory: "Bar" },
-    { name: "Brewski", category: "Cafes & Restaurants", subcategory: "Bar" },
-    { name: "Slug and Lettuce", category: "Cafes & Restaurants", subcategory: "Bar" },
-    { name: "Yates", category: "Cafes & Restaurants", subcategory: "Bar" },
-    { name: "Neapolitan Pizza & Bar", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Pizza Punks", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Lunya", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Maggie Fu", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Mamasan Bar & Brasserie", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
+    { name: "Mooboo", category: "Cafes & Restaurants", subcategory: "Bubble Tea" },
+    { name: "My Cookie Dough", category: "Cafes & Restaurants", subcategory: "Dessert Shop" },
+    { name: "Nando's", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "ORI Caffè", category: "Cafes & Restaurants", subcategory: "Cafe" },
+    { name: "Pizza Express", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Pret a Manger", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Salon Madre", category: "Cafes & Restaurants", subcategory: "Bar" },
+    { name: "Slim Chickens", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "Smoke & Dough", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Starbucks", category: "Cafes & Restaurants", subcategory: "Coffee Shop" },
+    { name: "Subway", category: "Cafes & Restaurants", subcategory: "Sandwich Shop" },
+    { name: "TGI Fridays", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "The Botanist", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
     { name: "The Real Greek", category: "Cafes & Restaurants", subcategory: "Restaurant" },
-    { name: "Red Dog Saloon", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Tortilla", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "Turtle Bay", category: "Cafes & Restaurants", subcategory: "Restaurant Bar" },
+    { name: "Wagamama", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Wingstop", category: "Cafes & Restaurants", subcategory: "Fast Casual" },
+    { name: "YO!", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+    { name: "Zizzi", category: "Cafes & Restaurants", subcategory: "Restaurant" },
+
+    // ═══════════════════════════════════
+    // HOTELS
+    // ═══════════════════════════════════
+    { name: "Hilton Liverpool", category: "Services", subcategory: "Hotel" },
+    { name: "Cove Apartments", category: "Services", subcategory: "Serviced Apartments" },
+    { name: "Novotel Liverpool", category: "Services", subcategory: "Hotel" },
+    { name: "School Lane Hotel", category: "Services", subcategory: "Hotel" },
 ];
 
 // ============================================================
@@ -250,19 +273,31 @@ async function enrichLocation() {
         where: { id: LOCATION_ID },
         data: {
             website: "https://www.liverpool-one.com",
+            phone: "0151 232 3100",
             numberOfStores: tenants.length,
             retailers: tenants.length,
             openedYear: 2008,
             totalFloorArea: 1399307, // 130,000m² ≈ 1,399,307 sqft
+            retailSpace: 1399307,
             numberOfFloors: 3,
             parkingSpaces: 2600,
+            carParkPrice: 2,
             owner: "Grosvenor Group",
-            management: "Grosvenor Group — open-air retail/leisure destination spanning 42 acres across 5 districts",
+            management: "Grosvenor Group",
+            anchorTenants: tenants.filter((t) => t.isAnchorTenant).length,
             openingHours: { "Mon-Fri": "10:00-20:00", Sat: "09:00-19:00", Sun: "11:00-17:00" },
-            publicTransit: "Liverpool Central station (Merseyrail, adjacent). Liverpool Lime Street main line station 10-min walk. Q1 bus station integrated.",
+            publicTransit:
+                "Liverpool Central station (Merseyrail, adjacent). Liverpool Lime Street main line station 10-min walk. Q1 bus station integrated.",
+            footfall: 30000000,
+            heroImage:
+                "https://tmpdmsmedia.newmindmedia.com/wsimgs/L1_upper_level_1591235076.png",
+            evCharging: true,
+            evChargingSpaces: 36,
             instagram: "https://www.instagram.com/liverpoolone/",
             facebook: "https://www.facebook.com/LiverpoolONE",
-            twitter: null,
+            twitter: "https://twitter.com/LiverpoolONE",
+            googleRating: 4.4,
+            googleReviews: 52000,
         },
     });
     console.log("✅ Location metadata updated");
@@ -317,6 +352,9 @@ async function updateLargestCategory() {
                 largestCategoryPercent: Number((cats[0]._count / total).toFixed(3)),
             },
         });
+        console.log(
+            `\n📊 Largest category: ${cats[0].category} (${((cats[0]._count / total) * 100).toFixed(1)}%)`
+        );
     }
 }
 
@@ -339,6 +377,9 @@ async function verify() {
             management: true,
             parkingSpaces: true,
             numberOfFloors: true,
+            footfall: true,
+            retailSpace: true,
+            heroImage: true,
             publicTransit: true,
             largestCategory: true,
             largestCategoryPercent: true,
@@ -351,9 +392,12 @@ async function verify() {
         console.log(`   Opened: ${loc.openedYear} | Owner: ${loc.owner}`);
         console.log(`   Stores: ${loc.numberOfStores} | DB Tenants: ${loc._count.tenants}`);
         console.log(`   Floors: ${loc.numberOfFloors} | Parking: ${loc.parkingSpaces}`);
-        console.log(`   Management: ${loc.management?.slice(0, 80)}...`);
-        console.log(`   Transit: ${loc.publicTransit?.slice(0, 100)}...`);
-        console.log(`   Largest: ${loc.largestCategory} (${((Number(loc.largestCategoryPercent) || 0) * 100).toFixed(1)}%)`);
+        console.log(`   Footfall: ${loc.footfall} | Retail Space: ${loc.retailSpace}`);
+        console.log(`   Hero Image: ${loc.heroImage ? "✅ Set" : "❌ Missing"}`);
+        console.log(`   Management: ${loc.management}`);
+        console.log(
+            `   Largest: ${loc.largestCategory} (${((Number(loc.largestCategoryPercent) || 0) * 100).toFixed(1)}%)`
+        );
     }
 
     const cats = await prisma.tenant.groupBy({

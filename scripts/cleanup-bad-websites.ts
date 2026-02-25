@@ -1,122 +1,86 @@
-// Remove low-quality and unsuitable website URLs
-import { PrismaClient } from '@prisma/client';
+#!/usr/bin/env tsx
+/**
+ * Cleanup script: nulls out bad website URLs (aggregators, chain stores, etc.)
+ * and deletes any tenants wrongly extracted from them.
+ */
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Domains to remove (same as blacklist in enrich-websites-v2.ts)
 const BAD_DOMAINS = [
-  'wheree.com',
-  'millngate.com',
-  'retail-systems.com',
-  'parkhousemedicalcentre.co.uk',
-  'clowes.co.uk',
-  'legallais.co.uk',
-  'fhp.co.uk',
-  'parkplaceretail.co.uk',
-  'completelyretail.co.uk',
-  'icatcare.org',
-  'petsathome.com',
-  'bmstores.co.uk',
-  'poundstretcher.co.uk',
-  'premierinn.com',
-  'expedia.com',
-  'alamy.com',
-  'skyscrapercity.com',
-  'amazonaws.com',
-  'lancs.live',
-  'nottinghampost.com',
-  'bordertelegraph.com',
-  'reddit.com',
-  'rome2rio.com',
-  'wikimedia.org',
-  'bristol.gov.uk',
-  'lancashire.gov.uk',
-  'monmouthshire.gov.uk',
-  'denbighshire.gov.uk',
-  'west-dunbarton.gov.uk',
-  'allsop.co.uk',
-  'costar.com',
-  'apple.com/place',
-  'maps.apple.com',
-  'cylex-uk.co.uk',
-  'lovebuildconstruction.com',
-  'jackson-partners.co.uk',
-  'nannycare.co.uk',
-  'ultimateaddons.com',
-  'rayleigh.cylex',
-  'discovereaststaffordshire.com',
-  'jorvikvikingcentre.co.uk',
-  'stores.tescomobile.com',
-  'intercom.help',
-  'townandcitygiftcards.com',
-  'barrowbc.gov.uk',
-  'branches.bankofscotland.co.uk',
-  'standardhotels.com',
-  'tripadvisor.com',
-  'bluediamond',
-  'macularsociety.org',
-  'rapleys.com',
-  'restaurants.subway.com',
-  'doona.shop',
-  'boots.jobs',
-  'retailers.tempur.com',
+  // Individual store pages
+  "stores.aldi.co.uk", "stores.sainsburys.co.uk", "stores.asda.com",
+  "stores.lidl.co.uk", "stores.morrisons.com",
+  // Fast food / restaurant chains
+  "kfc.co.uk", "dominos.co.uk", "papajohns.co.uk", "mcdonalds.com",
+  "justeat.com", "deliveroo.co.uk",
+  // Hotel / leisure chains
+  "premierinn.com", "travelodge.co.uk", "hilton.com", "booking.com",
+  "puregym.com", "placesleisure.org", "nuffieldhealth.com", "tenpin.co.uk",
+  // DIY / furniture / pet stores
+  "diy.com/store", "oakfurnitureland.co.uk", "wickes.co.uk",
+  "petsathome.com", "petsandfriends.co.uk", "jollyes.co.uk",
+  "matalan.co.uk/store", "safestore.co.uk", "dunelm.com/stores",
+  // Supermarket store locators
+  "tesco.com/store-locator", "sainsburys.co.uk/store",
+  // Coffee / food chains
+  "costa.co.uk", "vintageinn.co.uk",
+  // Property agents / listing sites
+  "completelyretail.co.uk", "inpost.co.uk", "savills.co.uk",
+  "jll.co.uk", "cushmanwakefield", "cbre.co.uk",
+  "thecrownestate.co.uk",
+  // Social / aggregator
+  "facebook.com", "instagram.com", "twitter.com", "linkedin.com",
+  "tripadvisor", "yelp.co.uk", "trustpilot.com",
+  // Gov / council
+  "gov.uk",
+  // Maps / shorteners
+  "maps.google", "goo.gl", "bit.ly",
+  // Misc wrong websites
+  "royalenfield.com",
+  "argos.co.uk/stores", "glasswells.co.uk", "tiso.com",
+  "mcarthurglen.com",
 ];
 
 async function main() {
-  console.log('🧹 Cleaning up bad website URLs\n');
-
-  // Get all locations with websites
-  const locations = await prisma.location.findMany({
-    where: {
-      website: { not: null }
-    },
-    select: { id: true, name: true, city: true, website: true }
+  const locs = await prisma.location.findMany({
+    where: { website: { not: null } },
+    select: { id: true, name: true, website: true },
   });
 
-  console.log(`📊 Found ${locations.length} locations with websites\n`);
-
-  let removedCount = 0;
-  const removedSites: Array<{ name: string; city: string; website: string }> = [];
-
-  for (const loc of locations) {
-    if (!loc.website) continue;
-
-    const urlLower = loc.website.toLowerCase();
-    const isBad = BAD_DOMAINS.some(domain => urlLower.includes(domain));
-
-    if (isBad) {
-      await prisma.location.update({
-        where: { id: loc.id },
-        data: { website: null }
-      });
-
-      removedSites.push({ name: loc.name, city: loc.city, website: loc.website });
-      removedCount++;
-      console.log(`❌ Removed: ${loc.name} (${loc.city})`);
-      console.log(`   ${loc.website}\n`);
+  const toClean: typeof locs = [];
+  for (const loc of locs) {
+    const w = (loc.website || "").toLowerCase();
+    if (BAD_DOMAINS.some((bad) => w.includes(bad))) {
+      toClean.push(loc);
     }
   }
 
-  console.log(`\n✅ Cleanup complete!`);
-  console.log(`   Removed: ${removedCount} bad websites`);
-  console.log(`   Kept: ${locations.length - removedCount} good websites\n`);
-
-  // Group by domain for summary
-  const domainCounts: Record<string, number> = {};
-  for (const site of removedSites) {
-    const domain = site.website.match(/https?:\/\/(?:www\.)?([^\/]+)/)?.[1] || 'unknown';
-    domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+  console.log(`Found ${toClean.length} locations with bad websites:\n`);
+  for (const l of toClean) {
+    console.log(`  - ${l.name.padEnd(45)} | ${(l.website || "").substring(0, 70)}`);
   }
 
-  console.log('📊 Removed by domain:');
-  Object.entries(domainCounts)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([domain, count]) => {
-      console.log(`   ${domain}: ${count}`);
-    });
+  // Null out bad websites
+  const ids = toClean.map((l) => l.id);
+  const result = await prisma.location.updateMany({
+    where: { id: { in: ids } },
+    data: { website: null },
+  });
+  console.log(`\n✅ Cleared ${result.count} bad website URLs`);
+
+  // Delete wrongly-extracted tenants from those locations
+  const deleted = await prisma.tenant.deleteMany({
+    where: { locationId: { in: ids } },
+  });
+  if (deleted.count > 0) {
+    console.log(`🗑️  Deleted ${deleted.count} tenants from bad-URL locations`);
+  }
 }
 
 main()
-  .catch(console.error)
+  .catch((err) => {
+    console.error("Error:", err);
+    process.exit(1);
+  })
   .finally(() => prisma.$disconnect());
-

@@ -131,8 +131,79 @@ model Location {
 
   // Relations
   tenants Tenant[]
+  spaces  Space[]
 
   @@map("locations")
+}
+
+enum SpaceType {
+  GENERAL
+  CHARITY
+  PREMIUM
+  PROMOTIONAL
+}
+
+enum BookingStatus {
+  CONFIRMED
+  UNCONFIRMED
+  CANCELLED
+}
+
+enum LicenseType {
+  PROMOTION
+  TENANCY
+}
+
+model Space {
+  id               String    @id @default(cuid())
+  locationId       String
+  name             String
+  type             SpaceType @default(GENERAL)
+  width            Decimal?  @db.Decimal(5, 2)
+  length           Decimal?  @db.Decimal(5, 2)
+  hasPower         Boolean   @default(false)
+  defaultDailyRate Decimal?  @db.Decimal(8, 2)
+  sortOrder        Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  location         Location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  bookings         SpaceBooking[]
+
+  @@unique([locationId, name])
+  @@map("spaces")
+}
+
+model SpaceBooking {
+  id            String        @id @default(cuid())
+  spaceId       String
+  reference     String        @unique
+  startDate     DateTime
+  endDate       DateTime
+  status        BookingStatus @default(UNCONFIRMED)
+  licenseType   LicenseType   @default(PROMOTION)
+
+  companyName   String
+  contactName   String?
+  contactEmail  String?
+  contactPhone  String?
+  brand         String?
+  setupDetail   String?
+  description   String?
+
+  dailyRate     Decimal?      @db.Decimal(8, 2)
+  totalValue    Decimal?      @db.Decimal(10, 2)
+
+  notes         String?
+  createdById   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  space         Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId, startDate, endDate])
+  @@map("space_bookings")
 }
 
 model Tenant {
