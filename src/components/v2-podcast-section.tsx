@@ -18,8 +18,59 @@ export function V2PodcastSection() {
                     </p>
                 </div>
 
-                {/* Featured Episode */}
+                {/* Featured Episode — Mark Robinson */}
                 <div className="max-w-4xl mx-auto">
+                    <Card className="border-[#D8D8D6] overflow-hidden">
+                        <CardContent className="p-0">
+                            <div className="aspect-video bg-[#D8D8D6]">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/UyaK6vUQQ7g"
+                                    title="Leadership, High Streets & the Future of Retail — Paul Clifford & Mark Robinson"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                />
+                            </div>
+                            <div className="p-6 md:p-8">
+                                <div className="flex items-start gap-4">
+                                    <Quote className="h-6 w-6 text-[#E6FB60] flex-shrink-0 mt-1" />
+                                    <div className="space-y-4">
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#4D4A46]">
+                                            Leadership, High Streets &amp; the Future of Retail
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Paul Clifford sits down with Mark Robinson for an open and insightful
+                                            conversation about leadership, the evolution of the high street, and the
+                                            realities of building sustainable businesses in today&apos;s retail landscape.
+                                            Together, they explore the challenges facing town centres, the importance of
+                                            innovation and collaboration, and why people — not just property — remain at the
+                                            heart of successful destinations.
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #Leadership
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #HighStreet
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #Placemaking
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #RetailFuture
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Previous Episode — NMTF */}
+                <div className="max-w-4xl mx-auto mt-8">
                     <Card className="border-[#D8D8D6] overflow-hidden">
                         <CardContent className="p-0">
                             <div className="aspect-video bg-[#D8D8D6]">
