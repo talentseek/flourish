@@ -10,7 +10,7 @@ export function V2Footer() {
                     {/* Social Media Icons */}
                     <div className="flex items-center gap-4">
                         <a
-                            href="https://www.facebook.com/p/This-is-Flourish-61555483902273/"
+                            href="https://www.facebook.com/thisisflourishuk"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:opacity-80 transition-opacity"
@@ -28,7 +28,7 @@ export function V2Footer() {
                             <Linkedin className="h-6 w-6 text-[#E6FB60]" />
                         </a>
                         <a
-                            href="https://www.instagram.com/this_is_flourish/"
+                            href="https://www.instagram.com/_thisisflourish_"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="hover:opacity-80 transition-opacity"
