@@ -11,13 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
+
 import { Textarea } from '@/components/ui/textarea'
 import { createBooking, updateBooking, updateBookingStatus } from '@/actions/space-actions'
 import { BookingStatus, LicenseType } from '@prisma/client'
@@ -68,9 +62,7 @@ export function BookingModal({
 }: BookingModalProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [licenseType, setLicenseType] = useState<string>(
-        booking?.licenseType || 'PROMOTION'
-    )
+
 
     const initialStart = booking?.startDate
         ? format(new Date(booking.startDate), 'yyyy-MM-dd')
@@ -234,19 +226,15 @@ export function BookingModal({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="licenseType">License Type *</Label>
-                            <input type="hidden" name="licenseType" value={licenseType} />
-                            <Select
-                                value={licenseType}
-                                onValueChange={setLicenseType}
+                            <select
+                                id="licenseType"
+                                name="licenseType"
+                                defaultValue={booking?.licenseType || 'PROMOTION'}
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
                             >
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="PROMOTION">Promotion</SelectItem>
-                                    <SelectItem value="TENANCY">Tenancy</SelectItem>
-                                </SelectContent>
-                            </Select>
+                                <option value="PROMOTION">Promotion</option>
+                                <option value="TENANCY">Tenancy</option>
+                            </select>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="brand">Brand</Label>
