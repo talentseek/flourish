@@ -36,6 +36,7 @@ export default async function AdminOperatorsPage() {
         updatedAt: op.updatedAt.toISOString(),
         licenses: op.licenses.map(lic => ({
             ...lic,
+            coverValue: lic.coverValue ? lic.coverValue.toString() : null,
             startDate: lic.startDate.toISOString(),
             endDate: lic.endDate.toISOString(),
             createdAt: lic.createdAt.toISOString(),

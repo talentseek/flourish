@@ -17,7 +17,8 @@ import { createBooking, updateBooking, updateBookingStatus } from '@/actions/spa
 import { searchOperators } from '@/actions/operator-actions'
 import { BookingStatus } from '@prisma/client'
 import { format } from 'date-fns'
-import { Search, ShieldCheck, ShieldAlert } from 'lucide-react'
+import { Search, ShieldCheck, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { checkBookingCompliance } from '@/lib/compliance-utils'
 
 interface OperatorResult {
     id: string
@@ -26,7 +27,8 @@ interface OperatorResult {
     contactName: string | null
     contactEmail: string | null
     contactPhone: string | null
-    licenses: { type: string; endDate: Date | string }[]
+    types: string[]
+    licenses: { type: string; endDate: Date | string; coverValue?: number | string | null }[]
 }
 
 interface BookingData {
@@ -100,6 +102,7 @@ export function BookingModal({
                 contactName: null,
                 contactEmail: null,
                 contactPhone: null,
+                types: [],
                 licenses: []
             })
             setOperatorSearch(booking.operator.companyName)
@@ -296,6 +299,25 @@ export function BookingModal({
                                 </div>
                             </div>
                         )}
+
+                        {/* Compliance warnings */}
+                        {selectedOperator && selectedOperator.types.length > 0 && (() => {
+                            const compliance = checkBookingCompliance(selectedOperator)
+                            if (compliance.canConfirm) return null
+                            return (
+                                <div className="border border-amber-300 bg-amber-50 rounded-md p-3 space-y-1">
+                                    <div className="flex items-center gap-2 text-amber-800 font-medium text-sm">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        Compliance issues — booking cannot be confirmed
+                                    </div>
+                                    <ul className="text-xs text-amber-700 list-disc pl-5 space-y-0.5">
+                                        {compliance.issues.map((issue, i) => (
+                                            <li key={i}>{issue}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )
+                        })()}
                     </div>
 
                     {/* Dates Row */}
@@ -385,18 +407,24 @@ export function BookingModal({
                     <DialogFooter className="flex items-center justify-between gap-2">
                         {mode === 'edit' && booking && (
                             <div className="flex gap-2 mr-auto">
-                                {booking.status !== 'CONFIRMED' && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleStatusChange('CONFIRMED')}
-                                        disabled={loading}
-                                        className="text-emerald-600 border-emerald-300 hover:bg-emerald-50"
-                                    >
-                                        Confirm
-                                    </Button>
-                                )}
+                                {booking.status !== 'CONFIRMED' && (() => {
+                                    const compliance = selectedOperator && selectedOperator.types.length > 0
+                                        ? checkBookingCompliance(selectedOperator)
+                                        : { canConfirm: false, issues: ['Operator data not loaded'] }
+                                    return (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleStatusChange('CONFIRMED')}
+                                            disabled={loading || !compliance.canConfirm}
+                                            className="text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+                                            title={compliance.canConfirm ? 'Confirm this booking' : compliance.issues.join(', ')}
+                                        >
+                                            Confirm
+                                        </Button>
+                                    )
+                                })()}
                                 {booking.status !== 'CANCELLED' && (
                                     <Button
                                         type="button"

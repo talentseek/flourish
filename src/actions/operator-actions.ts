@@ -171,6 +171,7 @@ interface AddLicenseData {
     reference?: string
     startDate: string
     endDate: string
+    coverValue?: number
     isVerified?: boolean
     notes?: string
 }
@@ -185,6 +186,7 @@ export async function addLicense(data: AddLicenseData) {
             reference: data.reference,
             startDate: new Date(data.startDate),
             endDate: new Date(data.endDate),
+            coverValue: data.coverValue,
             isVerified: data.isVerified || false,
             notes: data.notes,
         }
@@ -269,7 +271,7 @@ export async function searchOperators(query: string) {
                 where: {
                     endDate: { gte: new Date() }
                 },
-                select: { type: true, endDate: true }
+                select: { type: true, endDate: true, coverValue: true }
             }
         },
         orderBy: { companyName: 'asc' },

@@ -46,6 +46,7 @@ interface LicenseData {
     id: string
     type: LicenseCategory
     reference: string | null
+    coverValue: string | null
     startDate: string
     endDate: string
     isVerified: boolean
@@ -200,6 +201,9 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                 reference: (form.get('reference') as string) || undefined,
                 startDate: form.get('startDate') as string,
                 endDate: form.get('endDate') as string,
+                coverValue: form.get('coverValue')
+                    ? parseFloat(form.get('coverValue') as string)
+                    : undefined,
                 notes: (form.get('notes') as string) || undefined,
             })
 
@@ -385,6 +389,11 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                         {LICENSE_TYPES.find(lt => lt.value === lic.type)?.label || lic.type}
                                                                     </span>
                                                                     {lic.reference && <span className="text-muted-foreground">Ref: {lic.reference}</span>}
+                                                                    {lic.coverValue && (
+                                                                        <span className="text-muted-foreground font-medium">
+                                                                            Cover: £{Number(lic.coverValue).toLocaleString()}
+                                                                        </span>
+                                                                    )}
                                                                     <span className="text-muted-foreground">
                                                                         {formatDate(lic.startDate)} — {formatDate(lic.endDate)}
                                                                     </span>
@@ -530,6 +539,20 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                 <Label htmlFor="licEnd">End Date *</Label>
                                 <Input type="date" id="licEnd" name="endDate" required />
                             </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="coverValue">Cover Value (£)</Label>
+                            <Input
+                                type="number"
+                                step="1"
+                                id="coverValue"
+                                name="coverValue"
+                                placeholder="e.g. 5000000 or 10000000"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                PLI: £5m minimum (non-food) or £10m minimum (food operators)
+                            </p>
                         </div>
 
                         <div className="space-y-2">

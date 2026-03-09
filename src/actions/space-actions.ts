@@ -323,11 +323,36 @@ export async function updateBooking(bookingId: string, data: UpdateBookingData) 
 export async function updateBookingStatus(bookingId: string, status: BookingStatus) {
     const existing = await prisma.spaceBooking.findUnique({
         where: { id: bookingId },
-        include: { space: { select: { locationId: true } } }
+        include: {
+            space: { select: { locationId: true } },
+            operator: {
+                include: { licenses: true }
+            }
+        }
     })
     if (!existing) throw new Error('Booking not found')
 
     await verifyRMOrAdmin(existing.space.locationId)
+
+    // Compliance gate: block confirmation unless operator passes checks
+    if (status === 'CONFIRMED' && existing.operator) {
+        const { checkBookingCompliance } = await import('@/lib/compliance-utils')
+        const compliance = checkBookingCompliance({
+            types: existing.operator.types,
+            licenses: existing.operator.licenses.map(l => ({
+                type: l.type,
+                endDate: l.endDate,
+                coverValue: l.coverValue ? Number(l.coverValue) : null,
+            }))
+        })
+        if (!compliance.canConfirm) {
+            throw new Error(`Cannot confirm — compliance issues:\n• ${compliance.issues.join('\n• ')}`)
+        }
+    }
+
+    if (status === 'CONFIRMED' && !existing.operatorId) {
+        throw new Error('Cannot confirm a booking without an operator. Please assign an operator first.')
+    }
 
     const booking = await prisma.spaceBooking.update({
         where: { id: bookingId },
