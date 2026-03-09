@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, MapPin, Shield, ArrowRight } from "lucide-react"
+import { Users, MapPin, Shield, ArrowRight, Building2, CalendarDays } from "lucide-react"
 import Link from "next/link"
 import { prisma } from "@/lib/db"
 
@@ -10,12 +10,16 @@ export default async function AdminPage() {
         totalLocations,
         managedLocations,
         totalUsers,
-        regionalManagers
+        regionalManagers,
+        totalOperators,
+        totalSpaces,
     ] = await Promise.all([
         prisma.location.count(),
         prisma.location.count({ where: { isManaged: true } }),
         prisma.user.count(),
-        prisma.user.count({ where: { role: 'REGIONAL_MANAGER' } })
+        prisma.user.count({ where: { role: 'REGIONAL_MANAGER' } }),
+        prisma.operator.count({ where: { isActive: true } }),
+        prisma.space.count({ where: { isActive: true } }),
     ])
 
     return (
@@ -73,10 +77,31 @@ export default async function AdminPage() {
                         <p className="text-xs text-muted-foreground">Assigned to locations</p>
                     </CardContent>
                 </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Operators</CardTitle>
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{totalOperators}</div>
+                        <p className="text-xs text-muted-foreground">Registered operators</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Spaces</CardTitle>
+                        <CalendarDays className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{totalSpaces}</div>
+                        <p className="text-xs text-muted-foreground">Bookable spaces</p>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Quick Actions */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="hover:shadow-md transition-shadow">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -117,6 +142,29 @@ export default async function AdminPage() {
                         <Button asChild className="w-full">
                             <Link href="/admin/users">
                                 Manage Users
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Building2 className="h-5 w-5" />
+                            Operator Registry
+                        </CardTitle>
+                        <CardDescription>
+                            Manage operators, licenses, and compliance
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Register operators, track PLI and food hygiene certificates, and monitor compliance.
+                        </p>
+                        <Button asChild className="w-full">
+                            <Link href="/admin/operators">
+                                Manage Operators
                                 <ArrowRight className="h-4 w-4 ml-2" />
                             </Link>
                         </Button>

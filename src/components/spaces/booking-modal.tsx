@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -11,30 +11,40 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
 import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
 import { createBooking, updateBooking, updateBookingStatus } from '@/actions/space-actions'
-import { BookingStatus, LicenseType } from '@prisma/client'
+import { searchOperators } from '@/actions/operator-actions'
+import { BookingStatus } from '@prisma/client'
 import { format } from 'date-fns'
+import { Search, ShieldCheck, ShieldAlert } from 'lucide-react'
+
+interface OperatorResult {
+    id: string
+    companyName: string
+    tradingName: string | null
+    contactName: string | null
+    contactEmail: string | null
+    contactPhone: string | null
+    licenses: { type: string; endDate: Date | string }[]
+}
 
 interface BookingData {
     id: string
     reference: string
     spaceId: string
+    operatorId: string | null
     startDate: Date
     endDate: Date
     status: BookingStatus
-    licenseType: LicenseType
-    companyName: string
-    contactName?: string | null
-    contactEmail?: string | null
-    contactPhone?: string | null
+    companyName?: string | null
     brand?: string | null
     setupDetail?: string | null
     description?: string | null
     dailyRate?: number | null
     totalValue?: number | null
     notes?: string | null
+    operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 
 interface BookingModalProps {
@@ -63,6 +73,12 @@ export function BookingModal({
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+    // Operator picker state
+    const [operatorSearch, setOperatorSearch] = useState('')
+    const [operatorResults, setOperatorResults] = useState<OperatorResult[]>([])
+    const [selectedOperator, setSelectedOperator] = useState<OperatorResult | null>(null)
+    const [showResults, setShowResults] = useState(false)
+    const [searching, setSearching] = useState(false)
 
     const initialStart = booking?.startDate
         ? format(new Date(booking.startDate), 'yyyy-MM-dd')
@@ -74,8 +90,59 @@ export function BookingModal({
         ? format(new Date(booking.endDate), 'yyyy-MM-dd')
         : initialStart
 
+    // Pre-populate operator on edit
+    useEffect(() => {
+        if (mode === 'edit' && booking?.operator) {
+            setSelectedOperator({
+                id: booking.operator.id,
+                companyName: booking.operator.companyName,
+                tradingName: booking.operator.tradingName || null,
+                contactName: null,
+                contactEmail: null,
+                contactPhone: null,
+                licenses: []
+            })
+            setOperatorSearch(booking.operator.companyName)
+        } else if (mode === 'create') {
+            setSelectedOperator(null)
+            setOperatorSearch('')
+        }
+    }, [mode, booking, open])
+
+    const doSearch = useCallback(async (q: string) => {
+        if (q.length < 2) {
+            setOperatorResults([])
+            return
+        }
+        setSearching(true)
+        try {
+            const results = await searchOperators(q)
+            setOperatorResults(results as unknown as OperatorResult[])
+            setShowResults(true)
+        } catch {
+            setOperatorResults([])
+        } finally {
+            setSearching(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        const timer = setTimeout(() => doSearch(operatorSearch), 300)
+        return () => clearTimeout(timer)
+    }, [operatorSearch, doSearch])
+
+    function hasValidPLI(op: OperatorResult) {
+        return op.licenses.some(
+            l => l.type === 'PUBLIC_LIABILITY_INSURANCE' && new Date(l.endDate) > new Date()
+        )
+    }
+
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
+        if (!selectedOperator) {
+            setError('Please select an operator')
+            return
+        }
         setLoading(true)
         setError(null)
 
@@ -85,13 +152,9 @@ export function BookingModal({
             if (mode === 'create') {
                 await createBooking({
                     spaceId,
+                    operatorId: selectedOperator.id,
                     startDate: formData.get('startDate') as string,
                     endDate: formData.get('endDate') as string,
-                    companyName: formData.get('companyName') as string,
-                    contactName: (formData.get('contactName') as string) || undefined,
-                    contactEmail: (formData.get('contactEmail') as string) || undefined,
-                    contactPhone: (formData.get('contactPhone') as string) || undefined,
-                    licenseType: formData.get('licenseType') as LicenseType,
                     brand: (formData.get('brand') as string) || undefined,
                     setupDetail: (formData.get('setupDetail') as string) || undefined,
                     description: (formData.get('description') as string) || undefined,
@@ -102,13 +165,9 @@ export function BookingModal({
                 })
             } else if (booking) {
                 await updateBooking(booking.id, {
+                    operatorId: selectedOperator.id,
                     startDate: formData.get('startDate') as string,
                     endDate: formData.get('endDate') as string,
-                    companyName: formData.get('companyName') as string,
-                    contactName: (formData.get('contactName') as string) || undefined,
-                    contactEmail: (formData.get('contactEmail') as string) || undefined,
-                    contactPhone: (formData.get('contactPhone') as string) || undefined,
-                    licenseType: formData.get('licenseType') as LicenseType,
                     brand: (formData.get('brand') as string) || undefined,
                     setupDetail: (formData.get('setupDetail') as string) || undefined,
                     description: (formData.get('description') as string) || undefined,
@@ -153,89 +212,106 @@ export function BookingModal({
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Operator Picker */}
+                    <div className="space-y-2">
+                        <Label>Operator *</Label>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search operators..."
+                                value={operatorSearch}
+                                onChange={e => {
+                                    setOperatorSearch(e.target.value)
+                                    setSelectedOperator(null)
+                                }}
+                                onFocus={() => operatorSearch.length >= 2 && setShowResults(true)}
+                                className="pl-9"
+                            />
+                            {searching && (
+                                <span className="absolute right-3 top-2.5 text-xs text-muted-foreground">Searching...</span>
+                            )}
+                        </div>
+
+                        {/* Search Results Dropdown */}
+                        {showResults && operatorResults.length > 0 && !selectedOperator && (
+                            <div className="border rounded-md max-h-48 overflow-y-auto bg-background shadow-md">
+                                {operatorResults.map(op => (
+                                    <button
+                                        key={op.id}
+                                        type="button"
+                                        className="w-full text-left px-3 py-2 hover:bg-muted flex items-center justify-between text-sm"
+                                        onClick={() => {
+                                            setSelectedOperator(op)
+                                            setOperatorSearch(op.companyName)
+                                            setShowResults(false)
+                                        }}
+                                    >
+                                        <div>
+                                            <span className="font-medium">{op.companyName}</span>
+                                            {op.tradingName && <span className="text-muted-foreground ml-1">(t/a {op.tradingName})</span>}
+                                        </div>
+                                        {hasValidPLI(op) ? (
+                                            <ShieldCheck className="h-4 w-4 text-green-600" />
+                                        ) : (
+                                            <ShieldAlert className="h-4 w-4 text-red-500" />
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {showResults && operatorResults.length === 0 && operatorSearch.length >= 2 && !searching && !selectedOperator && (
+                            <p className="text-xs text-muted-foreground p-2">No operators found. Add one at /admin/operators first.</p>
+                        )}
+
+                        {/* Selected Operator Card */}
+                        {selectedOperator && (
+                            <div className="border rounded-md p-3 bg-muted/30 flex items-center justify-between">
+                                <div>
+                                    <div className="font-medium text-sm">{selectedOperator.companyName}</div>
+                                    {selectedOperator.contactName && (
+                                        <div className="text-xs text-muted-foreground">
+                                            {selectedOperator.contactName}
+                                            {selectedOperator.contactEmail && ` · ${selectedOperator.contactEmail}`}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {hasValidPLI(selectedOperator) ? (
+                                        <Badge className="bg-green-600 text-xs gap-1"><ShieldCheck className="h-3 w-3" />PLI Valid</Badge>
+                                    ) : (
+                                        <Badge variant="destructive" className="text-xs gap-1"><ShieldAlert className="h-3 w-3" />No PLI</Badge>
+                                    )}
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                            setSelectedOperator(null)
+                                            setOperatorSearch('')
+                                        }}
+                                    >
+                                        Change
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Dates Row */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="startDate">Start Date *</Label>
-                            <Input
-                                type="date"
-                                id="startDate"
-                                name="startDate"
-                                defaultValue={initialStart}
-                                required
-                            />
+                            <Input type="date" id="startDate" name="startDate" defaultValue={initialStart} required />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="endDate">End Date *</Label>
-                            <Input
-                                type="date"
-                                id="endDate"
-                                name="endDate"
-                                defaultValue={initialEnd}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Company & Contact */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="companyName">Company Name *</Label>
-                            <Input
-                                id="companyName"
-                                name="companyName"
-                                defaultValue={booking?.companyName || ''}
-                                placeholder="e.g. Scottish Power"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contactName">Contact Name</Label>
-                            <Input
-                                id="contactName"
-                                name="contactName"
-                                defaultValue={booking?.contactName || ''}
-                                placeholder="John Smith"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="contactEmail">Email</Label>
-                            <Input
-                                type="email"
-                                id="contactEmail"
-                                name="contactEmail"
-                                defaultValue={booking?.contactEmail || ''}
-                                placeholder="john@company.com"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="contactPhone">Phone</Label>
-                            <Input
-                                id="contactPhone"
-                                name="contactPhone"
-                                defaultValue={booking?.contactPhone || ''}
-                                placeholder="07..."
-                            />
+                            <Input type="date" id="endDate" name="endDate" defaultValue={initialEnd} required />
                         </div>
                     </div>
 
                     {/* Booking Details */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="licenseType">License Type *</Label>
-                            <select
-                                id="licenseType"
-                                name="licenseType"
-                                defaultValue={booking?.licenseType || 'PROMOTION'}
-                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
-                            >
-                                <option value="PROMOTION">Promotion</option>
-                                <option value="TENANCY">Tenancy</option>
-                            </select>
-                        </div>
                         <div className="space-y-2">
                             <Label htmlFor="brand">Brand</Label>
                             <Input
@@ -245,9 +321,6 @@ export function BookingModal({
                                 placeholder="e.g. Sky, Tesla"
                             />
                         </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="dailyRate">Daily Rate (£)</Label>
                             <Input
@@ -264,14 +337,6 @@ export function BookingModal({
                                 }
                                 placeholder="0.00"
                             />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Total Value</Label>
-                            <div className="text-sm text-muted-foreground pt-2">
-                                {booking?.totalValue != null
-                                    ? `£${Number(booking.totalValue).toFixed(2)}`
-                                    : 'Calculated on save'}
-                            </div>
                         </div>
                     </div>
 
@@ -306,6 +371,12 @@ export function BookingModal({
                             rows={2}
                         />
                     </div>
+
+                    {booking?.totalValue != null && (
+                        <div className="text-sm text-muted-foreground">
+                            Total Value: £{Number(booking.totalValue).toFixed(2)}
+                        </div>
+                    )}
 
                     {error && (
                         <p className="text-sm text-red-500 bg-red-50 p-2 rounded">{error}</p>

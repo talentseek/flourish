@@ -8,10 +8,8 @@ import { BookingCard } from './booking-card'
 import { BookingModal } from './booking-modal'
 import { SpaceDiaryToolbar } from './space-diary-toolbar'
 import { getBookingsForDiary } from '@/actions/space-actions'
-import { BookingStatus, LicenseType, SpaceType } from '@prisma/client'
+import { BookingStatus, SpaceType } from '@prisma/client'
 import { cn } from '@/lib/utils'
-
-// --- Types ---
 
 interface SpaceData {
     id: string
@@ -24,20 +22,18 @@ interface BookingData {
     id: string
     reference: string
     spaceId: string
+    operatorId: string | null
     startDate: Date
     endDate: Date
     status: BookingStatus
-    licenseType: LicenseType
-    companyName: string
-    contactName?: string | null
-    contactEmail?: string | null
-    contactPhone?: string | null
+    companyName?: string | null
     brand?: string | null
     setupDetail?: string | null
     description?: string | null
     dailyRate?: number | null
     totalValue?: number | null
     notes?: string | null
+    operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 
 interface SpaceDiaryGridProps {
@@ -62,7 +58,6 @@ export function SpaceDiaryGrid({
     const [activeFilter, setActiveFilter] = useState<BookingStatus | 'ALL'>('ALL')
     const [isPending, startTransition] = useTransition()
 
-    // Modal state
     const [modalOpen, setModalOpen] = useState(false)
     const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
     const [selectedSpaceId, setSelectedSpaceId] = useState<string>('')
@@ -74,40 +69,29 @@ export function SpaceDiaryGrid({
     const windowEnd = addDays(windowStart, DAYS_VISIBLE - 1)
     const days = Array.from({ length: DAYS_VISIBLE }, (_, i) => addDays(windowStart, i))
 
+    const mapBookings = useCallback((raw: Awaited<ReturnType<typeof getBookingsForDiary>>): BookingData[] => {
+        return raw.map((b) => ({
+            ...b,
+            startDate: new Date(b.startDate),
+            endDate: new Date(b.endDate),
+            dailyRate: b.dailyRate ? Number(b.dailyRate) : null,
+            totalValue: b.totalValue ? Number(b.totalValue) : null,
+        }))
+    }, [])
+
     const refreshBookings = useCallback(() => {
         startTransition(async () => {
-            const fresh = await getBookingsForDiary(
-                locationId,
-                windowStart,
-                addDays(windowStart, DAYS_VISIBLE - 1)
-            )
-            setBookings(
-                fresh.map((b) => ({
-                    ...b,
-                    startDate: new Date(b.startDate),
-                    endDate: new Date(b.endDate),
-                    dailyRate: b.dailyRate ? Number(b.dailyRate) : null,
-                    totalValue: b.totalValue ? Number(b.totalValue) : null,
-                }))
-            )
+            const fresh = await getBookingsForDiary(locationId, windowStart, addDays(windowStart, DAYS_VISIBLE - 1))
+            setBookings(mapBookings(fresh))
         })
-    }, [locationId, windowStart])
+    }, [locationId, windowStart, mapBookings])
 
     function navigateDays(offset: number) {
         const newStart = addDays(windowStart, offset)
         setWindowStart(newStart)
         startTransition(async () => {
-            const newEnd = addDays(newStart, DAYS_VISIBLE - 1)
-            const fresh = await getBookingsForDiary(locationId, newStart, newEnd)
-            setBookings(
-                fresh.map((b) => ({
-                    ...b,
-                    startDate: new Date(b.startDate),
-                    endDate: new Date(b.endDate),
-                    dailyRate: b.dailyRate ? Number(b.dailyRate) : null,
-                    totalValue: b.totalValue ? Number(b.totalValue) : null,
-                }))
-            )
+            const fresh = await getBookingsForDiary(locationId, newStart, addDays(newStart, DAYS_VISIBLE - 1))
+            setBookings(mapBookings(fresh))
         })
     }
 
@@ -115,17 +99,8 @@ export function SpaceDiaryGrid({
         const today = startOfDay(new Date())
         setWindowStart(today)
         startTransition(async () => {
-            const end = addDays(today, DAYS_VISIBLE - 1)
-            const fresh = await getBookingsForDiary(locationId, today, end)
-            setBookings(
-                fresh.map((b) => ({
-                    ...b,
-                    startDate: new Date(b.startDate),
-                    endDate: new Date(b.endDate),
-                    dailyRate: b.dailyRate ? Number(b.dailyRate) : null,
-                    totalValue: b.totalValue ? Number(b.totalValue) : null,
-                }))
-            )
+            const fresh = await getBookingsForDiary(locationId, today, addDays(today, DAYS_VISIBLE - 1))
+            setBookings(mapBookings(fresh))
         })
     }
 
@@ -149,7 +124,6 @@ export function SpaceDiaryGrid({
         setModalOpen(true)
     }
 
-    // Get bookings for a specific space on a specific day
     function getBookingsForCell(spaceId: string, date: Date): BookingData[] {
         return bookings.filter((b) => {
             if (b.spaceId !== spaceId) return false
@@ -161,15 +135,12 @@ export function SpaceDiaryGrid({
         })
     }
 
-    // Check if a booking starts on this day (to render the card)
     function isBookingStart(booking: BookingData, date: Date): boolean {
         const bStart = startOfDay(new Date(booking.startDate))
         const wStart = startOfDay(windowStart)
-        // Show at the start of the booking, or at the start of the window if booking started before
         return isSameDay(bStart, date) || (bStart < wStart && isSameDay(date, wStart))
     }
 
-    // Calculate how many columns a booking spans from a given start day
     function getBookingSpan(booking: BookingData, fromDate: Date): number {
         const bEnd = startOfDay(new Date(booking.endDate))
         const lastVisible = addDays(windowStart, DAYS_VISIBLE - 1)
@@ -185,7 +156,6 @@ export function SpaceDiaryGrid({
                 locationName={locationName}
             />
 
-            {/* Date Navigation */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon" onClick={() => navigateDays(-DAYS_VISIBLE)} disabled={isPending}>
@@ -204,7 +174,6 @@ export function SpaceDiaryGrid({
                 </span>
             </div>
 
-            {/* Grid */}
             <div className={cn(
                 'border rounded-lg overflow-x-auto',
                 isPending && 'opacity-60 pointer-events-none'
@@ -234,10 +203,7 @@ export function SpaceDiaryGrid({
                     <tbody>
                         {spaces.length === 0 ? (
                             <tr>
-                                <td
-                                    colSpan={DAYS_VISIBLE + 1}
-                                    className="text-center text-muted-foreground py-12"
-                                >
+                                <td colSpan={DAYS_VISIBLE + 1} className="text-center text-muted-foreground py-12">
                                     No spaces configured. Ask an admin to add spaces for this location.
                                 </td>
                             </tr>
@@ -283,14 +249,10 @@ export function SpaceDiaryGrid({
                                                             }}
                                                         >
                                                             <BookingCard
-                                                                id={booking.id}
-                                                                reference={booking.reference}
+                                                                status={booking.status}
                                                                 companyName={booking.companyName}
                                                                 brand={booking.brand}
-                                                                status={booking.status}
-                                                                startDate={booking.startDate}
-                                                                endDate={booking.endDate}
-                                                                dailyRate={booking.dailyRate}
+                                                                operator={booking.operator}
                                                                 onClick={() => handleBookingClick(booking, space)}
                                                             />
                                                         </div>
@@ -311,7 +273,6 @@ export function SpaceDiaryGrid({
                 </table>
             </div>
 
-            {/* Booking Modal */}
             <BookingModal
                 open={modalOpen}
                 onOpenChange={setModalOpen}

@@ -1,45 +1,31 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { BookingStatus } from '@prisma/client'
 
 interface BookingCardProps {
-    id: string
-    reference: string
-    companyName: string
+    status: string
+    companyName?: string | null
     brand?: string | null
-    status: BookingStatus
-    startDate: Date
-    endDate: Date
-    dailyRate?: number | null
+    operator?: { companyName: string; tradingName?: string | null } | null
     onClick?: () => void
 }
 
-const statusColors: Record<BookingStatus, string> = {
-    CONFIRMED: 'bg-emerald-500/90 hover:bg-emerald-500 border-emerald-600',
-    UNCONFIRMED: 'bg-amber-500/90 hover:bg-amber-500 border-amber-600',
-    CANCELLED: 'bg-red-400/70 hover:bg-red-400 border-red-500 line-through opacity-60',
-}
-
-export function BookingCard({
-    reference,
-    companyName,
-    brand,
-    status,
-    onClick,
-}: BookingCardProps) {
-    const displayName = brand || companyName
+export function BookingCard({ status, companyName, brand, operator, onClick }: BookingCardProps) {
+    const displayName = operator?.companyName || companyName || 'Unknown'
+    const displaySub = brand || operator?.tradingName || null
 
     return (
         <button
             onClick={onClick}
             className={cn(
-                'w-full text-left px-2 py-1 rounded text-xs font-medium text-white truncate border transition-colors cursor-pointer',
-                statusColors[status]
+                'w-full text-left text-[11px] px-1.5 py-0.5 rounded truncate font-medium leading-tight',
+                status === 'CONFIRMED' && 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+                status === 'UNCONFIRMED' && 'bg-amber-100 text-amber-800 border border-amber-200',
+                status === 'CANCELLED' && 'bg-red-100 text-red-800 border border-red-200 line-through opacity-60'
             )}
-            title={`${reference} — ${companyName}${brand ? ` (${brand})` : ''} — ${status}`}
         >
             {displayName}
+            {displaySub && <span className="opacity-70"> · {displaySub}</span>}
         </button>
     )
 }

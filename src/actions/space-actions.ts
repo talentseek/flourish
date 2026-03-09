@@ -3,7 +3,7 @@
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { BookingStatus, LicenseType, SpaceType } from '@prisma/client'
+import { BookingStatus, SpaceType } from '@prisma/client'
 
 // --- Auth Helpers ---
 
@@ -20,10 +20,7 @@ async function verifyRMOrAdmin(locationId?: string) {
     if (dbUser.role === 'ADMIN') return dbUser
 
     if (dbUser.role === 'REGIONAL_MANAGER') {
-        if (!locationId) {
-            // For cross-location queries, just verify they are RM
-            return dbUser
-        }
+        if (!locationId) return dbUser
         const location = await prisma.location.findFirst({
             where: { id: locationId, regionalManager: dbUser.name, isManaged: true }
         })
@@ -140,7 +137,6 @@ export async function updateSpace(spaceId: string, data: UpdateSpaceData) {
 export async function deleteSpace(spaceId: string) {
     await verifyAdmin()
 
-    // Soft delete
     const space = await prisma.space.update({
         where: { id: spaceId },
         data: { isActive: false }
@@ -153,38 +149,6 @@ export async function deleteSpace(spaceId: string) {
 
 // --- Booking CRUD ---
 
-export async function getBookingsForLocation(
-    locationId: string,
-    startDate?: Date,
-    endDate?: Date
-) {
-    await verifyRMOrAdmin(locationId)
-
-    const dateFilter: Record<string, unknown> = {}
-    if (startDate) dateFilter.gte = startDate
-    if (endDate) dateFilter.lte = endDate
-
-    return prisma.spaceBooking.findMany({
-        where: {
-            space: { locationId, isActive: true },
-            ...(startDate || endDate
-                ? {
-                    OR: [
-                        { startDate: Object.keys(dateFilter).length ? dateFilter : undefined },
-                        { endDate: Object.keys(dateFilter).length ? dateFilter : undefined }
-                    ]
-                }
-                : {})
-        },
-        include: {
-            space: {
-                select: { id: true, name: true, type: true, locationId: true }
-            }
-        },
-        orderBy: { startDate: 'asc' }
-    })
-}
-
 export async function getBookingsForDiary(
     locationId: string,
     windowStart: Date,
@@ -192,7 +156,6 @@ export async function getBookingsForDiary(
 ) {
     await verifyRMOrAdmin(locationId)
 
-    // Fetch all bookings that overlap with the visible window
     return prisma.spaceBooking.findMany({
         where: {
             space: { locationId, isActive: true },
@@ -202,6 +165,9 @@ export async function getBookingsForDiary(
         include: {
             space: {
                 select: { id: true, name: true, type: true }
+            },
+            operator: {
+                select: { id: true, companyName: true, tradingName: true }
             }
         },
         orderBy: { startDate: 'asc' }
@@ -210,21 +176,18 @@ export async function getBookingsForDiary(
 
 export async function getBookingsForRegionalManager() {
     const user = await verifyRMOrAdmin()
-
     if (!user.name) return []
 
-    // Get all locations assigned to this RM
     const locations = await prisma.location.findMany({
         where: { regionalManager: user.name, isManaged: true },
         select: { id: true, name: true }
     })
-
     if (locations.length === 0) return []
 
-    const bookings = await prisma.spaceBooking.findMany({
+    return prisma.spaceBooking.findMany({
         where: {
             space: {
-                locationId: { in: locations.map(l => l.id) },
+                locationId: { in: locations.map((l: { id: string }) => l.id) },
                 isActive: true
             },
             status: { not: 'CANCELLED' },
@@ -237,24 +200,21 @@ export async function getBookingsForRegionalManager() {
                     name: true,
                     location: { select: { id: true, name: true } }
                 }
+            },
+            operator: {
+                select: { id: true, companyName: true }
             }
         },
         orderBy: { startDate: 'asc' },
         take: 50
     })
-
-    return bookings
 }
 
 interface CreateBookingData {
     spaceId: string
+    operatorId: string
     startDate: string
     endDate: string
-    companyName: string
-    contactName?: string
-    contactEmail?: string
-    contactPhone?: string
-    licenseType?: LicenseType
     brand?: string
     setupDetail?: string
     description?: string
@@ -264,12 +224,17 @@ interface CreateBookingData {
 }
 
 export async function createBooking(data: CreateBookingData) {
-    // Get the space to verify location access
     const space = await prisma.space.findUnique({
         where: { id: data.spaceId },
         select: { locationId: true, defaultDailyRate: true }
     })
     if (!space) throw new Error('Space not found')
+
+    const operator = await prisma.operator.findUnique({
+        where: { id: data.operatorId },
+        select: { id: true, companyName: true, isActive: true }
+    })
+    if (!operator || !operator.isActive) throw new Error('Operator not found or inactive')
 
     const user = await verifyRMOrAdmin(space.locationId)
     const reference = await generateBookingReference()
@@ -283,14 +248,11 @@ export async function createBooking(data: CreateBookingData) {
     const booking = await prisma.spaceBooking.create({
         data: {
             spaceId: data.spaceId,
+            operatorId: data.operatorId,
             reference,
             startDate: start,
             endDate: end,
-            companyName: data.companyName,
-            contactName: data.contactName,
-            contactEmail: data.contactEmail,
-            contactPhone: data.contactPhone,
-            licenseType: data.licenseType || 'PROMOTION',
+            companyName: operator.companyName,
             brand: data.brand,
             setupDetail: data.setupDetail,
             description: data.description,
@@ -308,13 +270,9 @@ export async function createBooking(data: CreateBookingData) {
 }
 
 interface UpdateBookingData {
+    operatorId?: string
     startDate?: string
     endDate?: string
-    companyName?: string
-    contactName?: string
-    contactEmail?: string
-    contactPhone?: string
-    licenseType?: LicenseType
     brand?: string
     setupDetail?: string
     description?: string
@@ -336,7 +294,14 @@ export async function updateBooking(bookingId: string, data: UpdateBookingData) 
     if (data.startDate) updateData.startDate = new Date(data.startDate)
     if (data.endDate) updateData.endDate = new Date(data.endDate)
 
-    // Recalculate total if dates or rate changed
+    if (data.operatorId) {
+        const op = await prisma.operator.findUnique({
+            where: { id: data.operatorId },
+            select: { companyName: true }
+        })
+        if (op) updateData.companyName = op.companyName
+    }
+
     if (data.startDate || data.endDate || data.dailyRate !== undefined) {
         const start = data.startDate ? new Date(data.startDate) : existing.startDate
         const end = data.endDate ? new Date(data.endDate) : existing.endDate
@@ -387,7 +352,6 @@ export async function searchBookings(
 
     const where: Record<string, unknown> = {}
 
-    // RM can only see their locations
     if (user.role === 'REGIONAL_MANAGER' && user.name) {
         where.space = {
             location: { regionalManager: user.name, isManaged: true },
@@ -401,8 +365,9 @@ export async function searchBookings(
         where.OR = [
             { companyName: { contains: query, mode: 'insensitive' } },
             { brand: { contains: query, mode: 'insensitive' } },
-            { contactName: { contains: query, mode: 'insensitive' } },
-            { reference: { contains: query, mode: 'insensitive' } }
+            { reference: { contains: query, mode: 'insensitive' } },
+            { operator: { companyName: { contains: query, mode: 'insensitive' } } },
+            { operator: { tradingName: { contains: query, mode: 'insensitive' } } },
         ]
     }
 
@@ -419,6 +384,9 @@ export async function searchBookings(
                     name: true,
                     location: { select: { id: true, name: true } }
                 }
+            },
+            operator: {
+                select: { id: true, companyName: true, tradingName: true }
             }
         },
         orderBy: { startDate: 'desc' },
@@ -426,7 +394,7 @@ export async function searchBookings(
     })
 }
 
-// --- Location helpers for space pages ---
+// --- Location helpers ---
 
 export async function getManagedLocationsForSpaces() {
     const user = await verifyRMOrAdmin()
@@ -439,7 +407,6 @@ export async function getManagedLocationsForSpaces() {
         })
     }
 
-    // RM: only their locations
     if (!user.name) return []
     return prisma.location.findMany({
         where: { isManaged: true, regionalManager: user.name },

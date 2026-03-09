@@ -149,9 +149,79 @@ enum BookingStatus {
   CANCELLED
 }
 
-enum LicenseType {
-  PROMOTION
-  TENANCY
+enum OperatorType {
+  GENERAL
+  CHARITY
+  FOOD_AND_BEVERAGE
+  RETAIL
+  SERVICES
+  PROMOTIONAL
+}
+
+enum LicenseCategory {
+  PUBLIC_LIABILITY_INSURANCE
+  FOOD_HYGIENE
+  GENERAL_LICENSE
+  STREET_TRADING
+  ALCOHOL_LICENSE
+  FIRE_SAFETY
+  OTHER
+}
+
+enum ComplianceStatus {
+  NOT_CHECKED
+  PASSED
+  FAILED
+  EXPIRED
+}
+
+model Operator {
+  id                  String            @id @default(cuid())
+  companyName         String
+  tradingName         String?
+  contactName         String?
+  contactEmail        String?
+  contactPhone        String?
+  address             String?
+  website             String?
+
+  types               OperatorType[]
+
+  companiesHouseCheck ComplianceStatus  @default(NOT_CHECKED)
+  companiesHouseDate  DateTime?
+  companiesHouseRef   String?
+  creditCheck         ComplianceStatus  @default(NOT_CHECKED)
+  creditCheckDate     DateTime?
+
+  notes               String?
+  isActive            Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  licenses            OperatorLicense[]
+  bookings            SpaceBooking[]
+
+  @@map("operators")
+}
+
+model OperatorLicense {
+  id           String          @id @default(cuid())
+  operatorId   String
+  type         LicenseCategory
+  reference    String?
+  startDate    DateTime
+  endDate      DateTime
+  isVerified   Boolean         @default(false)
+  documentUrl  String?
+  notes        String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  operator     Operator        @relation(fields: [operatorId], references: [id], onDelete: Cascade)
+
+  @@index([operatorId])
+  @@index([endDate])
+  @@map("operator_licenses")
 }
 
 model Space {
@@ -178,16 +248,13 @@ model Space {
 model SpaceBooking {
   id            String        @id @default(cuid())
   spaceId       String
+  operatorId    String?
   reference     String        @unique
   startDate     DateTime
   endDate       DateTime
   status        BookingStatus @default(UNCONFIRMED)
-  licenseType   LicenseType   @default(PROMOTION)
 
-  companyName   String
-  contactName   String?
-  contactEmail  String?
-  contactPhone  String?
+  companyName   String?
   brand         String?
   setupDetail   String?
   description   String?
@@ -201,8 +268,10 @@ model SpaceBooking {
   updatedAt     DateTime      @updatedAt
 
   space         Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  operator      Operator?     @relation(fields: [operatorId], references: [id])
 
   @@index([spaceId, startDate, endDate])
+  @@index([operatorId])
   @@map("space_bookings")
 }
 
