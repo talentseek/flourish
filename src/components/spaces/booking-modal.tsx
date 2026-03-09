@@ -68,6 +68,9 @@ export function BookingModal({
 }: BookingModalProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [licenseType, setLicenseType] = useState<string>(
+        booking?.licenseType || 'PROMOTION'
+    )
 
     const initialStart = booking?.startDate
         ? format(new Date(booking.startDate), 'yyyy-MM-dd')
@@ -231,9 +234,10 @@ export function BookingModal({
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="licenseType">License Type *</Label>
+                            <input type="hidden" name="licenseType" value={licenseType} />
                             <Select
-                                name="licenseType"
-                                defaultValue={booking?.licenseType || 'PROMOTION'}
+                                value={licenseType}
+                                onValueChange={setLicenseType}
                             >
                                 <SelectTrigger>
                                     <SelectValue />
