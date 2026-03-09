@@ -170,6 +170,29 @@ export default async function AdminPage() {
                         </Button>
                     </CardContent>
                 </Card>
+
+                <Card className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <CalendarDays className="h-5 w-5" />
+                            Space Management
+                        </CardTitle>
+                        <CardDescription>
+                            Configure bookable spaces per location
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                            Add, edit, and manage kiosks, stands, and bookable areas for each location.
+                        </p>
+                        <Button asChild className="w-full">
+                            <Link href="/admin/spaces">
+                                Manage Spaces
+                                <ArrowRight className="h-4 w-4 ml-2" />
+                            </Link>
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
