@@ -28,6 +28,7 @@ import {
     deleteOperator,
     addLicense,
     removeLicense,
+    checkCompaniesHouse,
 } from '@/actions/operator-actions'
 import { OperatorType, LicenseCategory, ComplianceStatus } from '@prisma/client'
 import {
@@ -39,6 +40,8 @@ import {
     ShieldCheck,
     ShieldAlert,
     AlertTriangle,
+    RefreshCw,
+    Building2,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -66,6 +69,8 @@ interface OperatorData {
     companiesHouseCheck: ComplianceStatus
     companiesHouseDate: string | null
     companiesHouseRef: string | null
+    accountsNextDue: string | null
+    confirmationNextDue: string | null
     creditCheck: ComplianceStatus
     creditCheckDate: string | null
     notes: string | null
@@ -233,6 +238,23 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         )
     }
 
+    async function handleCheckCH(operatorId: string) {
+        setLoading(true)
+        try {
+            const result = await checkCompaniesHouse(operatorId)
+            if (result.found) {
+                alert(`Companies House: ${result.isActive ? 'ACTIVE' : 'NOT ACTIVE'}\nCompany: ${result.company?.companyName || 'N/A'}\nNumber: ${result.company?.companyNumber || 'N/A'}`)
+            } else {
+                alert(`Companies House check failed: ${result.error || 'Company not found'}`)
+            }
+            router.refresh()
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to check')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     function hasValidPLI(op: OperatorData) {
         return op.licenses.some(
             l => l.type === 'PUBLIC_LIABILITY_INSURANCE' && daysUntil(l.endDate) > 0
@@ -361,6 +383,54 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                     {expandedId === op.id && (
                                         <TableRow key={`${op.id}-licenses`}>
                                             <TableCell colSpan={9} className="bg-muted/30 p-4">
+                                                {/* Companies House Section */}
+                                                <div className="mb-4 rounded-md border p-3 bg-background">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                                                            <h4 className="font-medium text-sm">Companies House</h4>
+                                                            <ComplianceBadge status={op.companiesHouseCheck} />
+                                                        </div>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="gap-1"
+                                                            disabled={loading}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleCheckCH(op.id)
+                                                            }}
+                                                        >
+                                                            <RefreshCw className={`h-3 w-3 ${loading ? 'animate-spin' : ''}`} />
+                                                            {op.companiesHouseCheck === 'NOT_CHECKED' ? 'Check Now' : 'Re-check'}
+                                                        </Button>
+                                                    </div>
+                                                    {op.companiesHouseRef && (
+                                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                                            <div>
+                                                                <span className="text-muted-foreground">Company No: </span>
+                                                                <span className="font-mono">{op.companiesHouseRef}</span>
+                                                            </div>
+                                                            {op.accountsNextDue && (
+                                                                <div>
+                                                                    <span className="text-muted-foreground">Accounts Due: </span>
+                                                                    <span>{formatDate(op.accountsNextDue)}</span>
+                                                                </div>
+                                                            )}
+                                                            {op.confirmationNextDue && (
+                                                                <div>
+                                                                    <span className="text-muted-foreground">Confirmation Due: </span>
+                                                                    <span>{formatDate(op.confirmationNextDue)}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {op.companiesHouseDate && (
+                                                        <p className="text-xs text-muted-foreground mt-1">Last checked: {formatDate(op.companiesHouseDate)}</p>
+                                                    )}
+                                                </div>
+
+                                                {/* Licenses Section */}
                                                 <div className="flex items-center justify-between mb-3">
                                                     <h4 className="font-medium text-sm">Licenses & Certificates</h4>
                                                     <Button

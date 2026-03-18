@@ -31,6 +31,8 @@ export default async function AdminOperatorsPage() {
     const serialized = operators.map(op => ({
         ...op,
         companiesHouseDate: op.companiesHouseDate?.toISOString() || null,
+        accountsNextDue: op.accountsNextDue?.toISOString() || null,
+        confirmationNextDue: op.confirmationNextDue?.toISOString() || null,
         creditCheckDate: op.creditCheckDate?.toISOString() || null,
         createdAt: op.createdAt.toISOString(),
         updatedAt: op.updatedAt.toISOString(),

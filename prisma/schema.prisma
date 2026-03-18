@@ -190,6 +190,8 @@ model Operator {
   companiesHouseCheck ComplianceStatus  @default(NOT_CHECKED)
   companiesHouseDate  DateTime?
   companiesHouseRef   String?
+  accountsNextDue     DateTime?
+  confirmationNextDue DateTime?
   creditCheck         ComplianceStatus  @default(NOT_CHECKED)
   creditCheckDate     DateTime?
 

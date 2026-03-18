@@ -113,8 +113,70 @@ export async function createOperator(data: CreateOperatorData) {
         }
     })
 
+    // Auto-trigger Companies House check (fire-and-forget)
+    runCompaniesHouseCheck(operator.id, operator.companyName, data.companiesHouseRef).catch(
+        err => console.error('Auto CH check failed:', err)
+    )
+
     revalidatePath('/admin/operators')
     return { success: true, operator }
+}
+
+/**
+ * Run a Companies House check for an operator and store results.
+ * Callable manually via the admin UI re-check button.
+ */
+export async function checkCompaniesHouse(operatorId: string) {
+    await verifyAdmin()
+
+    const operator = await prisma.operator.findUnique({
+        where: { id: operatorId },
+        select: { companyName: true, companiesHouseRef: true }
+    })
+    if (!operator) throw new Error('Operator not found')
+
+    return runCompaniesHouseCheck(operatorId, operator.companyName, operator.companiesHouseRef)
+}
+
+async function runCompaniesHouseCheck(
+    operatorId: string,
+    companyName: string,
+    companyNumber?: string | null,
+) {
+    const { checkCompany } = await import('@/lib/companies-house')
+    const result = await checkCompany(companyName, companyNumber)
+
+    const updateData: Record<string, unknown> = {
+        companiesHouseDate: new Date(),
+    }
+
+    if (result.found && result.company) {
+        updateData.companiesHouseCheck = result.isActive ? 'PASSED' : 'FAILED'
+        updateData.companiesHouseRef = result.company.companyNumber
+        updateData.accountsNextDue = result.company.accountsNextDue
+            ? new Date(result.company.accountsNextDue)
+            : null
+        updateData.confirmationNextDue = result.company.confirmationNextDue
+            ? new Date(result.company.confirmationNextDue)
+            : null
+    } else {
+        updateData.companiesHouseCheck = 'FAILED'
+    }
+
+    await prisma.operator.update({
+        where: { id: operatorId },
+        data: updateData,
+    })
+
+    revalidatePath('/admin/operators')
+
+    return {
+        success: true,
+        found: result.found,
+        isActive: result.isActive,
+        company: result.company,
+        error: result.error,
+    }
 }
 
 interface UpdateOperatorData {
