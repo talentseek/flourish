@@ -17,7 +17,7 @@ import { CheckCircle2 } from "lucide-react"
 
 interface DemoRequestModalProps {
     trigger: React.ReactNode
-    variant?: "landsec" | "rivingtonhark" | "default"
+    variant?: "landsec" | "rivingtonhark" | "braehead" | "default"
 }
 
 export function DemoRequestModal({ trigger, variant = "default" }: DemoRequestModalProps) {
@@ -55,8 +55,9 @@ export function DemoRequestModal({ trigger, variant = "default" }: DemoRequestMo
 
     const isLandsec = variant === "landsec"
     const isRH = variant === "rivingtonhark"
-    const primaryColor = isRH ? "#E8458B" : isLandsec ? "#E6FB60" : "#E6FB60"
-    const bgColor = isRH ? "#1A1A2E" : isLandsec ? "#002855" : "#4D4A46"
+    const isBH = variant === "braehead"
+    const primaryColor = isRH ? "#E8458B" : isBH ? "#06B6D4" : isLandsec ? "#E6FB60" : "#E6FB60"
+    const bgColor = isRH ? "#1A1A2E" : isBH ? "#0A1628" : isLandsec ? "#002855" : "#4D4A46"
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
