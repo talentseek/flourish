@@ -266,6 +266,12 @@ model SpaceBooking {
   totalValue    Decimal?      @db.Decimal(10, 2)
 
   notes         String?
+
+  // PAT Testing
+  patCertNumber String?
+  patExpiryDate DateTime?
+  equipmentList String?
+
   createdById   String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

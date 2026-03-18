@@ -1,11 +1,15 @@
 /**
  * Compliance gate logic for booking confirmation.
  *
- * Rules:
+ * Operator-level rules:
  * 1. All operators must have a valid (non-expired) PLI
  * 2. Non-F&B operators: PLI cover ≥ £5,000,000
  * 3. F&B operators: PLI cover ≥ £10,000,000
  * 4. F&B operators must also have a valid Food Hygiene certificate
+ *
+ * Booking-level rules:
+ * 5. All bookings must have a PAT certificate number
+ * 6. PAT certificate must not be expired
  */
 
 export interface LicenseForCheck {
@@ -19,6 +23,12 @@ export interface OperatorForCheck {
     licenses: LicenseForCheck[]
 }
 
+export interface BookingForCheck {
+    patCertNumber?: string | null
+    patExpiryDate?: Date | string | null
+    equipmentList?: string | null
+}
+
 export interface ComplianceResult {
     canConfirm: boolean
     issues: string[]
@@ -27,11 +37,16 @@ export interface ComplianceResult {
 const PLI_MIN_NON_FOOD = 5_000_000
 const PLI_MIN_FOOD = 10_000_000
 
-export function checkBookingCompliance(operator: OperatorForCheck): ComplianceResult {
+export function checkBookingCompliance(
+    operator: OperatorForCheck,
+    booking?: BookingForCheck | null,
+): ComplianceResult {
     const issues: string[] = []
     const now = new Date()
 
     const isFoodOperator = operator.types.includes('FOOD_AND_BEVERAGE')
+
+    // --- Operator-level checks ---
 
     // Find valid (non-expired) PLI
     const validPLI = operator.licenses.find(
@@ -62,6 +77,18 @@ export function checkBookingCompliance(operator: OperatorForCheck): ComplianceRe
         if (!validFoodHygiene) {
             issues.push('Food Hygiene certificate required for Food & Beverage operators')
         }
+    }
+
+    // --- Booking-level checks ---
+
+    if (!booking?.patCertNumber) {
+        issues.push('PAT certificate number is required')
+    }
+
+    if (!booking?.patExpiryDate) {
+        issues.push('PAT certificate expiry date is required')
+    } else if (new Date(booking.patExpiryDate) <= now) {
+        issues.push('PAT certificate has expired')
     }
 
     return { canConfirm: issues.length === 0, issues }

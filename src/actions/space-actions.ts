@@ -221,6 +221,9 @@ interface CreateBookingData {
     dailyRate?: number
     status?: BookingStatus
     notes?: string
+    patCertNumber?: string
+    patExpiryDate?: string
+    equipmentList?: string
 }
 
 export async function createBooking(data: CreateBookingData) {
@@ -260,6 +263,9 @@ export async function createBooking(data: CreateBookingData) {
             totalValue,
             status: data.status || 'UNCONFIRMED',
             notes: data.notes,
+            patCertNumber: data.patCertNumber,
+            patExpiryDate: data.patExpiryDate ? new Date(data.patExpiryDate) : undefined,
+            equipmentList: data.equipmentList,
             createdById: user.id
         }
     })
@@ -278,6 +284,9 @@ interface UpdateBookingData {
     description?: string
     dailyRate?: number
     notes?: string
+    patCertNumber?: string
+    patExpiryDate?: string
+    equipmentList?: string
 }
 
 export async function updateBooking(bookingId: string, data: UpdateBookingData) {
@@ -293,6 +302,7 @@ export async function updateBooking(bookingId: string, data: UpdateBookingData) 
 
     if (data.startDate) updateData.startDate = new Date(data.startDate)
     if (data.endDate) updateData.endDate = new Date(data.endDate)
+    if (data.patExpiryDate) updateData.patExpiryDate = new Date(data.patExpiryDate)
 
     if (data.operatorId) {
         const op = await prisma.operator.findUnique({
@@ -337,14 +347,21 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
     // Compliance gate: block confirmation unless operator passes checks
     if (status === 'CONFIRMED' && existing.operator) {
         const { checkBookingCompliance } = await import('@/lib/compliance-utils')
-        const compliance = checkBookingCompliance({
-            types: existing.operator.types,
-            licenses: existing.operator.licenses.map(l => ({
-                type: l.type,
-                endDate: l.endDate,
-                coverValue: l.coverValue ? Number(l.coverValue) : null,
-            }))
-        })
+        const compliance = checkBookingCompliance(
+            {
+                types: existing.operator.types,
+                licenses: existing.operator.licenses.map(l => ({
+                    type: l.type,
+                    endDate: l.endDate,
+                    coverValue: l.coverValue ? Number(l.coverValue) : null,
+                }))
+            },
+            {
+                patCertNumber: existing.patCertNumber,
+                patExpiryDate: existing.patExpiryDate,
+                equipmentList: existing.equipmentList,
+            }
+        )
         if (!compliance.canConfirm) {
             throw new Error(`Cannot confirm — compliance issues:\n• ${compliance.issues.join('\n• ')}`)
         }

@@ -46,6 +46,9 @@ interface BookingData {
     dailyRate?: number | null
     totalValue?: number | null
     notes?: string | null
+    patCertNumber?: string | null
+    patExpiryDate?: Date | string | null
+    equipmentList?: string | null
     operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 
@@ -165,6 +168,9 @@ export function BookingModal({
                         ? parseFloat(formData.get('dailyRate') as string)
                         : undefined,
                     notes: (formData.get('notes') as string) || undefined,
+                    patCertNumber: (formData.get('patCertNumber') as string) || undefined,
+                    patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
+                    equipmentList: (formData.get('equipmentList') as string) || undefined,
                 })
             } else if (booking) {
                 await updateBooking(booking.id, {
@@ -178,6 +184,9 @@ export function BookingModal({
                         ? parseFloat(formData.get('dailyRate') as string)
                         : undefined,
                     notes: (formData.get('notes') as string) || undefined,
+                    patCertNumber: (formData.get('patCertNumber') as string) || undefined,
+                    patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
+                    equipmentList: (formData.get('equipmentList') as string) || undefined,
                 })
             }
 
@@ -302,7 +311,10 @@ export function BookingModal({
 
                         {/* Compliance warnings */}
                         {selectedOperator && selectedOperator.types.length > 0 && (() => {
-                            const compliance = checkBookingCompliance(selectedOperator)
+                            const compliance = checkBookingCompliance(selectedOperator, {
+                                patCertNumber: (document.getElementById('patCertNumber') as HTMLInputElement)?.value || null,
+                                patExpiryDate: (document.getElementById('patExpiryDate') as HTMLInputElement)?.value || null,
+                            })
                             if (compliance.canConfirm) return null
                             return (
                                 <div className="border border-amber-300 bg-amber-50 rounded-md p-3 space-y-1">
@@ -394,6 +406,50 @@ export function BookingModal({
                         />
                     </div>
 
+                    {/* PAT Testing Section */}
+                    <div className="border rounded-md p-4 space-y-3 bg-muted/20">
+                        <h4 className="font-medium text-sm flex items-center gap-2">
+                            ⚡ PAT Testing
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="patCertNumber">Certificate Number</Label>
+                                <Input
+                                    id="patCertNumber"
+                                    name="patCertNumber"
+                                    defaultValue={booking?.patCertNumber || ''}
+                                    placeholder="e.g. PAT-2026-001"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="patExpiryDate">Expiry Date</Label>
+                                <Input
+                                    type="date"
+                                    id="patExpiryDate"
+                                    name="patExpiryDate"
+                                    defaultValue={
+                                        booking?.patExpiryDate
+                                            ? format(new Date(booking.patExpiryDate), 'yyyy-MM-dd')
+                                            : ''
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="equipmentList">Equipment List</Label>
+                            <Textarea
+                                id="equipmentList"
+                                name="equipmentList"
+                                defaultValue={booking?.equipmentList || ''}
+                                placeholder="List all electrical equipment (e.g. 2x kettles, 1x coffee machine, 1x card reader)..."
+                                rows={2}
+                            />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            PAT certificate is required to confirm this booking.
+                        </p>
+                    </div>
+
                     {booking?.totalValue != null && (
                         <div className="text-sm text-muted-foreground">
                             Total Value: £{Number(booking.totalValue).toFixed(2)}
@@ -409,7 +465,10 @@ export function BookingModal({
                             <div className="flex gap-2 mr-auto">
                                 {booking.status !== 'CONFIRMED' && (() => {
                                     const compliance = selectedOperator && selectedOperator.types.length > 0
-                                        ? checkBookingCompliance(selectedOperator)
+                                        ? checkBookingCompliance(selectedOperator, {
+                                            patCertNumber: booking.patCertNumber,
+                                            patExpiryDate: booking.patExpiryDate,
+                                        })
                                         : { canConfirm: false, issues: ['Operator data not loaded'] }
                                     return (
                                         <Button
