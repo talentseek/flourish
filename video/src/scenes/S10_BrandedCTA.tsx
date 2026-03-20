@@ -168,7 +168,7 @@ export const S10_BrandedCTA: React.FC = () => {
               letterSpacing: "0.02em",
             }}
           >
-            flourish.ai
+            thisisflourish.co.uk
           </p>
 
           {/* Footer */}
