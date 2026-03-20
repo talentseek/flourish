@@ -3,7 +3,7 @@ import {
   AbsoluteFill,
   interpolate,
   useCurrentFrame,
-  Img,
+  OffthreadVideo,
   staticFile,
 } from "remotion";
 import { DotGrid } from "../components/DotGrid";
@@ -18,13 +18,8 @@ const BADGES = [
 export const S08_KioskReveal: React.FC = () => {
   const frame = useCurrentFrame();
 
-  // Image fade in
-  const imgOpacity = interpolate(frame, [0, 30], [0, 1], {
-    extrapolateRight: "clamp",
-  });
-
-  // Slow Ken Burns zoom
-  const zoom = interpolate(frame, [0, 240], [1, 1.04], {
+  // Video fade in
+  const vidOpacity = interpolate(frame, [0, 30], [0, 1], {
     extrapolateRight: "clamp",
   });
 
@@ -43,15 +38,15 @@ export const S08_KioskReveal: React.FC = () => {
     <AbsoluteFill>
       <DotGrid />
       <AbsoluteFill style={{ opacity: exitOpacity }}>
-        {/* Full-frame kiosk image */}
+        {/* Full-frame kiosk video (muted) */}
         <AbsoluteFill
           style={{
-            opacity: imgOpacity,
-            transform: `scale(${zoom})`,
+            opacity: vidOpacity,
           }}
         >
-          <Img
-            src={staticFile("artisans-kiosk.png")}
+          <OffthreadVideo
+            src={staticFile("artisans-kiosk.mp4")}
+            volume={0}
             style={{
               width: "100%",
               height: "100%",
