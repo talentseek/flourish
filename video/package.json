@@ -1,0 +1,26 @@
+{
+  "name": "flourish-video",
+  "version": "1.0.0",
+  "description": "Programmatic video framework for Flourish client showcases",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "render": "remotion render BraeheadShowcase out/braehead-showcase.mp4",
+    "lint": "tsc"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.435",
+    "@remotion/tailwind-v4": "4.0.435",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.435",
+    "tailwindcss": "4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.0.0",
+    "@types/web": "0.0.166",
+    "typescript": "5.7.3"
+  },
+  "sideEffects": ["*.css"]
+}
