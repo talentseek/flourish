@@ -18,7 +18,7 @@ export function V2PodcastSection() {
                     </p>
                 </div>
 
-                {/* Featured Episode — Mark Robinson */}
+                {/* Latest Episode — Caroline Main */}
                 <div className="max-w-4xl mx-auto">
                     <Card className="border-[#D8D8D6] overflow-hidden">
                         <CardContent className="p-0">
@@ -26,8 +26,59 @@ export function V2PodcastSection() {
                                 <iframe
                                     width="100%"
                                     height="100%"
+                                    src="https://www.youtube.com/embed/E-HZvzIxGHg"
+                                    title="Leadership, Resilience &amp; The Property Game: Caroline Main on Navigating Change"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                />
+                            </div>
+                            <div className="p-6 md:p-8">
+                                <div className="flex items-start gap-4">
+                                    <Quote className="h-6 w-6 text-[#E6FB60] flex-shrink-0 mt-1" />
+                                    <div className="space-y-4">
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#4D4A46]">
+                                            Leadership, Resilience &amp; The Property Game
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Paul Clifford is joined by property industry leader Caroline Main for an
+                                            open conversation about building a high-performance career without losing
+                                            your peace of mind. From breaking into property to leading in a
+                                            male-dominated environment, they explore mental resilience, authentic
+                                            leadership, and how the post-pandemic shift continues to shape the way
+                                            we work.
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #PropertyIndustry
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #Leadership
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #MentalResilience
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #WomenInProperty
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Previous Episode — Mark Robinson */}
+                <div className="max-w-4xl mx-auto mt-8">
+                    <Card className="border-[#D8D8D6] overflow-hidden">
+                        <CardContent className="p-0">
+                            <div className="aspect-video bg-[#D8D8D6]">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
                                     src="https://www.youtube.com/embed/UyaK6vUQQ7g"
-                                    title="Leadership, High Streets & the Future of Retail — Paul Clifford & Mark Robinson"
+                                    title="Leadership, High Streets &amp; the Future of Retail — Paul Clifford &amp; Mark Robinson"
                                     frameBorder="0"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     allowFullScreen
