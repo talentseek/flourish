@@ -185,30 +185,41 @@ export async function createUser(data: {
         throw new Error("A user with this email already exists")
     }
 
-    // Use BetterAuth's internal sign-up to handle password hashing properly
-    const result = await auth.api.signUpEmail({
-        body: {
+    // Hash password using BetterAuth's internal hasher (scrypt)
+    const ctx = await (auth as any).$context
+    const hashedPassword = await ctx.password.hash(password)
+
+    const now = new Date()
+    const userId = crypto.randomUUID()
+
+    // Create user directly via Prisma
+    const user = await prisma.user.create({
+        data: {
+            id: userId,
             name,
             email,
-            password,
-        },
-        headers: await headers(),
+            emailVerified: true,
+            role,
+            createdAt: now,
+            updatedAt: now,
+        }
     })
 
-    if (!result?.user?.id) {
-        throw new Error("Failed to create user account")
-    }
-
-    // Set the role (BetterAuth defaults to USER)
-    if (role !== 'USER') {
-        await prisma.user.update({
-            where: { id: result.user.id },
-            data: { role }
-        })
-    }
+    // Create the credential account record (how BetterAuth stores passwords)
+    await prisma.account.create({
+        data: {
+            id: crypto.randomUUID(),
+            userId: user.id,
+            accountId: user.id,
+            providerId: "credential",
+            password: hashedPassword,
+            createdAt: now,
+            updatedAt: now,
+        }
+    })
 
     revalidatePath("/admin/users")
-    return { success: true, userId: result.user.id }
+    return { success: true, userId: user.id }
 }
 
 // Delete a user (admin only)
