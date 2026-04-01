@@ -51,6 +51,7 @@ export const auth = betterAuth({
   // Mock email for development
   emailAndPassword: {
     enabled: true,
+    disableSignUp: true,
     async sendResetPassword(data: EmailData) {
       console.log("----------------------------------------");
       console.log("🔗 RESET PASSWORD LINK:");

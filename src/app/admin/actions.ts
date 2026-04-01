@@ -159,3 +159,90 @@ export async function getUsersForAdmin() {
         ]
     })
 }
+
+// Create a new user (admin only)
+export async function createUser(data: {
+    name: string
+    email: string
+    password: string
+    role: Role
+}) {
+    await verifyAdmin()
+
+    const { name, email, password, role } = data
+
+    if (!name || !email || !password) {
+        throw new Error("Name, email, and password are required")
+    }
+
+    if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters")
+    }
+
+    // Check for existing user
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
+        throw new Error("A user with this email already exists")
+    }
+
+    // Use BetterAuth's internal sign-up to handle password hashing properly
+    const result = await auth.api.signUpEmail({
+        body: {
+            name,
+            email,
+            password,
+        },
+        headers: await headers(),
+    })
+
+    if (!result?.user?.id) {
+        throw new Error("Failed to create user account")
+    }
+
+    // Set the role (BetterAuth defaults to USER)
+    if (role !== 'USER') {
+        await prisma.user.update({
+            where: { id: result.user.id },
+            data: { role }
+        })
+    }
+
+    revalidatePath("/admin/users")
+    return { success: true, userId: result.user.id }
+}
+
+// Delete a user (admin only)
+export async function deleteUser(userId: string) {
+    await verifyAdmin()
+
+    // Prevent deleting yourself
+    const session = await auth.api.getSession({
+        headers: await headers()
+    })
+    if (session?.user?.id === userId) {
+        throw new Error("You cannot delete your own account")
+    }
+
+    // Prevent deleting the last admin
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } })
+    if (!targetUser) {
+        throw new Error("User not found")
+    }
+
+    if (targetUser.role === 'ADMIN') {
+        const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } })
+        if (adminCount <= 1) {
+            throw new Error("Cannot delete the last admin user")
+        }
+    }
+
+    // Cascade delete auth records
+    await prisma.session.deleteMany({ where: { userId } })
+    await prisma.account.deleteMany({ where: { userId } })
+    await prisma.member.deleteMany({ where: { userId } })
+    await prisma.invitation.deleteMany({ where: { inviterId: userId } })
+    await prisma.user.delete({ where: { id: userId } })
+
+    revalidatePath("/admin/users")
+    return { success: true }
+}

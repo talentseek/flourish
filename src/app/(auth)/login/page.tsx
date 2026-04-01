@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -89,14 +90,6 @@ export default function LoginPage() {
                     </Button>
                 </form>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-2 mt-2">
-                <p className="text-muted-foreground mt-2">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/sign-up" className="text-purple-400 hover:text-purple-300 font-medium">
-                        Sign up
-                    </Link>
-                </p>
-            </CardFooter>
         </Card>
     );
 }
