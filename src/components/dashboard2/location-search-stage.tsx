@@ -103,7 +103,7 @@ export function LocationSearchStage({ locations, onLocationSelect }: LocationSea
                       setShowResults(false)
                       // Navigate to slug URL
                       const slug = generateSlug(location.name)
-                      router.push(`/dashboard2/${slug}`)
+                      router.push(`/dashboard/${slug}`)
                     }}
                   >
                     <CardContent className="p-4">

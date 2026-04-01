@@ -29,7 +29,7 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {items.map((item: any) => {
-            const isActive = pathname === item.url || (item.url !== "/dashboard2" && pathname?.startsWith(item.url))
+            const isActive = pathname === item.url || (item.url !== "/dashboard" && pathname?.startsWith(item.url))
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton 

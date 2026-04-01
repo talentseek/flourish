@@ -22,8 +22,8 @@ export function PublicLocationPage({ location, regionalManager }: PublicLocation
     const router = useRouter()
 
     const handleCompareClick = () => {
-        // Navigate to dashboard2 with location selected and stage 3
-        router.push(`/dashboard2?location=${location.id}&stage=3`)
+        // Navigate to dashboard with location selected and stage 3
+        router.push(`/dashboard?location=${location.id}&stage=3`)
     }
 
     return (

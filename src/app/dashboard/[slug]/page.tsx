@@ -1,12 +1,19 @@
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
-import { redirect } from "next/navigation"
+import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/db"
-import { Dashboard2Client } from "@/components/dashboard2/dashboard2-client"
+import { generateSlug, findLocationBySlug } from "@/lib/slug-utils"
+import { LocationDiscoveryPage } from "@/components/dashboard2/location-discovery-page"
 
 export const runtime = 'nodejs';
 
-export default async function DashboardPage() {
+interface SlugPageProps {
+  params: {
+    slug: string
+  }
+}
+
+export default async function SlugPage({ params }: SlugPageProps) {
   const session = await auth.api.getSession({
     headers: await headers()
   });
@@ -15,27 +22,35 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
-  // Fetch metrics and locations in parallel
-  const [locations, totalLocations, storesAggregate] = await Promise.all([
-    prisma.location.findMany({
-      include: {
-        tenants: true
-      },
-      orderBy: {
-        name: 'asc'
-      }
-    }),
-    prisma.location.count(),
-    prisma.location.aggregate({
-      _sum: { numberOfStores: true },
-    }),
-  ])
+  // Fetch all locations
+  const locations = await prisma.location.findMany({
+    include: {
+      tenants: true
+    },
+    orderBy: {
+      name: 'asc'
+    }
+  })
 
-  const totalStores = (storesAggregate._sum.numberOfStores ?? 0)
-  const analysesCompleted = 24 // Mock value for now
+  // Find location by slug
+  const locationMatch = findLocationBySlug(
+    locations.map(loc => ({ id: loc.id, name: loc.name })),
+    params.slug
+  )
 
-  // Convert Decimal objects to numbers and nulls to undefined for client serialization
-  const serializedLocations = locations.map((location: any) => ({
+  if (!locationMatch) {
+    notFound()
+  }
+
+  // Find the full location data
+  const location = locations.find(loc => loc.id === locationMatch.id)
+
+  if (!location) {
+    notFound()
+  }
+
+  // Serialize location data
+  const serializedLocation = {
     id: location.id,
     name: location.name,
     type: location.type,
@@ -91,26 +106,8 @@ export default async function DashboardPage() {
     healthIndex: location.healthIndex != null ? Number(location.healthIndex) : undefined,
     largestCategory: location.largestCategory ?? undefined,
     largestCategoryPercent: location.largestCategoryPercent != null ? Number(location.largestCategoryPercent) : undefined,
-    vacancy: location.vacancy != null ? Number(location.vacancy) : undefined,
-    vacancyGrowth: location.vacancyGrowth != null ? Number(location.vacancyGrowth) : undefined,
-    persistentVacancy: location.persistentVacancy != null ? Number(location.persistentVacancy) : undefined,
-    vacantUnits: location.vacantUnits ?? undefined,
-    vacantUnitGrowth: location.vacantUnitGrowth ?? undefined,
-    averageTenancyLengthYears: location.averageTenancyLengthYears != null ? Number(location.averageTenancyLengthYears) : undefined,
     percentMultiple: location.percentMultiple != null ? Number(location.percentMultiple) : undefined,
     percentIndependent: location.percentIndependent != null ? Number(location.percentIndependent) : undefined,
-    qualityOfferMass: location.qualityOfferMass != null ? Number(location.qualityOfferMass) : undefined,
-    qualityOfferPremium: location.qualityOfferPremium != null ? Number(location.qualityOfferPremium) : undefined,
-    qualityOfferValue: location.qualityOfferValue != null ? Number(location.qualityOfferValue) : undefined,
-    vacantFloorspace: location.vacantFloorspace ?? undefined,
-    vacantFloorspaceGrowth: location.vacantFloorspaceGrowth != null ? Number(location.vacantFloorspaceGrowth) : undefined,
-    floorspaceVacancy: location.floorspaceVacancy != null ? Number(location.floorspaceVacancy) : undefined,
-    floorspaceVacancyGrowth: location.floorspaceVacancyGrowth != null ? Number(location.floorspaceVacancyGrowth) : undefined,
-    floorspaceVacancyLeisure: location.floorspaceVacancyLeisure != null ? Number(location.floorspaceVacancyLeisure) : undefined,
-    floorspaceVacancyLeisureGrowth: location.floorspaceVacancyLeisureGrowth != null ? Number(location.floorspaceVacancyLeisureGrowth) : undefined,
-    floorspaceVacancyRetail: location.floorspaceVacancyRetail != null ? Number(location.floorspaceVacancyRetail) : undefined,
-    floorspaceVacancyRetailGrowth: location.floorspaceVacancyRetailGrowth != null ? Number(location.floorspaceVacancyRetailGrowth) : undefined,
-    floorspacePersistentVacancy: location.floorspacePersistentVacancy != null ? Number(location.floorspacePersistentVacancy) : undefined,
     tenants: location.tenants.map((tenant: any) => ({
       id: tenant.id,
       name: tenant.name,
@@ -120,16 +117,7 @@ export default async function DashboardPage() {
       floor: tenant.floor ?? undefined,
       isAnchorTenant: tenant.isAnchorTenant,
     })),
-  }))
+  }
 
-  return (
-    <Dashboard2Client
-      locations={serializedLocations}
-      metrics={{
-        totalLocations,
-        totalStores,
-        analysesCompleted
-      }}
-    />
-  )
+  return <LocationDiscoveryPage location={serializedLocation} />
 }

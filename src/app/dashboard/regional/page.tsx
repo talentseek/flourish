@@ -78,7 +78,7 @@ export default async function RegionalDashboard() {
                         {locations.map(loc => (
                             <Link
                                 key={loc.id}
-                                href={`/dashboard2/${generateSlug(loc.name)}`}
+                                href={`/dashboard/${generateSlug(loc.name)}`}
                                 className="block transition-transform hover:scale-[1.02]"
                             >
                                 <Card className="h-full cursor-pointer hover:border-primary/50 hover:shadow-md transition-all">

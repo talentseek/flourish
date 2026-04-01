@@ -74,7 +74,7 @@ export function UserButtonClient({ afterSignOutUrl = "/" }: UserButtonClientProp
         <DropdownMenuSeparator className="bg-zinc-800" />
         <DropdownMenuItem
           className="focus:bg-zinc-900 focus:text-white cursor-pointer"
-          onClick={() => router.push("/dashboard2")}
+          onClick={() => router.push("/dashboard")}
         >
           <User className="mr-2 h-4 w-4" />
           <span>Dashboard</span>

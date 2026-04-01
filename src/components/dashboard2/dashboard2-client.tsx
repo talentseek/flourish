@@ -62,7 +62,7 @@ export function Dashboard2Client({ locations, metrics }: Dashboard2ClientProps) 
     setCurrentStage(2)
     // Update URL with slug
     const slug = generateSlug(location.name)
-    router.push(`/dashboard2/${slug}`, { scroll: false })
+    router.push(`/dashboard/${slug}`, { scroll: false })
   }
 
   const handleCompareClick = () => {

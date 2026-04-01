@@ -9,6 +9,7 @@ import {
   ShieldIcon,
   CalendarDaysIcon,
 } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
 import { UserButtonClient } from "@/components/user-button-client"
 import { FlourishLogo } from "@/components/flourish-logo"
 import Link from "next/link"
@@ -27,11 +28,15 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userRole?: string
 }
 
-export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
+export function AppSidebar({ userRole: userRoleProp, ...props }: AppSidebarProps) {
+  // Self-resolve role from session if not passed as prop
+  const { data: session } = authClient.useSession()
+  const userRole = userRoleProp || (session?.user as any)?.role || "USER"
+
   const navItems = [
     {
       title: "Dashboard",
-      url: "/dashboard2",
+      url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
@@ -104,4 +109,3 @@ export function AppSidebar({ userRole, ...props }: AppSidebarProps) {
     </Sidebar>
   )
 }
-

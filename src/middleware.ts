@@ -5,6 +5,13 @@ export async function middleware(request: NextRequest) {
   // Better Auth uses this exact cookie name
   const sessionCookie = request.cookies.get("better-auth.session_token");
 
+  // Redirect legacy /dashboard2 routes to /dashboard
+  if (request.nextUrl.pathname.startsWith("/dashboard2")) {
+    const newPath = request.nextUrl.pathname.replace("/dashboard2", "/dashboard");
+    const url = new URL(newPath + request.nextUrl.search, request.url);
+    return NextResponse.redirect(url, 301);
+  }
+
   // Define protected routes
   const isDashboard = request.nextUrl.pathname.startsWith("/dashboard");
   const isAdmin = request.nextUrl.pathname.startsWith("/admin");
@@ -29,6 +36,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/login", "/sign-up", "/forgot-password", "/reset-password"]
+  matcher: ["/dashboard/:path*", "/dashboard2/:path*", "/admin/:path*", "/login", "/sign-up", "/forgot-password", "/reset-password"]
 };
-
