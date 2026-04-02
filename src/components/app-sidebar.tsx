@@ -8,6 +8,7 @@ import {
   MapPinIcon,
   ShieldIcon,
   CalendarDaysIcon,
+  BriefcaseIcon,
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 import { UserButtonClient } from "@/components/user-button-client"
@@ -62,6 +63,15 @@ export function AppSidebar({ userRole: userRoleProp, ...props }: AppSidebarProps
       title: "Spaces",
       url: "/dashboard/regional/spaces",
       icon: CalendarDaysIcon,
+    })
+  }
+
+  // Add CRM for ADMIN users
+  if (userRole === 'ADMIN') {
+    navItems.push({
+      title: "CRM",
+      url: "/crm",
+      icon: BriefcaseIcon,
     })
   }
 

@@ -24,6 +24,12 @@ model User {
   accounts      Account[]
   members       Member[]
   invitations   Invitation[]
+
+  // CRM relations
+  crmDeals                CrmDeal[]
+  crmActivities           CrmActivity[]
+  crmFollowUps            CrmFollowUp[]
+  crmNotificationSettings CrmNotificationSettings?
 }
 
 model Location {
@@ -130,8 +136,9 @@ model Location {
   updatedAt       DateTime @updatedAt
 
   // Relations
-  tenants Tenant[]
-  spaces  Space[]
+  tenants          Tenant[]
+  spaces           Space[]
+  crmDealLocations CrmDealLocation[]
 
   @@map("locations")
 }
@@ -451,4 +458,159 @@ model ContactSubmission {
   createdAt   DateTime @default(now())
 
   @@map("contact_submissions")
+}
+
+// ─── CRM Models ─────────────────────────────────────────
+
+enum DealStage {
+  LEAD
+  CONTACTED
+  MEETING_SCHEDULED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum CrmActivityType {
+  NOTE
+  CALL
+  EMAIL
+  MEETING
+  VISIT
+  STAGE_CHANGE
+  OTHER
+}
+
+model CrmOrganisation {
+  id        String   @id @default(cuid())
+  name      String
+  website   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deals    CrmDeal[]
+  contacts CrmContact[]
+
+  @@map("crm_organisations")
+}
+
+model CrmDeal {
+  id             String    @id @default(cuid())
+  title          String
+  stage          DealStage @default(LEAD)
+  value          Int?
+  organisationId String?
+  ownerId        String
+
+  notes          String?
+  stageChangedAt DateTime  @default(now())
+  closedAt       DateTime?
+  lostReason     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation CrmOrganisation? @relation(fields: [organisationId], references: [id])
+  owner        User             @relation(fields: [ownerId], references: [id])
+  locations    CrmDealLocation[]
+  contacts     CrmDealContact[]
+  activities   CrmActivity[]
+  followUps    CrmFollowUp[]
+
+  @@index([ownerId])
+  @@index([stage])
+  @@index([organisationId])
+  @@map("crm_deals")
+}
+
+model CrmDealLocation {
+  id           String @id @default(cuid())
+  dealId       String
+  locationId   String?
+  locationName String
+  locationCity String?
+
+  deal     CrmDeal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  location Location? @relation(fields: [locationId], references: [id])
+
+  @@unique([dealId, locationId])
+  @@index([locationId])
+  @@map("crm_deal_locations")
+}
+
+model CrmContact {
+  id             String  @id @default(cuid())
+  name           String
+  email          String?
+  phone          String?
+  linkedin       String?
+  jobTitle       String?
+  organisationId String?
+  notes          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation CrmOrganisation? @relation(fields: [organisationId], references: [id])
+  deals        CrmDealContact[]
+
+  @@map("crm_contacts")
+}
+
+model CrmDealContact {
+  id        String @id @default(cuid())
+  dealId    String
+  contactId String
+
+  deal    CrmDeal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contact CrmContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([dealId, contactId])
+  @@map("crm_deal_contacts")
+}
+
+model CrmActivity {
+  id        String          @id @default(cuid())
+  dealId    String
+  userId    String
+  type      CrmActivityType
+  content   String
+  createdAt DateTime        @default(now())
+
+  deal CrmDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id])
+
+  @@index([dealId])
+  @@map("crm_activities")
+}
+
+model CrmFollowUp {
+  id          String    @id @default(cuid())
+  dealId      String
+  userId      String
+  dueDate     DateTime
+  description String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  deal CrmDeal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id])
+
+  @@index([userId, dueDate])
+  @@index([dealId])
+  @@map("crm_follow_ups")
+}
+
+model CrmNotificationSettings {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  digestEnabled Boolean @default(false)
+  digestTime    String  @default("07:00")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("crm_notification_settings")
 }
