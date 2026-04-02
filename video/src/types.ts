@@ -104,4 +104,8 @@ export interface ShowcaseConfig {
       afterColor: string;
     }>;
   };
+
+  // ── Optional: Custom soundtrack ──
+  /** Filename in public/ — defaults to "soundtrack.mp3" */
+  soundtrack?: string;
 }

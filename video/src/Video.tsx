@@ -16,7 +16,7 @@ import { S10_BrandedCTA } from "./scenes/S10_BrandedCTA";
 export const Video: React.FC<{ config: ShowcaseConfig }> = ({ config }) => {
   return (
     <AbsoluteFill style={{ background: BRAND.bg }}>
-      <Audio src={staticFile("soundtrack.mp3")} volume={0.35} />
+      <Audio src={staticFile(config.soundtrack ?? "soundtrack.mp3")} volume={0.35} />
 
       <Sequence from={SCENES.brandedIntro.from} durationInFrames={SCENES.brandedIntro.duration}>
         <S01_BrandedIntro config={config} />

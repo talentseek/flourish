@@ -3,6 +3,7 @@ import { Composition } from "remotion";
 import { Video } from "./Video";
 import { VIDEO } from "./styles";
 import { braehead } from "./configs/braehead";
+import { royalExchange } from "./configs/royal-exchange";
 
 /**
  * To add a new showcase:
@@ -24,17 +25,15 @@ export const RemotionRoot: React.FC = () => {
         width={VIDEO.width}
         height={VIDEO.height}
       />
-      {/* Add future showcases here:
       <Composition
-        id={newConfig.id}
+        id={royalExchange.id}
         component={Video}
-        defaultProps={{ config: newConfig }}
+        defaultProps={{ config: royalExchange }}
         durationInFrames={VIDEO.durationInFrames}
         fps={VIDEO.fps}
         width={VIDEO.width}
         height={VIDEO.height}
       />
-      */}
     </>
   );
 };
