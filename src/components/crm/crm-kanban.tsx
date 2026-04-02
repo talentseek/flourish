@@ -10,6 +10,7 @@ import { Plus, TrendingUp, Trophy, AlertCircle, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DealCard } from "./deal-card"
 import { CreateDealDialog } from "./create-deal-dialog"
+import { DigestToggle } from "./digest-toggle"
 import { updateDealStage } from "@/app/crm/actions"
 
 type DealData = {
@@ -56,11 +57,13 @@ export function CrmKanban({
     allDeals: allDealsInitial,
     stats,
     userId,
+    digestEnabled,
 }: {
     initialDeals: DealData[]
     allDeals: DealData[]
     stats: { totalDeals: number; totalValue: number; activeValue: number; stages: { stage: DealStage; count: number; value: number }[] }
     userId: string
+    digestEnabled: boolean
 }) {
     const [deals, setDeals] = useState(initialDeals)
     const [allDeals] = useState(allDealsInitial)
@@ -105,9 +108,12 @@ export function CrmKanban({
                         <h1 className="text-2xl font-bold tracking-tight">Pipeline</h1>
                         <p className="text-sm text-muted-foreground mt-0.5">Manage deals and sales opportunities</p>
                     </div>
-                    <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
-                        <Plus className="h-4 w-4" /> New Deal
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <DigestToggle initialEnabled={digestEnabled} />
+                        <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
+                            <Plus className="h-4 w-4" /> New Deal
+                        </Button>
+                    </div>
                 </div>
 
                 {/* ── Stats Strip ── */}

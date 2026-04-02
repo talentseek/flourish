@@ -1,4 +1,4 @@
-import { getDeals, getAllDeals, getPipelineStats } from "./actions"
+import { getDeals, getAllDeals, getPipelineStats, getNotificationSettings } from "./actions"
 import { CrmKanban } from "@/components/crm/crm-kanban"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
@@ -9,10 +9,11 @@ export default async function CrmPage() {
     if (!session?.user) redirect("/login")
     if ((session.user as any).role !== "ADMIN") redirect("/dashboard")
 
-    const [deals, allDeals, stats] = await Promise.all([
+    const [deals, allDeals, stats, notifSettings] = await Promise.all([
         getDeals(),
         getAllDeals(),
         getPipelineStats(),
+        getNotificationSettings(),
     ])
 
     return (
@@ -22,7 +23,9 @@ export default async function CrmPage() {
                 allDeals={JSON.parse(JSON.stringify(allDeals))}
                 stats={stats}
                 userId={session.user.id}
+                digestEnabled={notifSettings?.digestEnabled ?? false}
             />
         </div>
     )
 }
+
