@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { Toaster } from "@/components/ui/sonner"
 
 export const runtime = 'nodejs';
 
@@ -34,6 +35,8 @@ export default async function CrmLayout({
                     {children}
                 </div>
             </SidebarInset>
+            <Toaster position="bottom-right" richColors />
         </SidebarProvider>
     )
 }
+

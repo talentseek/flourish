@@ -1,17 +1,19 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useMemo } from "react"
 import { DealStage } from "@prisma/client"
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, closestCenter, PointerSensor, useSensor, useSensors, useDroppable } from "@dnd-kit/core"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, TrendingUp, Trophy, AlertCircle, Info } from "lucide-react"
+import { Plus, TrendingUp, Trophy, AlertCircle, Info, Search, X, Clock } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DealCard } from "./deal-card"
 import { CreateDealDialog } from "./create-deal-dialog"
 import { DigestToggle } from "./digest-toggle"
 import { updateDealStage } from "@/app/crm/actions"
+import { toast } from "sonner"
 
 type DealData = {
     id: string
@@ -20,6 +22,7 @@ type DealData = {
     value: number | null
     notes: string | null
     createdAt: string
+    stageChangedAt?: string
     organisation: { id: string; name: string } | null
     owner?: { id: string; name: string | null } | null
     locations: { id: string; locationName: string; locationCity: string | null; locationId: string | null }[]
@@ -46,10 +49,18 @@ const STAGES: StageConfig[] = [
     { key: "LOST", label: "Lost", tooltip: "Deal didn't close — record reason for future reference", accent: "#f87171", bg: "rgba(248, 113, 113, 0.08)" },
 ]
 
+const STAGE_LABELS: Record<string, string> = Object.fromEntries(STAGES.map(s => [s.key, s.label]))
+
 function formatValue(v: number) {
     if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}M`
     if (v >= 1_000) return `£${(v / 1_000).toFixed(0)}k`
     return `£${v}`
+}
+
+function daysAgo(dateStr: string) {
+    const d = new Date(dateStr)
+    const now = new Date()
+    return Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24))
 }
 
 export function CrmKanban({
@@ -70,9 +81,32 @@ export function CrmKanban({
     const [activeTab, setActiveTab] = useState("my-pipeline")
     const [createOpen, setCreateOpen] = useState(false)
     const [activeDragId, setActiveDragId] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState("")
     const [, startTransition] = useTransition()
 
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+
+    // Filter deals by search query
+    const filteredDeals = useMemo(() => {
+        if (!searchQuery.trim()) return deals
+        const q = searchQuery.toLowerCase()
+        return deals.filter(d =>
+            d.title.toLowerCase().includes(q) ||
+            d.organisation?.name.toLowerCase().includes(q) ||
+            d.locations.some(l => l.locationName.toLowerCase().includes(q) || l.locationCity?.toLowerCase().includes(q)) ||
+            d.contacts.some(c => c.contact.name.toLowerCase().includes(q))
+        )
+    }, [deals, searchQuery])
+
+    const filteredAllDeals = useMemo(() => {
+        if (!searchQuery.trim()) return allDeals
+        const q = searchQuery.toLowerCase()
+        return allDeals.filter(d =>
+            d.title.toLowerCase().includes(q) ||
+            d.organisation?.name.toLowerCase().includes(q) ||
+            d.locations.some(l => l.locationName.toLowerCase().includes(q) || l.locationCity?.toLowerCase().includes(q))
+        )
+    }, [allDeals, searchQuery])
 
     const handleDragStart = (event: DragStartEvent) => setActiveDragId(event.active.id as string)
 
@@ -89,8 +123,14 @@ export function CrmKanban({
 
         setDeals((prev) => prev.map((d) => (d.id === dealId ? { ...d, stage: newStage } : d)))
         startTransition(async () => {
-            try { await updateDealStage(dealId, newStage) }
-            catch { setDeals((prev) => prev.map((d) => (d.id === dealId ? { ...d, stage: deal.stage } : d))) }
+            try {
+                await updateDealStage(dealId, newStage)
+                toast.success(`${deal.title} → ${STAGE_LABELS[newStage]}`)
+            }
+            catch {
+                setDeals((prev) => prev.map((d) => (d.id === dealId ? { ...d, stage: deal.stage } : d)))
+                toast.error("Failed to update stage")
+            }
         })
     }
 
@@ -125,7 +165,29 @@ export function CrmKanban({
                     <StatBlock icon={<AlertCircle className="h-4 w-4 text-amber-400" />} label="Follow-ups Due" value={String(overdueTotalCount)} sub="overdue / today" valueClass={overdueTotalCount > 0 ? "text-amber-400" : ""} />
                 </div>
 
-                {/* ── Tabs + Board ── */}
+                {/* ── Search + Tabs ── */}
+                <div className="flex items-center gap-4">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search deals, orgs, locations..."
+                            className="pl-9 pr-8 h-9"
+                        />
+                        {searchQuery && (
+                            <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground">
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
+                    </div>
+                    {searchQuery && (
+                        <span className="text-xs text-muted-foreground">
+                            {filteredDeals.length} of {deals.length} deals
+                        </span>
+                    )}
+                </div>
+
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
                     <TabsList className="w-fit">
                         <TabsTrigger value="my-pipeline">My Pipeline</TabsTrigger>
@@ -134,7 +196,7 @@ export function CrmKanban({
 
                     <TabsContent value="my-pipeline" className="flex-1 mt-4 min-h-0">
                         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                            <KanbanBoard deals={deals} />
+                            <KanbanBoard deals={filteredDeals} />
                             <DragOverlay dropAnimation={null}>
                                 {activeDeal ? <DealCard deal={activeDeal} isDragging /> : null}
                             </DragOverlay>
@@ -142,11 +204,11 @@ export function CrmKanban({
                     </TabsContent>
 
                     <TabsContent value="team" className="flex-1 mt-4 min-h-0">
-                        <KanbanBoard deals={allDeals} isTeamView />
+                        <KanbanBoard deals={filteredAllDeals} isTeamView />
                     </TabsContent>
                 </Tabs>
 
-                <CreateDealDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={(deal) => { setDeals((prev) => [deal as DealData, ...prev]); setCreateOpen(false) }} />
+                <CreateDealDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={(deal) => { setDeals((prev) => [deal as DealData, ...prev]); setCreateOpen(false); toast.success("Deal created") }} />
             </div>
         </TooltipProvider>
     )

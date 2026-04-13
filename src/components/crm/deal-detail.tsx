@@ -11,16 +11,33 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import {
     ArrowLeft, Building2, MapPin, User, Phone, Mail, Linkedin,
-    MessageSquare, Calendar, Check, Plus, Trash2, Briefcase, Pencil, X, Save
+    MessageSquare, Calendar, Check, Plus, Trash2, Briefcase, Pencil, X, Save,
+    TrendingDown, TrendingUp, Users, BarChart3, Globe, Star, Clock
 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 import {
     updateDealStage, updateDeal, addActivity, createFollowUp,
     completeFollowUp, deleteFollowUp, addContactToDeal,
     removeContactFromDeal, removeLocationFromDeal, deleteDeal
 } from "@/app/crm/actions"
+
+type LocationData = {
+    id: string; name: string; city: string; type: string
+    footfall: number | null; numberOfStores: number | null; vacancy: any
+    owner: string | null; management: string | null; googleRating: any
+    googleReviews?: number | null
+    healthIndex?: any; retailSpace?: number | null
+    numberOfFloors?: number | null; anchorTenants?: number | null
+    population?: number | null; medianAge?: number | null
+    avgHouseholdIncome?: any
+    percentMultiple?: any; percentIndependent?: any
+    vacantUnits?: number | null; vacantFloorspace?: number | null
+    instagram?: string | null; facebook?: string | null; website?: string | null
+}
 
 type FullDeal = {
     id: string; title: string; stage: DealStage; value: number | null
@@ -29,11 +46,7 @@ type FullDeal = {
     owner: { id: string; name: string | null; email: string } | null
     locations: {
         id: string; locationName: string; locationCity: string | null; locationId: string | null
-        location: {
-            id: string; name: string; city: string; type: string
-            footfall: number | null; numberOfStores: number | null; vacancy: any
-            owner: string | null; management: string | null; googleRating: any
-        } | null
+        location: LocationData | null
     }[]
     contacts: {
         id: string; contact: {
@@ -63,16 +76,25 @@ const ACTIVITY_ICONS: Record<CrmActivityType, any> = {
     VISIT: MapPin, STAGE_CHANGE: ArrowLeft, OTHER: MessageSquare,
 }
 
+function daysAgo(dateStr: string) {
+    return Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
+}
+
 export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; userId: string }) {
     const router = useRouter()
     const [deal, setDeal] = useState(initialDeal)
     const [isPending, startTransition] = useTransition()
 
-    // ── Inline editing state ──
+    // Inline editing
     const [editingField, setEditingField] = useState<"title" | "value" | "notes" | null>(null)
     const [editTitle, setEditTitle] = useState(deal.title)
     const [editValue, setEditValue] = useState(deal.value?.toString() || "")
     const [editNotes, setEditNotes] = useState(deal.notes || "")
+
+    // Lost reason modal
+    const [showLostModal, setShowLostModal] = useState(false)
+    const [lostReason, setLostReason] = useState("")
+    const [pendingLostStage, setPendingLostStage] = useState(false)
 
     // Activity form
     const [activityType, setActivityType] = useState<CrmActivityType>("NOTE")
@@ -90,7 +112,6 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
     const [newContactLinkedin, setNewContactLinkedin] = useState("")
     const [newContactJobTitle, setNewContactJobTitle] = useState("")
 
-    // ── Inline edit handlers ──
     const startEdit = (field: "title" | "value" | "notes") => {
         setEditingField(field)
         if (field === "title") setEditTitle(deal.title)
@@ -109,13 +130,34 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
             await updateDeal(deal.id, data)
             setDeal(d => ({ ...d, ...data }))
             setEditingField(null)
+            toast.success("Saved")
         })
     }
 
     const handleStageChange = (stage: DealStage) => {
+        if (stage === "LOST") {
+            setPendingLostStage(true)
+            setShowLostModal(true)
+            return
+        }
         startTransition(async () => {
             await updateDealStage(deal.id, stage)
             setDeal((d) => ({ ...d, stage }))
+            toast.success(`Stage → ${STAGE_LABEL[stage]}`)
+        })
+    }
+
+    const handleConfirmLost = () => {
+        startTransition(async () => {
+            await updateDealStage(deal.id, "LOST")
+            if (lostReason.trim()) {
+                await updateDeal(deal.id, { lostReason: lostReason.trim() })
+            }
+            setDeal(d => ({ ...d, stage: "LOST", lostReason: lostReason.trim() || null }))
+            setShowLostModal(false)
+            setLostReason("")
+            setPendingLostStage(false)
+            toast.info("Deal marked as Lost")
         })
     }
 
@@ -128,6 +170,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                 activities: [{ id: Date.now().toString(), type: activityType, content: activityContent.trim(), createdAt: new Date().toISOString(), user: { id: userId, name: "You" } }, ...d.activities],
             }))
             setActivityContent("")
+            toast.success("Activity logged")
         })
     }
 
@@ -141,6 +184,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
             }))
             setFollowUpDate("")
             setFollowUpDesc("")
+            toast.success("Follow-up added")
         })
     }
 
@@ -151,6 +195,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                 ...d,
                 followUps: d.followUps.map((f) => f.id === fuId ? { ...f, completed: true, completedAt: new Date().toISOString() } : f),
             }))
+            toast.success("Follow-up completed ✓")
         })
     }
 
@@ -158,6 +203,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         startTransition(async () => {
             await deleteFollowUp(fuId)
             setDeal((d) => ({ ...d, followUps: d.followUps.filter(f => f.id !== fuId) }))
+            toast("Follow-up deleted")
         })
     }
 
@@ -174,6 +220,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
             router.refresh()
             setShowContactForm(false)
             setNewContactName(""); setNewContactEmail(""); setNewContactPhone(""); setNewContactLinkedin(""); setNewContactJobTitle("")
+            toast.success("Contact added")
         })
     }
 
@@ -181,6 +228,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         startTransition(async () => {
             await removeContactFromDeal(dealContactId, deal.id)
             setDeal(d => ({ ...d, contacts: d.contacts.filter(c => c.id !== dealContactId) }))
+            toast("Contact removed")
         })
     }
 
@@ -189,6 +237,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         startTransition(async () => {
             await removeLocationFromDeal(dealLocationId, deal.id)
             setDeal(d => ({ ...d, locations: d.locations.filter(l => l.id !== dealLocationId) }))
+            toast("Location removed")
         })
     }
 
@@ -197,6 +246,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         startTransition(async () => {
             await deleteDeal(deal.id)
             router.push("/crm")
+            toast.success("Deal deleted")
         })
     }
 
@@ -206,7 +256,11 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         return `£${v}`
     }
 
+    const stageAge = daysAgo(deal.stageChangedAt)
+    const linkedLocation = deal.locations.find(l => l.location)?.location
+
     return (
+        <>
         <div className="flex flex-col gap-6">
             {/* Header */}
             <div className="flex items-start justify-between">
@@ -215,7 +269,6 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                         <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
                     </Link>
                     <div>
-                        {/* Editable Title */}
                         {editingField === "title" ? (
                             <div className="flex items-center gap-2">
                                 <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="text-2xl font-bold h-10 w-[400px]" autoFocus onKeyDown={e => { if (e.key === "Enter") saveEdit("title"); if (e.key === "Escape") cancelEdit() }} />
@@ -232,7 +285,6 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                             {deal.organisation && (
                                 <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{deal.organisation.name}</span>
                             )}
-                            {/* Editable Value */}
                             {editingField === "value" ? (
                                 <div className="flex items-center gap-1">
                                     <span className="text-xs">£</span>
@@ -246,13 +298,16 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                                     <Pencil className="h-3 w-3 opacity-0 group-hover/val:opacity-100 transition-opacity" />
                                 </span>
                             )}
-                            <span>Created {new Date(deal.createdAt).toLocaleDateString()}</span>
+                            <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {stageAge === 0 ? "Today" : `${stageAge}d in stage`}
+                            </span>
                         </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <Select value={deal.stage} onValueChange={(v) => handleStageChange(v as DealStage)}>
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-[195px]">
                             <div className="flex items-center gap-2">
                                 <div className={`w-2.5 h-2.5 rounded-full ${STAGE_COLOR[deal.stage]}`} />
                                 <SelectValue />
@@ -286,6 +341,73 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
 
                 {/* OVERVIEW TAB */}
                 <TabsContent value="overview" className="space-y-4">
+                    {/* Flourish Intelligence Panel */}
+                    {linkedLocation && (
+                        <Card className="border-emerald-500/20 bg-emerald-500/[0.02]">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <BarChart3 className="h-4 w-4 text-emerald-500" />
+                                    Flourish Intelligence
+                                    <Badge variant="outline" className="text-[10px] text-emerald-500 border-emerald-500/30">Live Data</Badge>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {linkedLocation.footfall && (
+                                        <IntelStat label="Annual Footfall" value={`${(linkedLocation.footfall / 1_000_000).toFixed(1)}M`} icon={<Users className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.numberOfStores && (
+                                        <IntelStat label="Stores" value={String(linkedLocation.numberOfStores)} icon={<Building2 className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.vacancy != null && Number(linkedLocation.vacancy) > 0 && (
+                                        <IntelStat label="Vacancy Rate" value={`${(Number(linkedLocation.vacancy) * 100).toFixed(1)}%`} icon={<TrendingDown className="h-3.5 w-3.5" />} accent={Number(linkedLocation.vacancy) > 0.1 ? "text-amber-400" : "text-emerald-400"} />
+                                    )}
+                                    {linkedLocation.healthIndex != null && (
+                                        <IntelStat label="Health Index" value={Number(linkedLocation.healthIndex).toFixed(0)} icon={<TrendingUp className="h-3.5 w-3.5" />} accent={Number(linkedLocation.healthIndex) > 50 ? "text-emerald-400" : "text-amber-400"} />
+                                    )}
+                                    {linkedLocation.googleRating && (
+                                        <IntelStat label="Google Rating" value={`${linkedLocation.googleRating}${linkedLocation.googleReviews ? ` (${linkedLocation.googleReviews})` : ""}`} icon={<Star className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.retailSpace && (
+                                        <IntelStat label="Retail Space" value={`${(linkedLocation.retailSpace / 1000).toFixed(0)}k sqft`} icon={<MapPin className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.percentMultiple != null && (
+                                        <IntelStat label="Multiple Retailers" value={`${(Number(linkedLocation.percentMultiple) * 100).toFixed(0)}%`} icon={<Building2 className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.percentIndependent != null && (
+                                        <IntelStat label="Independent" value={`${(Number(linkedLocation.percentIndependent) * 100).toFixed(0)}%`} icon={<Building2 className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.vacantUnits != null && (
+                                        <IntelStat label="Vacant Units" value={String(linkedLocation.vacantUnits)} icon={<TrendingDown className="h-3.5 w-3.5" />} accent={linkedLocation.vacantUnits > 10 ? "text-amber-400" : ""} />
+                                    )}
+                                    {linkedLocation.population && (
+                                        <IntelStat label="Local Population" value={`${(linkedLocation.population / 1000).toFixed(0)}k`} icon={<Users className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.medianAge && (
+                                        <IntelStat label="Median Age" value={String(linkedLocation.medianAge)} icon={<Users className="h-3.5 w-3.5" />} />
+                                    )}
+                                    {linkedLocation.avgHouseholdIncome && (
+                                        <IntelStat label="Avg Income" value={`£${(Number(linkedLocation.avgHouseholdIncome) / 1000).toFixed(0)}k`} icon={<TrendingUp className="h-3.5 w-3.5" />} />
+                                    )}
+                                </div>
+                                {/* Social links */}
+                                {(linkedLocation.website || linkedLocation.instagram || linkedLocation.facebook) && (
+                                    <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border/40">
+                                        {linkedLocation.website && (
+                                            <a href={linkedLocation.website} target="_blank" className="text-xs text-blue-500 flex items-center gap-1 hover:underline"><Globe className="h-3 w-3" />Website</a>
+                                        )}
+                                        {linkedLocation.instagram && (
+                                            <a href={linkedLocation.instagram} target="_blank" className="text-xs text-blue-500 hover:underline">Instagram</a>
+                                        )}
+                                        {linkedLocation.facebook && (
+                                            <a href={linkedLocation.facebook} target="_blank" className="text-xs text-blue-500 hover:underline">Facebook</a>
+                                        )}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
                     {/* Linked Locations */}
                     <Card>
                         <CardHeader>
@@ -319,7 +441,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                         </CardContent>
                     </Card>
 
-                    {/* Notes — editable */}
+                    {/* Notes */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle className="text-lg">Notes</CardTitle>
@@ -347,6 +469,14 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                             )}
                         </CardContent>
                     </Card>
+
+                    {/* Lost Reason (if applicable) */}
+                    {deal.stage === "LOST" && deal.lostReason && (
+                        <Card className="border-red-500/20">
+                            <CardHeader><CardTitle className="text-lg text-red-400">Lost Reason</CardTitle></CardHeader>
+                            <CardContent><p className="text-sm">{deal.lostReason}</p></CardContent>
+                        </Card>
+                    )}
                 </TabsContent>
 
                 {/* CONTACTS TAB */}
@@ -399,9 +529,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                 {/* ACTIVITY TAB */}
                 <TabsContent value="activity" className="space-y-4">
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Log Activity</CardTitle>
-                        </CardHeader>
+                        <CardHeader><CardTitle className="text-lg">Log Activity</CardTitle></CardHeader>
                         <CardContent className="space-y-3">
                             <div className="flex gap-2">
                                 <Select value={activityType} onValueChange={(v) => setActivityType(v as CrmActivityType)}>
@@ -491,6 +619,39 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                     </Card>
                 </TabsContent>
             </Tabs>
+        </div>
+
+        {/* Lost Reason Modal */}
+        <Dialog open={showLostModal} onOpenChange={(open) => { if (!open) { setShowLostModal(false); setPendingLostStage(false) } }}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Mark as Lost</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 py-2">
+                    <p className="text-sm text-muted-foreground">Why was this deal lost? This helps improve your future pipeline.</p>
+                    <Textarea value={lostReason} onChange={e => setLostReason(e.target.value)} placeholder="e.g. Went with competitor, budget cut, timing wrong..." rows={3} autoFocus />
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => { setShowLostModal(false); setPendingLostStage(false) }}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleConfirmLost} disabled={isPending}>Mark as Lost</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
+    )
+}
+
+/* ── Intelligence Stat Card ── */
+function IntelStat({ label, value, icon, accent }: { label: string; value: string; icon: React.ReactNode; accent?: string }) {
+    return (
+        <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-background/50 border border-border/40">
+            <div className={`shrink-0 ${accent || "text-muted-foreground"}`}>
+                {icon}
+            </div>
+            <div className="min-w-0">
+                <p className={`text-sm font-semibold tabular-nums leading-tight ${accent || ""}`}>{value}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{label}</p>
+            </div>
         </div>
     )
 }
