@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { DealStage, CrmActivityType } from "@prisma/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,10 +13,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
     ArrowLeft, Building2, MapPin, User, Phone, Mail, Linkedin,
-    MessageSquare, Calendar, Check, Plus, Trash2, Briefcase
+    MessageSquare, Calendar, Check, Plus, Trash2, Briefcase, Pencil, X, Save
 } from "lucide-react"
 import Link from "next/link"
-import { updateDealStage, updateDeal, addActivity, createFollowUp, completeFollowUp, addContactToDeal, deleteDeal } from "@/app/crm/actions"
+import {
+    updateDealStage, updateDeal, addActivity, createFollowUp,
+    completeFollowUp, deleteFollowUp, addContactToDeal,
+    removeContactFromDeal, removeLocationFromDeal, deleteDeal
+} from "@/app/crm/actions"
 
 type FullDeal = {
     id: string; title: string; stage: DealStage; value: number | null
@@ -41,10 +45,18 @@ type FullDeal = {
     followUps: { id: string; dueDate: string; description: string; completed: boolean; completedAt: string | null; createdAt: string }[]
 }
 
-const STAGE_COLORS: Record<DealStage, string> = {
-    LEAD: "bg-slate-500", CONTACTED: "bg-blue-500", MEETING_SCHEDULED: "bg-amber-500",
-    PROPOSAL_SENT: "bg-purple-500", NEGOTIATION: "bg-orange-500", WON: "bg-emerald-500", LOST: "bg-red-500",
-}
+const STAGE_OPTIONS: { value: DealStage; label: string; color: string }[] = [
+    { value: "LEAD", label: "Lead", color: "bg-slate-500" },
+    { value: "CONTACTED", label: "Contacted", color: "bg-blue-500" },
+    { value: "MEETING_SCHEDULED", label: "Meeting Scheduled", color: "bg-amber-500" },
+    { value: "PROPOSAL_SENT", label: "Proposal Sent", color: "bg-purple-500" },
+    { value: "NEGOTIATION", label: "Negotiation", color: "bg-orange-500" },
+    { value: "WON", label: "Won", color: "bg-emerald-500" },
+    { value: "LOST", label: "Lost", color: "bg-red-500" },
+]
+
+const STAGE_LABEL = Object.fromEntries(STAGE_OPTIONS.map(s => [s.value, s.label]))
+const STAGE_COLOR = Object.fromEntries(STAGE_OPTIONS.map(s => [s.value, s.color]))
 
 const ACTIVITY_ICONS: Record<CrmActivityType, any> = {
     NOTE: MessageSquare, CALL: Phone, EMAIL: Mail, MEETING: Briefcase,
@@ -55,6 +67,12 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
     const router = useRouter()
     const [deal, setDeal] = useState(initialDeal)
     const [isPending, startTransition] = useTransition()
+
+    // ── Inline editing state ──
+    const [editingField, setEditingField] = useState<"title" | "value" | "notes" | null>(null)
+    const [editTitle, setEditTitle] = useState(deal.title)
+    const [editValue, setEditValue] = useState(deal.value?.toString() || "")
+    const [editNotes, setEditNotes] = useState(deal.notes || "")
 
     // Activity form
     const [activityType, setActivityType] = useState<CrmActivityType>("NOTE")
@@ -71,6 +89,28 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
     const [newContactPhone, setNewContactPhone] = useState("")
     const [newContactLinkedin, setNewContactLinkedin] = useState("")
     const [newContactJobTitle, setNewContactJobTitle] = useState("")
+
+    // ── Inline edit handlers ──
+    const startEdit = (field: "title" | "value" | "notes") => {
+        setEditingField(field)
+        if (field === "title") setEditTitle(deal.title)
+        if (field === "value") setEditValue(deal.value?.toString() || "")
+        if (field === "notes") setEditNotes(deal.notes || "")
+    }
+
+    const cancelEdit = () => setEditingField(null)
+
+    const saveEdit = (field: "title" | "value" | "notes") => {
+        startTransition(async () => {
+            const data: any = {}
+            if (field === "title") data.title = editTitle.trim()
+            if (field === "value") data.value = editValue ? parseInt(editValue) : null
+            if (field === "notes") data.notes = editNotes.trim() || null
+            await updateDeal(deal.id, data)
+            setDeal(d => ({ ...d, ...data }))
+            setEditingField(null)
+        })
+    }
 
     const handleStageChange = (stage: DealStage) => {
         startTransition(async () => {
@@ -114,6 +154,13 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         })
     }
 
+    const handleDeleteFollowUp = (fuId: string) => {
+        startTransition(async () => {
+            await deleteFollowUp(fuId)
+            setDeal((d) => ({ ...d, followUps: d.followUps.filter(f => f.id !== fuId) }))
+        })
+    }
+
     const handleAddContact = () => {
         if (!newContactName.trim()) return
         startTransition(async () => {
@@ -130,8 +177,23 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
         })
     }
 
+    const handleRemoveContact = (dealContactId: string) => {
+        startTransition(async () => {
+            await removeContactFromDeal(dealContactId, deal.id)
+            setDeal(d => ({ ...d, contacts: d.contacts.filter(c => c.id !== dealContactId) }))
+        })
+    }
+
+    const handleRemoveLocation = (dealLocationId: string) => {
+        if (!confirm("Remove this location from the deal?")) return
+        startTransition(async () => {
+            await removeLocationFromDeal(dealLocationId, deal.id)
+            setDeal(d => ({ ...d, locations: d.locations.filter(l => l.id !== dealLocationId) }))
+        })
+    }
+
     const handleDelete = () => {
-        if (!confirm("Are you sure you want to delete this deal?")) return
+        if (!confirm("Are you sure you want to delete this deal? This cannot be undone.")) return
         startTransition(async () => {
             await deleteDeal(deal.id)
             router.push("/crm")
@@ -153,12 +215,37 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                         <Button variant="ghost" size="icon"><ArrowLeft className="h-4 w-4" /></Button>
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold">{deal.title}</h1>
+                        {/* Editable Title */}
+                        {editingField === "title" ? (
+                            <div className="flex items-center gap-2">
+                                <Input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="text-2xl font-bold h-10 w-[400px]" autoFocus onKeyDown={e => { if (e.key === "Enter") saveEdit("title"); if (e.key === "Escape") cancelEdit() }} />
+                                <Button size="icon" variant="ghost" onClick={() => saveEdit("title")} disabled={isPending}><Save className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" onClick={cancelEdit}><X className="h-4 w-4" /></Button>
+                            </div>
+                        ) : (
+                            <h1 className="text-2xl font-bold group flex items-center gap-2 cursor-pointer" onClick={() => startEdit("title")}>
+                                {deal.title}
+                                <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </h1>
+                        )}
                         <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                             {deal.organisation && (
                                 <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{deal.organisation.name}</span>
                             )}
-                            {deal.value && <span className="font-mono font-semibold">{formatValue(deal.value)}</span>}
+                            {/* Editable Value */}
+                            {editingField === "value" ? (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs">£</span>
+                                    <Input type="number" value={editValue} onChange={e => setEditValue(e.target.value)} className="h-6 w-[100px] text-xs" autoFocus onKeyDown={e => { if (e.key === "Enter") saveEdit("value"); if (e.key === "Escape") cancelEdit() }} />
+                                    <Button size="icon" variant="ghost" className="h-5 w-5" onClick={() => saveEdit("value")} disabled={isPending}><Save className="h-3 w-3" /></Button>
+                                    <Button size="icon" variant="ghost" className="h-5 w-5" onClick={cancelEdit}><X className="h-3 w-3" /></Button>
+                                </div>
+                            ) : (
+                                <span className="font-mono font-semibold cursor-pointer hover:text-foreground transition-colors group/val flex items-center gap-1" onClick={() => startEdit("value")}>
+                                    {deal.value ? formatValue(deal.value) : "No value set"}
+                                    <Pencil className="h-3 w-3 opacity-0 group-hover/val:opacity-100 transition-opacity" />
+                                </span>
+                            )}
                             <span>Created {new Date(deal.createdAt).toLocaleDateString()}</span>
                         </div>
                     </div>
@@ -167,13 +254,18 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                     <Select value={deal.stage} onValueChange={(v) => handleStageChange(v as DealStage)}>
                         <SelectTrigger className="w-[180px]">
                             <div className="flex items-center gap-2">
-                                <div className={`w-2.5 h-2.5 rounded-full ${STAGE_COLORS[deal.stage]}`} />
+                                <div className={`w-2.5 h-2.5 rounded-full ${STAGE_COLOR[deal.stage]}`} />
                                 <SelectValue />
                             </div>
                         </SelectTrigger>
                         <SelectContent>
-                            {(["LEAD", "CONTACTED", "MEETING_SCHEDULED", "PROPOSAL_SENT", "NEGOTIATION", "WON", "LOST"] as DealStage[]).map((s) => (
-                                <SelectItem key={s} value={s}>{s.replace(/_/g, " ")}</SelectItem>
+                            {STAGE_OPTIONS.map((s) => (
+                                <SelectItem key={s.value} value={s.value}>
+                                    <span className="flex items-center gap-2">
+                                        <span className={`w-2 h-2 rounded-full ${s.color}`} />
+                                        {s.label}
+                                    </span>
+                                </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -202,7 +294,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                         <CardContent className="space-y-3">
                             {deal.locations.length === 0 && <p className="text-sm text-muted-foreground">No locations linked</p>}
                             {deal.locations.map((dl) => (
-                                <div key={dl.id} className="flex items-start gap-3 p-3 rounded-lg border">
+                                <div key={dl.id} className="flex items-start gap-3 p-3 rounded-lg border group">
                                     <MapPin className={`h-4 w-4 mt-0.5 ${dl.locationId ? "text-emerald-500" : "text-muted-foreground"}`} />
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
@@ -219,18 +311,42 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                                             </div>
                                         )}
                                     </div>
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500" onClick={() => handleRemoveLocation(dl.id)} disabled={isPending}>
+                                        <X className="h-3.5 w-3.5" />
+                                    </Button>
                                 </div>
                             ))}
                         </CardContent>
                     </Card>
 
-                    {/* Notes */}
-                    {deal.notes && (
-                        <Card>
-                            <CardHeader><CardTitle className="text-lg">Notes</CardTitle></CardHeader>
-                            <CardContent><p className="text-sm whitespace-pre-wrap">{deal.notes}</p></CardContent>
-                        </Card>
-                    )}
+                    {/* Notes — editable */}
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <CardTitle className="text-lg">Notes</CardTitle>
+                            {editingField !== "notes" && (
+                                <Button size="sm" variant="ghost" onClick={() => startEdit("notes")} className="gap-1 text-muted-foreground">
+                                    <Pencil className="h-3 w-3" /> Edit
+                                </Button>
+                            )}
+                        </CardHeader>
+                        <CardContent>
+                            {editingField === "notes" ? (
+                                <div className="space-y-2">
+                                    <Textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} rows={4} autoFocus placeholder="Add notes..." />
+                                    <div className="flex gap-2">
+                                        <Button size="sm" onClick={() => saveEdit("notes")} disabled={isPending} className="gap-1">
+                                            <Save className="h-3 w-3" /> Save
+                                        </Button>
+                                        <Button size="sm" variant="ghost" onClick={cancelEdit}>Cancel</Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-sm whitespace-pre-wrap text-muted-foreground">
+                                    {deal.notes || "No notes yet. Click Edit to add some."}
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
                 </TabsContent>
 
                 {/* CONTACTS TAB */}
@@ -260,7 +376,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                             )}
                             {deal.contacts.length === 0 && !showContactForm && <p className="text-sm text-muted-foreground">No contacts linked</p>}
                             {deal.contacts.map((dc) => (
-                                <div key={dc.id} className="flex items-start gap-3 p-3 rounded-lg border">
+                                <div key={dc.id} className="flex items-start gap-3 p-3 rounded-lg border group">
                                     <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
                                     <div className="flex-1">
                                         <div className="font-medium text-sm">{dc.contact.name}</div>
@@ -271,6 +387,9 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                                             {dc.contact.linkedin && <a href={dc.contact.linkedin} target="_blank" className="text-xs text-blue-500 flex items-center gap-1"><Linkedin className="h-3 w-3" />LinkedIn</a>}
                                         </div>
                                     </div>
+                                    <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500" onClick={() => handleRemoveContact(dc.id)} disabled={isPending}>
+                                        <X className="h-3.5 w-3.5" />
+                                    </Button>
                                 </div>
                             ))}
                         </CardContent>
@@ -316,7 +435,7 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                                             </div>
                                             <div className="pb-4 flex-1">
                                                 <div className="flex items-center gap-2">
-                                                    <Badge variant="outline" className="text-[10px]">{a.type}</Badge>
+                                                    <Badge variant="outline" className="text-[10px]">{a.type === "STAGE_CHANGE" ? "Stage Change" : a.type.charAt(0) + a.type.slice(1).toLowerCase()}</Badge>
                                                     <span className="text-xs text-muted-foreground">{a.user.name || "Unknown"} · {new Date(a.createdAt).toLocaleString()}</span>
                                                 </div>
                                                 <p className="text-sm mt-1">{a.content}</p>
@@ -349,11 +468,11 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                             {deal.followUps.map((fu) => {
                                 const isOverdue = !fu.completed && new Date(fu.dueDate) < new Date()
                                 return (
-                                    <div key={fu.id} className={`flex items-center gap-3 p-3 rounded-lg border ${fu.completed ? "opacity-50" : isOverdue ? "border-amber-500/50 bg-amber-500/5" : ""}`}>
-                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => !fu.completed && handleCompleteFollowUp(fu.id)} disabled={fu.completed || isPending}>
+                                    <div key={fu.id} className={`flex items-center gap-3 p-3 rounded-lg border group ${fu.completed ? "opacity-50" : isOverdue ? "border-amber-500/50 bg-amber-500/5" : ""}`}>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => !fu.completed && handleCompleteFollowUp(fu.id)} disabled={fu.completed || isPending}>
                                             <Check className={`h-3.5 w-3.5 ${fu.completed ? "text-emerald-500" : ""}`} />
                                         </Button>
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                             <p className={`text-sm ${fu.completed ? "line-through" : ""}`}>{fu.description}</p>
                                             <p className={`text-xs ${isOverdue ? "text-amber-500 font-medium" : "text-muted-foreground"}`}>
                                                 <Calendar className="h-3 w-3 inline mr-1" />
@@ -361,6 +480,9 @@ export function DealDetail({ deal: initialDeal, userId }: { deal: FullDeal; user
                                                 {isOverdue && " — Overdue"}
                                             </p>
                                         </div>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-500" onClick={() => handleDeleteFollowUp(fu.id)} disabled={isPending}>
+                                            <Trash2 className="h-3.5 w-3.5" />
+                                        </Button>
                                     </div>
                                 )
                             })}

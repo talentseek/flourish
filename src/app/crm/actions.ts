@@ -400,3 +400,44 @@ export async function addLocationToDeal(dealId: string, data: {
     revalidatePath(`/crm/${dealId}`)
     revalidatePath("/crm")
 }
+
+// ── Remove contact from deal ─────────────────────────────
+
+export async function removeContactFromDeal(dealContactId: string, dealId: string) {
+    const user = await verifyCrmAccess()
+    const link = await prisma.crmDealContact.findUnique({
+        where: { id: dealContactId },
+        include: { contact: { select: { name: true } } },
+    })
+    if (!link) throw new Error("Contact link not found")
+
+    await prisma.crmDealContact.delete({ where: { id: dealContactId } })
+
+    await prisma.crmActivity.create({
+        data: { dealId, userId: user.id, type: "NOTE", content: `Contact removed: ${link.contact.name}` },
+    })
+
+    revalidatePath(`/crm/${dealId}`)
+}
+
+// ── Delete follow-up ─────────────────────────────────────
+
+export async function deleteFollowUp(followUpId: string) {
+    await verifyCrmAccess()
+    const followUp = await prisma.crmFollowUp.findUnique({ where: { id: followUpId }, select: { dealId: true } })
+    if (!followUp) throw new Error("Follow-up not found")
+
+    await prisma.crmFollowUp.delete({ where: { id: followUpId } })
+    revalidatePath(`/crm/${followUp.dealId}`)
+    revalidatePath("/crm")
+}
+
+// ── Remove location from deal ────────────────────────────
+
+export async function removeLocationFromDeal(dealLocationId: string, dealId: string) {
+    await verifyCrmAccess()
+    await prisma.crmDealLocation.delete({ where: { id: dealLocationId } })
+    revalidatePath(`/crm/${dealId}`)
+    revalidatePath("/crm")
+}
+
