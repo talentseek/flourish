@@ -57,7 +57,7 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
     const serializedSpaces = spaces.map(s => ({
         id: s.id,
         name: s.name,
-        type: s.type,
+        types: s.types,
         defaultDailyRate: s.defaultDailyRate ? Number(s.defaultDailyRate) : null
     }))
 

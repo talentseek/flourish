@@ -3,7 +3,7 @@
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { BookingStatus, SpaceType } from '@prisma/client'
+import { BookingStatus } from '@prisma/client'
 
 // --- Auth Helpers ---
 
@@ -81,10 +81,13 @@ export async function getSpacesForLocation(locationId: string) {
 interface CreateSpaceData {
     locationId: string
     name: string
-    type?: SpaceType
+    types?: string[]
     width?: number
     length?: number
     hasPower?: boolean
+    powerPhase?: string
+    hasWater?: boolean
+    hasDrainage?: boolean
     defaultDailyRate?: number
     sortOrder?: number
 }
@@ -96,10 +99,13 @@ export async function createSpace(data: CreateSpaceData) {
         data: {
             locationId: data.locationId,
             name: data.name,
-            type: data.type || 'GENERAL',
+            types: data.types || ['GENERAL'],
             width: data.width,
             length: data.length,
             hasPower: data.hasPower || false,
+            powerPhase: data.hasPower ? (data.powerPhase || null) : null,
+            hasWater: data.hasWater || false,
+            hasDrainage: data.hasDrainage || false,
             defaultDailyRate: data.defaultDailyRate,
             sortOrder: data.sortOrder || 0
         }
@@ -112,10 +118,13 @@ export async function createSpace(data: CreateSpaceData) {
 
 interface UpdateSpaceData {
     name?: string
-    type?: SpaceType
+    types?: string[]
     width?: number | null
     length?: number | null
     hasPower?: boolean
+    powerPhase?: string | null
+    hasWater?: boolean
+    hasDrainage?: boolean
     defaultDailyRate?: number | null
     sortOrder?: number
     isActive?: boolean
@@ -164,7 +173,7 @@ export async function getBookingsForDiary(
         },
         include: {
             space: {
-                select: { id: true, name: true, type: true }
+                select: { id: true, name: true, types: true }
             },
             operator: {
                 select: { id: true, companyName: true, tradingName: true }

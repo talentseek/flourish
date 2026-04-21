@@ -8,13 +8,13 @@ import { BookingCard } from './booking-card'
 import { BookingModal } from './booking-modal'
 import { SpaceDiaryToolbar } from './space-diary-toolbar'
 import { getBookingsForDiary } from '@/actions/space-actions'
-import { BookingStatus, SpaceType } from '@prisma/client'
+import { BookingStatus } from '@prisma/client'
 import { cn } from '@/lib/utils'
 
 interface SpaceData {
     id: string
     name: string
-    type: SpaceType
+    types: string[]
     defaultDailyRate: number | null
 }
 
@@ -214,7 +214,7 @@ export function SpaceDiaryGrid({
                                         <div className="flex items-center justify-between">
                                             <span>{space.name}</span>
                                             <span className="text-[10px] text-muted-foreground font-normal">
-                                                {space.type}
+                                                {space.types[0] || 'GENERAL'}
                                             </span>
                                         </div>
                                     </td>
