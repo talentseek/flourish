@@ -240,6 +240,9 @@ model Space {
   length           Decimal?  @db.Decimal(5, 2)
   hasPower         Boolean   @default(false)
   powerPhase       String?   // "SINGLE_PHASE" or "THREE_PHASE"
+  powerAmperage    String?   // "13A", "16A", "32A", "63A", "100A_PLUS"
+  powerConnection  String?   // "UK_3PIN", "COMMANDO_BLUE", "COMMANDO_RED", "HARDWIRED"
+  powerDelivery    String?   // "FLOOR_BOX", "CEILING_DROP", "WALL_MOUNTED"
   hasWater         Boolean   @default(false)
   hasDrainage      Boolean   @default(false)
   defaultDailyRate Decimal?  @db.Decimal(8, 2)

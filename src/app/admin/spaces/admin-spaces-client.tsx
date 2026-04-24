@@ -54,13 +54,34 @@ const POWER_PHASES = [
     {
         value: 'SINGLE_PHASE',
         label: 'Single Phase (230V)',
-        description: 'Standard domestic supply — suits lighting, basic appliances, and small equipment',
+        description: 'Standard domestic supply — lighting, basic appliances, small equipment',
     },
     {
         value: 'THREE_PHASE',
-        label: 'Three Phase (415V)',
-        description: 'Industrial supply — required for heavy commercial equipment, large fridges, and high-power cooking',
+        label: 'Three Phase (400V)',
+        description: 'Industrial supply — heavy commercial equipment, large fridges, high-power cooking',
     },
+] as const
+
+const POWER_AMPERAGES = [
+    { value: '13A', label: '13A (Standard)', description: 'Standard 3-pin plug — lighting, till, small appliance' },
+    { value: '16A', label: '16 Amp', description: 'Blue Commando — small catering, coffee machines' },
+    { value: '32A', label: '32 Amp', description: 'Red Commando — hot food, larger fridges' },
+    { value: '63A', label: '63 Amp', description: 'Heavy catering, multiple circuits' },
+    { value: '100A_PLUS', label: '100+ Amp', description: 'Large-format build, bespoke distribution board' },
+] as const
+
+const POWER_CONNECTIONS = [
+    { value: 'UK_3PIN', label: 'UK 3-Pin Socket', description: 'Standard domestic 13A socket' },
+    { value: 'COMMANDO_BLUE', label: 'Commando (Blue)', description: 'Industrial single-phase — 16A / 32A' },
+    { value: 'COMMANDO_RED', label: 'Commando (Red)', description: 'Industrial three-phase — 32A / 63A' },
+    { value: 'HARDWIRED', label: 'Hardwired', description: 'Fused spur or direct to breaker — no plug' },
+] as const
+
+const POWER_DELIVERIES = [
+    { value: 'FLOOR_BOX', label: 'Floor Box', description: 'Recessed floor outlet beneath the unit' },
+    { value: 'CEILING_DROP', label: 'Ceiling Drop / Power Pole', description: 'Power from above via drop cable or pole' },
+    { value: 'WALL_MOUNTED', label: 'Wall Mounted', description: 'Socket on pillar, wall, or adjacent structure' },
 ] as const
 
 // ─── Types ──────────────────────────────────────────────
@@ -73,6 +94,9 @@ interface SpaceData {
     length: number | null
     hasPower: boolean
     powerPhase: string | null
+    powerAmperage: string | null
+    powerConnection: string | null
+    powerDelivery: string | null
     hasWater: boolean
     hasDrainage: boolean
     defaultDailyRate: number | null
@@ -179,6 +203,9 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
         length?: number
         hasPower: boolean
         powerPhase?: string
+        powerAmperage?: string
+        powerConnection?: string
+        powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
         defaultDailyRate?: number
@@ -206,6 +233,9 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
         length?: number
         hasPower: boolean
         powerPhase?: string
+        powerAmperage?: string
+        powerConnection?: string
+        powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
         defaultDailyRate?: number
@@ -220,6 +250,9 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                 length: data.length ?? null,
                 defaultDailyRate: data.defaultDailyRate ?? null,
                 powerPhase: data.hasPower ? (data.powerPhase || null) : null,
+                powerAmperage: data.hasPower ? (data.powerAmperage || null) : null,
+                powerConnection: data.hasPower ? (data.powerConnection || null) : null,
+                powerDelivery: data.hasPower ? (data.powerDelivery || null) : null,
             })
             setEditDialogOpen(false)
             setEditingSpace(null)
@@ -336,13 +369,17 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                                                                     <Zap className="h-3.5 w-3.5" />
                                                                     <span className="text-xs">
                                                                         {space.powerPhase === 'THREE_PHASE' ? '3P' : '1P'}
+                                                                        {space.powerAmperage ? ` ${POWER_AMPERAGES.find(a => a.value === space.powerAmperage)?.label || space.powerAmperage}` : ''}
                                                                     </span>
                                                                 </span>
                                                             </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                {space.powerPhase === 'THREE_PHASE'
-                                                                    ? 'Three Phase (415V)'
-                                                                    : 'Single Phase (230V)'}
+                                                            <TooltipContent className="max-w-[300px]">
+                                                                <div className="space-y-0.5 text-xs">
+                                                                    <div>{space.powerPhase === 'THREE_PHASE' ? 'Three Phase (400V)' : 'Single Phase (230V)'}</div>
+                                                                    {space.powerAmperage && <div>{POWER_AMPERAGES.find(a => a.value === space.powerAmperage)?.label || space.powerAmperage}</div>}
+                                                                    {space.powerConnection && <div>{POWER_CONNECTIONS.find(c => c.value === space.powerConnection)?.label || space.powerConnection}</div>}
+                                                                    {space.powerDelivery && <div>{POWER_DELIVERIES.find(d => d.value === space.powerDelivery)?.label || space.powerDelivery}</div>}
+                                                                </div>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     )}
@@ -462,6 +499,9 @@ function SpaceForm({
         length?: number
         hasPower: boolean
         powerPhase?: string
+        powerAmperage?: string
+        powerConnection?: string
+        powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
         defaultDailyRate?: number
@@ -476,6 +516,9 @@ function SpaceForm({
     )
     const [hasPower, setHasPower] = useState(defaultValues?.hasPower || false)
     const [powerPhase, setPowerPhase] = useState(defaultValues?.powerPhase || 'SINGLE_PHASE')
+    const [powerAmperage, setPowerAmperage] = useState(defaultValues?.powerAmperage || '')
+    const [powerConnection, setPowerConnection] = useState(defaultValues?.powerConnection || '')
+    const [powerDelivery, setPowerDelivery] = useState(defaultValues?.powerDelivery || '')
     const [hasWater, setHasWater] = useState(defaultValues?.hasWater || false)
     const [hasDrainage, setHasDrainage] = useState(defaultValues?.hasDrainage || false)
 
@@ -499,6 +542,9 @@ function SpaceForm({
             length: form.get('length') ? parseFloat(form.get('length') as string) : undefined,
             hasPower,
             powerPhase: hasPower ? powerPhase : undefined,
+            powerAmperage: hasPower && powerAmperage ? powerAmperage : undefined,
+            powerConnection: hasPower && powerConnection ? powerConnection : undefined,
+            powerDelivery: hasPower && powerDelivery ? powerDelivery : undefined,
             hasWater,
             hasDrainage,
             defaultDailyRate: form.get('defaultDailyRate')
@@ -642,38 +688,133 @@ function SpaceForm({
                 </div>
             </div>
 
-            {/* Row 5: Power Phase (conditional) */}
+            {/* Row 5: Power Detail (conditional) */}
             {hasPower && (
-                <div className="space-y-2 ml-1 pl-4 border-l-2 border-amber-500/30">
-                    <Label>Power Type</Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {POWER_PHASES.map((phase) => (
-                            <label
-                                key={phase.value}
-                                className={`
-                                    flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-150
-                                    ${powerPhase === phase.value
-                                        ? 'bg-amber-500/10 border-amber-500/50 ring-1 ring-amber-500/20'
-                                        : 'bg-muted/20 border-border hover:bg-muted/40'
-                                    }
-                                `}
-                            >
-                                <input
-                                    type="radio"
-                                    name="powerPhaseRadio"
-                                    value={phase.value}
-                                    checked={powerPhase === phase.value}
-                                    onChange={() => setPowerPhase(phase.value)}
-                                    className="mt-1 accent-amber-500"
-                                />
-                                <div>
-                                    <div className="text-sm font-medium">{phase.label}</div>
-                                    <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                                        {phase.description}
+                <div className="space-y-4 ml-1 pl-4 border-l-2 border-amber-500/30">
+                    {/* Phase */}
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Phase</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {POWER_PHASES.map((phase) => (
+                                <label
+                                    key={phase.value}
+                                    className={`
+                                        flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-150
+                                        ${powerPhase === phase.value
+                                            ? 'bg-amber-500/10 border-amber-500/50 ring-1 ring-amber-500/20'
+                                            : 'bg-muted/20 border-border hover:bg-muted/40'
+                                        }
+                                    `}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="powerPhaseRadio"
+                                        value={phase.value}
+                                        checked={powerPhase === phase.value}
+                                        onChange={() => setPowerPhase(phase.value)}
+                                        className="mt-1 accent-amber-500"
+                                    />
+                                    <div>
+                                        <div className="text-sm font-medium">{phase.label}</div>
+                                        <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                                            {phase.description}
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
-                        ))}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Amperage */}
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Amperage</Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                            {POWER_AMPERAGES.map((amp) => (
+                                <label
+                                    key={amp.value}
+                                    className={`
+                                        flex flex-col p-2.5 rounded-lg border cursor-pointer transition-all duration-150 text-center
+                                        ${powerAmperage === amp.value
+                                            ? 'bg-amber-500/10 border-amber-500/50 ring-1 ring-amber-500/20'
+                                            : 'bg-muted/20 border-border hover:bg-muted/40'
+                                        }
+                                    `}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="powerAmperageRadio"
+                                        value={amp.value}
+                                        checked={powerAmperage === amp.value}
+                                        onChange={() => setPowerAmperage(amp.value)}
+                                        className="sr-only"
+                                    />
+                                    <div className="text-sm font-medium">{amp.label}</div>
+                                    <div className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{amp.description}</div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Connection Type */}
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Connection Type</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {POWER_CONNECTIONS.map((conn) => (
+                                <label
+                                    key={conn.value}
+                                    className={`
+                                        flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-150
+                                        ${powerConnection === conn.value
+                                            ? 'bg-amber-500/10 border-amber-500/50 ring-1 ring-amber-500/20'
+                                            : 'bg-muted/20 border-border hover:bg-muted/40'
+                                        }
+                                    `}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="powerConnectionRadio"
+                                        value={conn.value}
+                                        checked={powerConnection === conn.value}
+                                        onChange={() => setPowerConnection(conn.value)}
+                                        className="sr-only"
+                                    />
+                                    <div>
+                                        <div className="text-sm font-medium">{conn.label}</div>
+                                        <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{conn.description}</div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Delivery Method */}
+                    <div className="space-y-2">
+                        <Label className="text-xs uppercase tracking-wider text-muted-foreground">Delivery Method</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            {POWER_DELIVERIES.map((del) => (
+                                <label
+                                    key={del.value}
+                                    className={`
+                                        flex flex-col p-3 rounded-lg border cursor-pointer transition-all duration-150
+                                        ${powerDelivery === del.value
+                                            ? 'bg-amber-500/10 border-amber-500/50 ring-1 ring-amber-500/20'
+                                            : 'bg-muted/20 border-border hover:bg-muted/40'
+                                        }
+                                    `}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="powerDeliveryRadio"
+                                        value={del.value}
+                                        checked={powerDelivery === del.value}
+                                        onChange={() => setPowerDelivery(del.value)}
+                                        className="sr-only"
+                                    />
+                                    <div className="text-sm font-medium">{del.label}</div>
+                                    <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{del.description}</div>
+                                </label>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
