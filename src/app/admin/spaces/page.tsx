@@ -38,6 +38,8 @@ export default async function AdminSpacesPage() {
                     powerDelivery: true,
                     hasWater: true,
                     hasDrainage: true,
+                    isExternal: true,
+                    notes: true,
                     defaultDailyRate: true,
                     sortOrder: true,
                     isActive: true,

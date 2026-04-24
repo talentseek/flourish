@@ -246,6 +246,8 @@ model Space {
   hasWater         Boolean   @default(false)
   hasDrainage      Boolean   @default(false)
   defaultDailyRate Decimal?  @db.Decimal(8, 2)
+  isExternal       Boolean   @default(false)
+  notes            String?
   sortOrder        Int       @default(0)
   isActive         Boolean   @default(true)
   createdAt        DateTime  @default(now())

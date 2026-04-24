@@ -30,9 +30,10 @@ import {
 } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { createSpace, updateSpace, deleteSpace } from '@/actions/space-actions'
-import { Plus, Pencil, Trash2, MapPin, Zap, Droplets, ArrowDownToLine, Info } from 'lucide-react'
+import { Plus, Pencil, Trash2, MapPin, Zap, Droplets, ArrowDownToLine, Info, Building2, TreePine } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Textarea } from '@/components/ui/textarea'
 
 // ─── Constants ──────────────────────────────────────────
 
@@ -99,6 +100,8 @@ interface SpaceData {
     powerDelivery: string | null
     hasWater: boolean
     hasDrainage: boolean
+    isExternal: boolean
+    notes: string | null
     defaultDailyRate: number | null
     sortOrder: number
     isActive: boolean
@@ -208,6 +211,8 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
         powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
+        isExternal: boolean
+        notes?: string
         defaultDailyRate?: number
         sortOrder?: number
     }) {
@@ -238,6 +243,8 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
         powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
+        isExternal: boolean
+        notes?: string
         defaultDailyRate?: number
         sortOrder?: number
     }) {
@@ -345,7 +352,17 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                                 <TableBody>
                                     {spaces.map((space) => (
                                         <TableRow key={space.id} className={!space.isActive ? 'opacity-50' : ''}>
-                                            <TableCell className="font-medium">{space.name}</TableCell>
+                                            <TableCell className="font-medium">
+                                                <div className="flex items-center gap-1.5">
+                                                    {space.name}
+                                                    {space.isExternal && (
+                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 text-emerald-600 border-emerald-500/40">
+                                                            <TreePine className="h-2.5 w-2.5" />
+                                                            Ext
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
                                                     {space.types.map((t) => (
@@ -504,6 +521,8 @@ function SpaceForm({
         powerDelivery?: string
         hasWater: boolean
         hasDrainage: boolean
+        isExternal: boolean
+        notes?: string
         defaultDailyRate?: number
         sortOrder?: number
     }) => void
@@ -521,6 +540,7 @@ function SpaceForm({
     const [powerDelivery, setPowerDelivery] = useState(defaultValues?.powerDelivery || '')
     const [hasWater, setHasWater] = useState(defaultValues?.hasWater || false)
     const [hasDrainage, setHasDrainage] = useState(defaultValues?.hasDrainage || false)
+    const [isExternal, setIsExternal] = useState(defaultValues?.isExternal || false)
 
     function toggleType(value: string) {
         setSelectedTypes((prev) => {
@@ -547,6 +567,8 @@ function SpaceForm({
             powerDelivery: hasPower && powerDelivery ? powerDelivery : undefined,
             hasWater,
             hasDrainage,
+            isExternal,
+            notes: form.get('notes') as string || undefined,
             defaultDailyRate: form.get('defaultDailyRate')
                 ? parseFloat(form.get('defaultDailyRate') as string)
                 : undefined,
@@ -818,6 +840,34 @@ function SpaceForm({
                     </div>
                 </div>
             )}
+
+            {/* Row 6: External toggle */}
+            <div className="space-y-2">
+                <UtilityToggle
+                    id="isExternal"
+                    label="External Space"
+                    icon={TreePine}
+                    checked={isExternal}
+                    onChange={setIsExternal}
+                    color="emerald"
+                />
+                <p className="text-xs text-muted-foreground ml-1">
+                    {isExternal ? 'This space is outdoors / external to the main building.' : 'Internal space (default) — inside the main building.'}
+                </p>
+            </div>
+
+            {/* Row 7: Notes */}
+            <div className="space-y-2">
+                <Label htmlFor="notes">Notes</Label>
+                <Textarea
+                    id="notes"
+                    name="notes"
+                    defaultValue={defaultValues?.notes || ''}
+                    placeholder="Any additional details about this space (access requirements, restrictions, equipment nearby, etc.)"
+                    rows={3}
+                    className="resize-y"
+                />
+            </div>
 
             <DialogFooter>
                 <Button type="submit" disabled={loading}>

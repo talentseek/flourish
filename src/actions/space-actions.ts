@@ -91,6 +91,8 @@ interface CreateSpaceData {
     powerDelivery?: string
     hasWater?: boolean
     hasDrainage?: boolean
+    isExternal?: boolean
+    notes?: string
     defaultDailyRate?: number
     sortOrder?: number
 }
@@ -112,6 +114,8 @@ export async function createSpace(data: CreateSpaceData) {
             powerDelivery: data.hasPower ? (data.powerDelivery || null) : null,
             hasWater: data.hasWater || false,
             hasDrainage: data.hasDrainage || false,
+            isExternal: data.isExternal || false,
+            notes: data.notes || null,
             defaultDailyRate: data.defaultDailyRate,
             sortOrder: data.sortOrder || 0
         }
@@ -134,6 +138,8 @@ interface UpdateSpaceData {
     powerDelivery?: string | null
     hasWater?: boolean
     hasDrainage?: boolean
+    isExternal?: boolean
+    notes?: string | null
     defaultDailyRate?: number | null
     sortOrder?: number
     isActive?: boolean
