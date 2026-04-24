@@ -16,8 +16,8 @@ export async function getRegionalLocations() {
         select: { role: true, name: true }
     });
 
-    if (!dbUser || dbUser.role !== 'REGIONAL_MANAGER') {
-        throw new Error("Unauthorized: Regional Manager access required.");
+    if (!dbUser || (dbUser.role !== 'REGIONAL_MANAGER' && dbUser.role !== 'ADMIN')) {
+        throw new Error("Unauthorized: Regional Manager or Admin access required.");
     }
 
     if (!dbUser.name) {

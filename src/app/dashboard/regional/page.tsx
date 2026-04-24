@@ -29,7 +29,7 @@ export default async function RegionalDashboard() {
         select: { role: true, name: true }
     });
 
-    if (!dbUser || dbUser.role !== 'REGIONAL_MANAGER') {
+    if (!dbUser || (dbUser.role !== 'REGIONAL_MANAGER' && dbUser.role !== 'ADMIN')) {
         redirect('/dashboard');
     }
 
