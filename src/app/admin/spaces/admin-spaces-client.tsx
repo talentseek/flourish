@@ -49,6 +49,11 @@ const SPACE_TYPES = [
     { value: 'STORAGE', label: 'Storage', description: 'Storage or back-of-house use' },
     { value: 'SEASONAL', label: 'Seasonal', description: 'Seasonal pop-up (Christmas, summer, etc.)' },
     { value: 'SERVICES', label: 'Services', description: 'Service-based (repairs, beauty, etc.)' },
+    { value: 'PERMANENT_KIOSK', label: 'Permanent Kiosk', description: 'Long-term or permanent kiosk installation' },
+    { value: 'EXPERIENTIAL', label: 'Experiential', description: 'Brand activation or immersive retail experience' },
+    { value: 'CARS', label: 'Cars', description: 'Vehicle display or car sales' },
+    { value: 'LOCKERS', label: 'Lockers', description: 'Locker installation (click & collect, parcel, etc.)' },
+    { value: 'VENDING', label: 'Vending', description: 'Vending machine placement' },
 ] as const
 
 const POWER_PHASES = [
