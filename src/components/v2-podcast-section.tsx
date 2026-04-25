@@ -18,8 +18,59 @@ export function V2PodcastSection() {
                     </p>
                 </div>
 
-                {/* Latest Episode — Caroline Main */}
+                {/* Latest Episode — Chris Wade */}
                 <div className="max-w-4xl mx-auto">
+                    <Card className="border-[#D8D8D6] overflow-hidden">
+                        <CardContent className="p-0">
+                            <div className="aspect-video bg-[#D8D8D6]">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/x9cRpzS76PE"
+                                    title="Placemaking, Human Connections &amp; The 2026 Destination — Paul Clifford &amp; Chris Wade"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                />
+                            </div>
+                            <div className="p-6 md:p-8">
+                                <div className="flex items-start gap-4">
+                                    <Quote className="h-6 w-6 text-[#E6FB60] flex-shrink-0 mt-1" />
+                                    <div className="space-y-4">
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#4D4A46]">
+                                            Placemaking, Human Connections &amp; The 2026 Destination
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Paul Clifford sits down with place-making expert Chris Wade for an
+                                            insightful look into what truly makes destinations thrive in 2026.
+                                            They explore why prioritising emotional and social connections is
+                                            outperforming traditional commercial models, and how aligning retail
+                                            spaces with human needs is essential for long-term success. A must-listen
+                                            for anyone involved in the evolution of physical retail.
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #Placemaking
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #PhysicalRetail
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #CommunityBuilding
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #RetailFuture
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Previous Episode — Caroline Main */}
+                <div className="max-w-4xl mx-auto mt-8">
                     <Card className="border-[#D8D8D6] overflow-hidden">
                         <CardContent className="p-0">
                             <div className="aspect-video bg-[#D8D8D6]">
