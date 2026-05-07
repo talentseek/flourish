@@ -33,3 +33,32 @@ html.v2-page-active body {
 .animate-scroll:hover {
   animation-play-state: paused;
 }
+
+/* ====================================================================
+   DARK MODE OVERRIDE — Force light mode for the entire marketing page.
+   This prevents browser prefers-color-scheme: dark from leaking into
+   the public-facing site via shadcn/ui theme variables.
+   ==================================================================== */
+.dark .v2-page,
+.dark .v2-page *,
+html.dark body.v2-page-active {
+  /* Reset all theme-aware variables to their light-mode values */
+  --background: oklch(0.9689 0.0042 56.3749);
+  --foreground: #4D4A46;
+  --card: #F7F4F2;
+  --card-foreground: #4D4A46;
+  --popover: #F7F4F2;
+  --popover-foreground: #4D4A46;
+  --primary: #E6FB60;
+  --primary-foreground: #4D4A46;
+  --secondary: #A69D94;
+  --secondary-foreground: #4D4A46;
+  --muted: #F7F4F2;
+  --muted-foreground: #4D4A46;
+  --accent: #E6FB60;
+  --accent-foreground: #4D4A46;
+  --border: #D8D8D6;
+  --input: #F7F4F2;
+  --ring: #E6FB60;
+  color-scheme: light;
+}
