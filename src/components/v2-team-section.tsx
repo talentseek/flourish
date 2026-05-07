@@ -31,11 +31,11 @@ const teamMembers = [
     funFact: "Has a reputation for calming chaos — whether it's logistics, licensing or latte-making."
   },
   {
-    name: "Jemma Mills",
+    name: "Sophie Sterland",
     role: "Regional Manager",
-    image: "/jemmanew.webp",
-    bio: "From WH Smith to Welcome Break, Jemma's been there, sold that. She's brilliant at building long-lasting relationships and thrives on helping businesses shine — whether you're new to retail or scaling up.",
-    funFact: "When she's not supporting traders, she's in the stables — a dedicated horse trainer and proud equestrian."
+    image: "/SophieSterland.png",
+    bio: "Sophie brings a strong retail background with management experience across both luxury and high-street brands, including Swarovski and Kurt Geiger. She has a proven track record in team leadership, delivering exceptional customer experiences, and driving sales performance. Known for her energy, organisation, and resilience, Sophie plays a key role in supporting both our clients and our growing portfolio.",
+    funFact: "Proud parent of three — she brings the same unstoppable energy from the school run straight into site visits."
   },
   {
     name: "Amanda Bishop",
