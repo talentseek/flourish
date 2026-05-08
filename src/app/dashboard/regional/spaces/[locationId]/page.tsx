@@ -68,6 +68,7 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
                         mapPinY: true,
                         types: true,
                         isExternal: true,
+                        images: true,
                     },
                     orderBy: { sortOrder: 'asc' },
                 }

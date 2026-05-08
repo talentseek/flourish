@@ -45,6 +45,7 @@ interface FloorMapWithSpaces {
         mapPinY: number | null
         types: string[]
         isExternal: boolean
+        images: string[]
     }[]
 }
 

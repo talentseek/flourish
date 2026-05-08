@@ -22,6 +22,7 @@ interface SpacePinViewData {
     floorMapId: string | null
     types: string[]
     isExternal: boolean
+    images: string[]
 }
 
 interface SpaceMapViewProps {
@@ -34,6 +35,7 @@ interface SpaceMapViewProps {
 
 export function SpaceMapView({ floorMaps, spaces, onSpaceClick }: SpaceMapViewProps) {
     const [activeMapId, setActiveMapId] = useState<string>(floorMaps[0]?.id || '')
+    const [hoveredSpaceId, setHoveredSpaceId] = useState<string | null>(null)
 
     const activeMap = floorMaps.find(m => m.id === activeMapId)
     const pinnedSpaces = spaces.filter(
@@ -92,36 +94,84 @@ export function SpaceMapView({ floorMaps, spaces, onSpaceClick }: SpaceMapViewPr
                         />
 
                         {/* Pins */}
-                        {pinnedSpaces.map((space) => (
-                            <div
-                                key={space.id}
-                                className="absolute group cursor-pointer"
-                                style={{
-                                    left: `${space.mapPinX}%`,
-                                    top: `${space.mapPinY}%`,
-                                    transform: 'translate(-50%, -100%)',
-                                }}
-                                onClick={() => onSpaceClick?.(space.id)}
-                            >
-                                {/* Pin marker */}
-                                <div className="relative">
-                                    <div className="w-6 h-6 rounded-full bg-primary border-2 border-white shadow-lg flex items-center justify-center transition-transform group-hover:scale-125">
-                                        <span className="text-[9px] font-bold text-primary-foreground">
-                                            {space.sortOrder}
-                                        </span>
-                                    </div>
-                                    <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent border-t-primary mx-auto -mt-[1px]" />
-                                </div>
+                        {pinnedSpaces.map((space) => {
+                            const isHovered = hoveredSpaceId === space.id
+                            const hasImages = space.images.length > 0
+                            // Determine tooltip position to avoid overflow
+                            const pinX = space.mapPinX ?? 0
+                            const pinY = space.mapPinY ?? 0
+                            const tooltipOnRight = pinX < 50
+                            const tooltipAbove = pinY > 30
 
-                                {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-popover border rounded shadow-md text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                    <div className="font-medium">{space.name}</div>
-                                    {space.isExternal && (
-                                        <div className="text-emerald-500 text-[10px]">External</div>
+                            return (
+                                <div
+                                    key={space.id}
+                                    className="absolute"
+                                    style={{
+                                        left: `${pinX}%`,
+                                        top: `${pinY}%`,
+                                        transform: 'translate(-50%, -100%)',
+                                        zIndex: isHovered ? 50 : 10,
+                                    }}
+                                    onMouseEnter={() => setHoveredSpaceId(space.id)}
+                                    onMouseLeave={() => setHoveredSpaceId(null)}
+                                    onClick={() => onSpaceClick?.(space.id)}
+                                >
+                                    {/* Pin marker */}
+                                    <div className="relative cursor-pointer">
+                                        <div className={`w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all duration-200 ${
+                                            isHovered ? 'bg-primary scale-125' : 'bg-primary'
+                                        }`}>
+                                            <span className="text-[9px] font-bold text-primary-foreground">
+                                                {space.sortOrder}
+                                            </span>
+                                        </div>
+                                        <div className="w-0 h-0 border-l-[5px] border-r-[5px] border-t-[6px] border-l-transparent border-r-transparent border-t-primary mx-auto -mt-[1px]" />
+                                    </div>
+
+                                    {/* Rich tooltip */}
+                                    {isHovered && (
+                                        <div
+                                            className={`absolute pointer-events-none ${
+                                                tooltipAbove ? 'bottom-full mb-2' : 'top-full mt-2'
+                                            } ${
+                                                tooltipOnRight ? 'left-0' : 'right-0'
+                                            }`}
+                                            style={{ width: hasImages ? '240px' : 'auto' }}
+                                        >
+                                            <div className="bg-popover border rounded-lg shadow-xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150">
+                                                {/* Images */}
+                                                {hasImages && (
+                                                    <div className={`grid ${space.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-0`}>
+                                                        {space.images.map((url, i) => (
+                                                            // eslint-disable-next-line @next/next/no-img-element
+                                                            <img
+                                                                key={i}
+                                                                src={url}
+                                                                alt={`${space.name} photo ${i + 1}`}
+                                                                className="w-full h-28 object-cover"
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Info */}
+                                                <div className="px-3 py-2">
+                                                    <div className="font-medium text-sm">{space.name}</div>
+                                                    <div className="flex items-center gap-1 mt-1 flex-wrap">
+                                                        {space.isExternal && (
+                                                            <Badge variant="outline" className="text-[10px] px-1 py-0 text-emerald-600 border-emerald-500/40">
+                                                                External
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </CardContent>
             )}
