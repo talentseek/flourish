@@ -2,8 +2,6 @@
 
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { writeFile, unlink, mkdir } from 'fs/promises'
-import { join } from 'path'
 
 async function verifyAdmin() {
     const sessionUser = await getSessionUser()
@@ -22,32 +20,50 @@ export async function uploadFile(formData: FormData): Promise<string> {
     const file = formData.get('file') as File
     if (!file) throw new Error('No file provided')
 
-    // Generate unique filename
-    const ext = file.name.split('.').pop() || 'bin'
-    const safeName = file.name.replace(/[^a-z0-9_.-]/gi, '_').replace(/\.[^.]+$/, '')
-    const uniqueName = `${safeName}_${Date.now()}.${ext}`
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+    if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')
 
-    // Save to public/maps directory
-    const dir = join(process.cwd(), 'public', 'maps')
-    await mkdir(dir, { recursive: true })
+    // Use Vercel Blob REST API directly — avoids undici/webpack incompatibility
+    const response = await fetch(
+        `https://blob.vercel-storage.com/${encodeURIComponent(file.name)}`,
+        {
+            method: 'PUT',
+            headers: {
+                'authorization': `Bearer ${token}`,
+                'x-content-type': file.type || 'application/octet-stream',
+                'x-add-random-suffix': '1',
+            },
+            body: file,
+            // @ts-expect-error — duplex is needed for streaming request bodies
+            duplex: 'half',
+        }
+    )
 
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const filePath = join(dir, uniqueName)
-    await writeFile(filePath, buffer)
+    if (!response.ok) {
+        const text = await response.text()
+        throw new Error(`Upload failed: ${text}`)
+    }
 
-    return `/maps/${uniqueName}`
+    const result = await response.json() as { url: string }
+    return result.url
 }
 
 export async function deleteFile(url: string): Promise<void> {
     await verifyAdmin()
 
-    // Only delete local files (starting with /maps/)
-    if (url.startsWith('/maps/')) {
-        try {
-            const filePath = join(process.cwd(), 'public', url)
-            await unlink(filePath)
-        } catch {
-            // File may already be deleted
-        }
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+    if (!token || !url.startsWith('http')) return
+
+    try {
+        await fetch('https://blob.vercel-storage.com/delete', {
+            method: 'POST',
+            headers: {
+                'authorization': `Bearer ${token}`,
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ urls: [url] }),
+        })
+    } catch {
+        // File may already be deleted
     }
 }
