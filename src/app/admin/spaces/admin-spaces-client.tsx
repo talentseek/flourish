@@ -34,6 +34,7 @@ import { Plus, Pencil, Trash2, MapPin, Zap, Droplets, ArrowDownToLine, Info, Bui
 import { useRouter } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Textarea } from '@/components/ui/textarea'
+import { FloorMapManager, FloorMapData, SpacePinData } from './floor-map-manager'
 
 // ─── Constants ──────────────────────────────────────────
 
@@ -107,6 +108,10 @@ interface SpaceData {
     hasDrainage: boolean
     isExternal: boolean
     notes: string | null
+    floorMapId: string | null
+    mapPinX: number | null
+    mapPinY: number | null
+    images: string[]
     defaultDailyRate: number | null
     sortOrder: number
     isActive: boolean
@@ -118,6 +123,7 @@ interface LocationData {
     city: string
     type: string
     spaces: SpaceData[]
+    floorMaps: FloorMapData[]
 }
 
 interface AdminSpacesClientProps {
@@ -327,6 +333,22 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                         Add Space
                     </Button>
                 </div>
+
+                {/* Floor Maps */}
+                {selectedLocation && (
+                    <FloorMapManager
+                        locationId={selectedLocationId}
+                        floorMaps={selectedLocation.floorMaps}
+                        spaces={spaces.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            sortOrder: s.sortOrder,
+                            mapPinX: s.mapPinX,
+                            mapPinY: s.mapPinY,
+                            floorMapId: s.floorMapId,
+                        }))}
+                    />
+                )}
 
                 {/* Spaces Table */}
                 <Card>

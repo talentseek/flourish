@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
 import { getSpacesForLocation, getBookingsForDiary } from '@/actions/space-actions'
 import { SpaceDiaryGrid } from '@/components/spaces/space-diary-grid'
+import { SpaceMapView } from '@/components/spaces/space-map-view'
 import { startOfDay, addDays } from 'date-fns'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SiteHeader } from '@/components/site-header'
@@ -10,6 +11,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DiaryPageClient } from './diary-page-client'
 
 export const runtime = 'nodejs'
 
@@ -49,9 +51,28 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
     const windowStart = startOfDay(new Date())
     const windowEnd = addDays(windowStart, 9)
 
-    const [spaces, bookings] = await Promise.all([
+    const [spaces, bookings, floorMaps] = await Promise.all([
         getSpacesForLocation(location.id),
-        getBookingsForDiary(location.id, windowStart, windowEnd)
+        getBookingsForDiary(location.id, windowStart, windowEnd),
+        prisma.floorMap.findMany({
+            where: { locationId: location.id },
+            orderBy: { sortOrder: 'asc' },
+            include: {
+                spaces: {
+                    where: { isActive: true, mapPinX: { not: null }, mapPinY: { not: null } },
+                    select: {
+                        id: true,
+                        name: true,
+                        sortOrder: true,
+                        mapPinX: true,
+                        mapPinY: true,
+                        types: true,
+                        isExternal: true,
+                    },
+                    orderBy: { sortOrder: 'asc' },
+                }
+            }
+        })
     ])
 
     const serializedSpaces = spaces.map(s => ({
@@ -79,6 +100,18 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         operator: b.operator || null,
     }))
 
+    const serializedFloorMaps = floorMaps.map(m => ({
+        id: m.id,
+        name: m.name,
+        imageUrl: m.imageUrl,
+        sortOrder: m.sortOrder,
+        spaces: m.spaces.map(s => ({
+            ...s,
+            mapPinX: s.mapPinX ? Number(s.mapPinX) : null,
+            mapPinY: s.mapPinY ? Number(s.mapPinY) : null,
+        }))
+    }))
+
     return (
         <SidebarProvider>
             <AppSidebar variant="inset" userRole={dbUser.role} />
@@ -94,12 +127,13 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
                             </Button>
                         </Link>
 
-                        <SpaceDiaryGrid
+                        <DiaryPageClient
                             locationId={location.id}
                             locationName={`${location.name} — ${location.city}`}
                             spaces={serializedSpaces}
                             initialBookings={serializedBookings}
                             initialWindowStart={windowStart}
+                            floorMaps={serializedFloorMaps}
                         />
                     </div>
                 </div>

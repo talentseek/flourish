@@ -11,7 +11,9 @@ import { S06_DiscoverTenant } from "./scenes/S06_DiscoverTenant";
 import { S07_Outreach } from "./scenes/S07_Outreach";
 import { S08_Reveal } from "./scenes/S08_Reveal";
 import { S09_Impact } from "./scenes/S09_Impact";
+import { S10_CommercialImpact } from "./scenes/S10_CommercialImpact";
 import { S10_BrandedCTA } from "./scenes/S10_BrandedCTA";
+import { S12_GrokWalkthrough } from "./scenes/S12_GrokWalkthrough";
 
 export const Video: React.FC<{ config: ShowcaseConfig }> = ({ config }) => {
   return (
@@ -54,6 +56,17 @@ export const Video: React.FC<{ config: ShowcaseConfig }> = ({ config }) => {
         <S09_Impact config={config} />
       </Sequence>
 
+      {/* S10: Commercial Impact */}
+      <Sequence from={SCENES.commercialImpact.from} durationInFrames={SCENES.commercialImpact.duration}>
+        <S10_CommercialImpact config={config} />
+      </Sequence>
+
+      {/* S11: Grok Phone Walkthrough */}
+      <Sequence from={SCENES.grokWalkthrough.from} durationInFrames={SCENES.grokWalkthrough.duration}>
+        <S12_GrokWalkthrough />
+      </Sequence>
+
+      {/* S12: Branded CTA */}
       <Sequence from={SCENES.brandedCTA.from} durationInFrames={SCENES.brandedCTA.duration}>
         <S10_BrandedCTA config={config} />
       </Sequence>

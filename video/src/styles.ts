@@ -38,20 +38,22 @@ export const VIDEO = {
   width: 1920,
   height: 1080,
   fps: 30,
-  durationInFrames: 2100, // 70 seconds
+  durationInFrames: 2610, // ~87 seconds
 } as const;
 
 // Scene frame allocations (30fps)
-// Total: 2100 frames = 70 seconds
+// Total: 2610 frames = ~87 seconds
 export const SCENES = {
-  brandedIntro:     { from: 0,    duration: 90  },   //  3s — Logo + Braehead
-  theProblem:       { from: 90,   duration: 180 },   //  6s — Empty units crisis
-  searchBraehead:   { from: 270,  duration: 240 },   //  8s — Dashboard search
-  dataIntelligence: { from: 510,  duration: 210 },   //  7s — Stats counters
-  gapAnalysis:      { from: 720,  duration: 300 },   // 10s — Category bars + gap
-  discoverArtisans: { from: 1020, duration: 240 },   //  8s — Brand reveal
-  outreach:         { from: 1260, duration: 180 },   //  6s — Email mock
-  kioskReveal:      { from: 1440, duration: 240 },   //  8s — Kiosk image
-  impact:           { from: 1680, duration: 180 },   //  6s — Before/after
-  brandedCTA:       { from: 1860, duration: 240 },   //  8s — CTA
+  brandedIntro:      { from: 0,    duration: 90  },   //  3s — Logo + location
+  theProblem:        { from: 90,   duration: 180 },   //  6s — Empty units crisis
+  searchBraehead:    { from: 270,  duration: 240 },   //  8s — Dashboard search
+  dataIntelligence:  { from: 510,  duration: 210 },   //  7s — Stats counters
+  gapAnalysis:       { from: 720,  duration: 300 },   // 10s — Category bars + gap
+  discoverArtisans:  { from: 1020, duration: 240 },   //  8s — Brand reveal
+  outreach:          { from: 1260, duration: 180 },   //  6s — Counter + email
+  kioskReveal:       { from: 1440, duration: 240 },   //  8s — Video reveal
+  impact:            { from: 1680, duration: 180 },   //  6s — Before/after metrics
+  commercialImpact:  { from: 1860, duration: 210 },   //  7s — £0 → £22,800/yr (NEW)
+  grokWalkthrough:   { from: 2070, duration: 300 },   // 10s — Phone walkthrough (S11)
+  brandedCTA:        { from: 2370, duration: 240 },   //  8s — CTA (S12)
 } as const;

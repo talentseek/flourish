@@ -105,6 +105,14 @@ export interface ShowcaseConfig {
     }>;
   };
 
+  // ── Scene 10: Commercial Impact (optional) ──
+  commercialImpact?: {
+    label: string;
+    rentBefore: string;
+    rentAfter: string;
+    annualAfter: string;
+  };
+
   // ── Optional: Custom soundtrack ──
   /** Filename in public/ — defaults to "soundtrack.mp3" */
   soundtrack?: string;

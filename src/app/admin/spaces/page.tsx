@@ -15,7 +15,7 @@ export default async function AdminSpacesPage() {
         redirect('/dashboard')
     }
 
-    // Fetch managed locations with their spaces
+    // Fetch managed locations with their spaces and floor maps
     const locations = await prisma.location.findMany({
         where: { isManaged: true },
         select: {
@@ -40,9 +40,22 @@ export default async function AdminSpacesPage() {
                     hasDrainage: true,
                     isExternal: true,
                     notes: true,
+                    floorMapId: true,
+                    mapPinX: true,
+                    mapPinY: true,
+                    images: true,
                     defaultDailyRate: true,
                     sortOrder: true,
                     isActive: true,
+                }
+            },
+            floorMaps: {
+                orderBy: { sortOrder: 'asc' },
+                select: {
+                    id: true,
+                    name: true,
+                    imageUrl: true,
+                    sortOrder: true,
                 }
             }
         },
@@ -56,6 +69,8 @@ export default async function AdminSpacesPage() {
             width: s.width ? Number(s.width) : null,
             length: s.length ? Number(s.length) : null,
             defaultDailyRate: s.defaultDailyRate ? Number(s.defaultDailyRate) : null,
+            mapPinX: s.mapPinX ? Number(s.mapPinX) : null,
+            mapPinY: s.mapPinY ? Number(s.mapPinY) : null,
         }))
     }))
 

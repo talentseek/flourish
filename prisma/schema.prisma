@@ -138,6 +138,7 @@ model Location {
   // Relations
   tenants          Tenant[]
   spaces           Space[]
+  floorMaps        FloorMap[]
   crmDealLocations CrmDealLocation[]
 
   @@map("locations")
@@ -231,9 +232,26 @@ model OperatorLicense {
   @@map("operator_licenses")
 }
 
+model FloorMap {
+  id         String   @id @default(cuid())
+  locationId String
+  name       String   // "Ground Floor", "Upper Floor", etc.
+  imageUrl   String   // Vercel Blob URL to the SVG/PNG
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  spaces     Space[]
+
+  @@unique([locationId, name])
+  @@map("floor_maps")
+}
+
 model Space {
   id               String    @id @default(cuid())
   locationId       String
+  floorMapId       String?
   name             String
   types            String[]  @default(["GENERAL"])
   width            Decimal?  @db.Decimal(5, 2)
@@ -248,12 +266,16 @@ model Space {
   defaultDailyRate Decimal?  @db.Decimal(8, 2)
   isExternal       Boolean   @default(false)
   notes            String?
+  mapPinX          Decimal?  @db.Decimal(6, 3) // X position as percentage 0-100
+  mapPinY          Decimal?  @db.Decimal(6, 3) // Y position as percentage 0-100
+  images           String[]  @default([])
   sortOrder        Int       @default(0)
   isActive         Boolean   @default(true)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
   location         Location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  floorMap         FloorMap?      @relation(fields: [floorMapId], references: [id])
   bookings         SpaceBooking[]
 
   @@unique([locationId, name])

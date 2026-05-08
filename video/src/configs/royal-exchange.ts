@@ -38,12 +38,12 @@ export const royalExchange: ShowcaseConfig = {
   intelligence: {
     kpis: [
       { value: 35, suffix: "+", label: "Luxury Retailers", color: BRAND.lime },
-      { value: 2, suffix: "M", label: "Annual Visitors", color: BRAND.teal },
-      { value: 20370, suffix: " sqft", label: "Retail Floor Area", color: BRAND.text },
+      { value: 5, suffix: "M+", label: "Annual Visitors", color: BRAND.teal },
+      { value: 20000, suffix: " sqft", label: "Retail Floor Area", color: BRAND.text },
       { value: 4.6, suffix: "★", label: "Google Rating", color: BRAND.amber, decimals: 1 },
       { value: 450, suffix: "+ yrs", label: "Heritage Since 1571", color: BRAND.green },
     ],
-    anchors: ["Hermès", "Tiffany & Co", "Omega", "Fortnum & Mason", "Boodles", "Jo Malone", "Bremont", "Georg Jensen", "Montblanc"],
+    anchors: ["Hermès", "Tiffany & Co", "Omega", "Fortnum & Mason", "Boodles", "Jo Malone", "Bremont", "Georg Jensen", "Montblanc", "Watches of Switzerland", "Penhaligon's", "Mappin & Webb"],
   },
 
   gapAnalysis: {
@@ -63,10 +63,10 @@ export const royalExchange: ShowcaseConfig = {
   },
 
   tenant: {
-    name: "3 London Florists",
-    description: "Flourish identified and contacted 79 London-based florists within a single week. Three outstanding operators visited the site — each bringing unique floral artistry to the City.",
+    name: "79 London Florists",
+    description: "Flourish scanned its tenant network and identified 79 London-based florists perfectly suited to The Royal Exchange — premium operators with the brand positioning to sit alongside Hermès and Tiffany & Co.",
     categories: ["Flowers & Florists", "Premium Retail"],
-    products: ["Jen's Plants & Florist", "Flowers With Swag", "Blooms London Bridge"],
+    products: ["McQueens", "Moyses Stevens", "Wild at Heart", "Rebel Rebel", "That Flower Shop", "Philippa Craddock"],
     matchScore: 92,
   },
 
@@ -82,8 +82,8 @@ export const royalExchange: ShowcaseConfig = {
   },
 
   reveal: {
-    media: "florist-royal-exchange.png",
-    mediaType: "image",
+    media: "jens-walkthrough.mp4",
+    mediaType: "video",
     tenantName: "3 Florists Visited the Site",
     placement: "Premium Concession — The Royal Exchange Courtyard",
     badges: [
@@ -100,6 +100,13 @@ export const royalExchange: ShowcaseConfig = {
       { label: "Response Rate", before: "—", after: "~20%", afterColor: BRAND.lime },
       { label: "Timeline", before: "Gap Identified", after: "1 Week to Visits", afterColor: BRAND.green },
     ],
+  },
+
+  commercialImpact: {
+    label: "New Annual Revenue",
+    rentBefore: "£0",
+    rentAfter: "£1,900 / month",
+    annualAfter: "£22,800 / year",
   },
 
   // Custom soundtrack for this showcase
