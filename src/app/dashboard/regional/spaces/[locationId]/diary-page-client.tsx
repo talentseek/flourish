@@ -11,6 +11,7 @@ interface SpaceData {
     id: string
     name: string
     types: string[]
+    images: string[]
     defaultDailyRate: number | null
 }
 

@@ -80,6 +80,7 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         id: s.id,
         name: s.name,
         types: s.types,
+        images: s.images,
         defaultDailyRate: s.defaultDailyRate ? Number(s.defaultDailyRate) : null
     }))
 

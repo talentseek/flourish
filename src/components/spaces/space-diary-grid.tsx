@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useTransition } from 'react'
 import { format, addDays, startOfDay, differenceInDays, isSameDay } from 'date-fns'
-import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BookingCard } from './booking-card'
 import { BookingModal } from './booking-modal'
@@ -15,6 +15,7 @@ interface SpaceData {
     id: string
     name: string
     types: string[]
+    images: string[]
     defaultDailyRate: number | null
 }
 
@@ -211,11 +212,33 @@ export function SpaceDiaryGrid({
                             spaces.map((space) => (
                                 <tr key={space.id} className="group">
                                     <td className="text-xs font-medium p-2 border-b border-r sticky left-0 bg-background z-10">
-                                        <div className="flex items-center justify-between">
-                                            <span>{space.name}</span>
-                                            <span className="text-[10px] text-muted-foreground font-normal">
-                                                {space.types[0] || 'GENERAL'}
-                                            </span>
+                                        <div className="flex items-center justify-between relative group/name">
+                                            <span className="cursor-default">{space.name}</span>
+                                            {space.images.length > 0 && (
+                                                <ImageIcon className="h-3 w-3 text-blue-500 flex-shrink-0 ml-1" />
+                                            )}
+
+                                            {/* Image tooltip on hover */}
+                                            {space.images.length > 0 && (
+                                                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 opacity-0 group-hover/name:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
+                                                    <div className="bg-popover border rounded-lg shadow-xl overflow-hidden" style={{ width: '220px' }}>
+                                                        <div className={`grid ${space.images.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-0`}>
+                                                            {space.images.map((url, i) => (
+                                                                // eslint-disable-next-line @next/next/no-img-element
+                                                                <img
+                                                                    key={i}
+                                                                    src={url}
+                                                                    alt={`${space.name} photo ${i + 1}`}
+                                                                    className="w-full h-24 object-cover"
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        <div className="px-2 py-1.5">
+                                                            <div className="text-xs font-medium truncate">{space.name}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </td>
                                     {days.map((day) => {
