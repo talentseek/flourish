@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,7 +30,9 @@ import {
 } from '@/components/ui/table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { createSpace, updateSpace, deleteSpace } from '@/actions/space-actions'
-import { Plus, Pencil, Trash2, MapPin, Zap, Droplets, ArrowDownToLine, Info, Building2, TreePine } from 'lucide-react'
+import { addSpaceImage, removeSpaceImage } from '@/actions/floor-map-actions'
+import { uploadFile, deleteFile } from '@/actions/upload-actions'
+import { Plus, Pencil, Trash2, MapPin, Zap, Droplets, ArrowDownToLine, Info, Building2, TreePine, ImageIcon, ImagePlus, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Textarea } from '@/components/ui/textarea'
@@ -388,6 +390,12 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                                                             Ext
                                                         </Badge>
                                                     )}
+                                                    {space.images.length > 0 && (
+                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-0.5 text-blue-600 border-blue-500/40">
+                                                            <ImageIcon className="h-2.5 w-2.5" />
+                                                            {space.images.length}
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                             </TableCell>
                                             <TableCell>
@@ -514,12 +522,20 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                             <DialogTitle>Edit Space</DialogTitle>
                         </DialogHeader>
                         {editingSpace && (
-                            <SpaceForm
-                                onSubmit={handleEditSpace}
-                                defaultValues={editingSpace}
-                                submitLabel="Save Changes"
-                                loading={loading}
-                            />
+                            <>
+                                <SpaceForm
+                                    onSubmit={handleEditSpace}
+                                    defaultValues={editingSpace}
+                                    submitLabel="Save Changes"
+                                    loading={loading}
+                                />
+                                <div className="border-t pt-4 mt-2">
+                                    <SpaceImageManager
+                                        spaceId={editingSpace.id}
+                                        images={editingSpace.images}
+                                    />
+                                </div>
+                            </>
                         )}
                     </DialogContent>
                 </Dialog>
@@ -902,5 +918,107 @@ function SpaceForm({
                 </Button>
             </DialogFooter>
         </form>
+    )
+}
+
+// ─── Space Image Manager ────────────────────────────────
+
+function SpaceImageManager({
+    spaceId,
+    images,
+}: {
+    spaceId: string
+    images: string[]
+}) {
+    const router = useRouter()
+    const [uploading, setUploading] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
+    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setUploading(true)
+        try {
+            const formData = new FormData()
+            formData.set('file', file)
+            const url = await uploadFile(formData)
+            await addSpaceImage(spaceId, url)
+            router.refresh()
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to upload image')
+        } finally {
+            setUploading(false)
+            if (fileInputRef.current) fileInputRef.current.value = ''
+        }
+    }
+
+    async function handleRemove(imageUrl: string) {
+        if (!confirm('Remove this image?')) return
+        try {
+            await deleteFile(imageUrl)
+            await removeSpaceImage(spaceId, imageUrl)
+            router.refresh()
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to remove image')
+        }
+    }
+
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-1.5">
+                    <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                    Space Photos
+                    <span className="text-muted-foreground font-normal">({images.length}/2)</span>
+                </Label>
+                {images.length < 2 && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 h-7 text-xs"
+                        disabled={uploading}
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <ImagePlus className="h-3 w-3" />
+                        {uploading ? 'Uploading...' : 'Add Photo'}
+                    </Button>
+                )}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={handleUpload}
+                />
+            </div>
+
+            {images.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-3 text-center bg-muted/30 rounded-lg">
+                    No photos yet. Add up to 2 photos of this space.
+                </p>
+            ) : (
+                <div className="grid grid-cols-2 gap-3">
+                    {images.map((url, i) => (
+                        <div key={i} className="relative group rounded-lg overflow-hidden border bg-muted/20">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                                src={url}
+                                alt={`Space photo ${i + 1}`}
+                                className="w-full h-32 object-cover"
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500/90 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => handleRemove(url)}
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
     )
 }
