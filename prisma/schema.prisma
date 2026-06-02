@@ -179,6 +179,7 @@ enum ComplianceStatus {
   PASSED
   FAILED
   EXPIRED
+  DISSOLVED
 }
 
 model Operator {

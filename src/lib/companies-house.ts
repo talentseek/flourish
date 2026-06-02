@@ -100,18 +100,18 @@ export async function searchCompanyByName(businessName: string): Promise<Company
             .trim()
 
         const query = encodeURIComponent(cleanName)
-        const data = await chFetch(`/search/companies?q=${query}&items_per_page=5`)
+        const data = await chFetch(`/search/companies?q=${query}&items_per_page=10`)
 
         if (!data.items || data.items.length === 0) {
             return { found: false, isActive: false, company: null, error: 'No companies found' }
         }
 
-        // Sort by match quality — prefer exact/contains match + active status
+        // Score all results — prefer active, but include dissolved
         const scored = data.items
-            .filter((item: any) => item.company_status === 'active')
             .map((item: any) => ({
                 item,
-                score: calculateMatchScore(businessName, item.title),
+                score: calculateMatchScore(businessName, item.title)
+                    + (item.company_status === 'active' ? 10 : 0),
             }))
             .sort((a: any, b: any) => b.score - a.score)
 

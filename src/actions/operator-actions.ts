@@ -151,7 +151,13 @@ async function runCompaniesHouseCheck(
     }
 
     if (result.found && result.company) {
-        updateData.companiesHouseCheck = result.isActive ? 'PASSED' : 'FAILED'
+        if (result.isActive) {
+            updateData.companiesHouseCheck = 'PASSED'
+        } else if (result.company.companyStatus === 'dissolved') {
+            updateData.companiesHouseCheck = 'DISSOLVED'
+        } else {
+            updateData.companiesHouseCheck = 'FAILED'
+        }
         updateData.companiesHouseRef = result.company.companyNumber
         updateData.accountsNextDue = result.company.accountsNextDue
             ? new Date(result.company.accountsNextDue)

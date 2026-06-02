@@ -117,6 +117,7 @@ function ComplianceBadge({ status }: { status: ComplianceStatus }) {
         case 'PASSED': return <Badge className="bg-green-600 text-xs gap-1"><ShieldCheck className="h-3 w-3" />Passed</Badge>
         case 'FAILED': return <Badge variant="destructive" className="text-xs gap-1"><ShieldAlert className="h-3 w-3" />Failed</Badge>
         case 'EXPIRED': return <Badge className="bg-amber-500 text-xs gap-1"><AlertTriangle className="h-3 w-3" />Expired</Badge>
+        case 'DISSOLVED': return <Badge variant="outline" className="text-xs gap-1 text-slate-500 border-slate-400"><AlertTriangle className="h-3 w-3" />Dissolved</Badge>
         default: return <Badge variant="secondary" className="text-xs">Not Checked</Badge>
     }
 }
