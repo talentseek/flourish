@@ -24,6 +24,7 @@ model User {
   accounts      Account[]
   members       Member[]
   invitations   Invitation[]
+  loginLogs     UserLoginLog[]
 
   // CRM relations
   crmDeals                CrmDeal[]
@@ -640,4 +641,21 @@ model CrmNotificationSettings {
   user User @relation(fields: [userId], references: [id])
 
   @@map("crm_notification_settings")
+}
+
+// ─── Login Audit Log ─────────────────────────────────────────
+
+model UserLoginLog {
+  id        String   @id @default(cuid())
+  userId    String
+  email     String
+  loginAt   DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([loginAt])
+  @@map("user_login_logs")
 }

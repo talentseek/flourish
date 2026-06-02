@@ -48,6 +48,35 @@ export const auth = betterAuth({
   plugins: [
     organization()
   ],
+
+  // Record every login to the permanent audit log
+  databaseHooks: {
+    session: {
+      create: {
+        after: async (session) => {
+          try {
+            const user = await prisma.user.findUnique({
+              where: { id: session.userId },
+              select: { email: true },
+            });
+            if (user) {
+              await prisma.userLoginLog.create({
+                data: {
+                  userId: session.userId,
+                  email: user.email,
+                  ipAddress: session.ipAddress ?? null,
+                  userAgent: session.userAgent ?? null,
+                },
+              });
+            }
+          } catch (err) {
+            // Non-blocking — never fail a login because of logging
+            console.error("[Auth] Failed to write login audit log:", err);
+          }
+        },
+      },
+    },
+  },
   // Mock email for development
   emailAndPassword: {
     enabled: true,

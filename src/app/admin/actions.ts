@@ -257,3 +257,72 @@ export async function deleteUser(userId: string) {
     revalidatePath("/admin/users")
     return { success: true }
 }
+
+// ── Login history ──────────────────────────────────────────────────────
+
+export async function getLoginHistory(page = 1, pageSize = 50) {
+    await verifyAdmin()
+
+    const [logs, total] = await Promise.all([
+        prisma.userLoginLog.findMany({
+            include: {
+                user: { select: { name: true, role: true } },
+            },
+            orderBy: { loginAt: "desc" },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.userLoginLog.count(),
+    ])
+
+    return { logs, total, page, pageSize }
+}
+
+export async function getLoginStats() {
+    await verifyAdmin()
+
+    const now = new Date()
+    const todayStart = new Date(now)
+    todayStart.setHours(0, 0, 0, 0)
+    const weekAgo = new Date(todayStart)
+    weekAgo.setDate(weekAgo.getDate() - 7)
+
+    // Fall back to sessions table if audit log is empty
+    const auditTotal = await prisma.userLoginLog.count()
+
+    if (auditTotal === 0) {
+        // Use sessions as a proxy
+        const sessions = await prisma.session.findMany({
+            include: { user: { select: { name: true, email: true, role: true } } },
+            orderBy: { createdAt: "desc" },
+        })
+        return {
+            source: "sessions" as const,
+            sessions,
+            totalLogins: sessions.length,
+            uniqueUsers: new Set(sessions.map(s => s.userId)).size,
+            loginsToday: sessions.filter(s => s.createdAt >= todayStart).length,
+            loginsThisWeek: sessions.filter(s => s.createdAt >= weekAgo).length,
+            activeSessions: sessions.filter(s => s.expiresAt > now).length,
+        }
+    }
+
+    const [totalLogins, uniqueUsers, loginsToday, loginsThisWeek, activeSessions] =
+        await Promise.all([
+            prisma.userLoginLog.count(),
+            prisma.userLoginLog.groupBy({ by: ["userId"] }).then(r => r.length),
+            prisma.userLoginLog.count({ where: { loginAt: { gte: todayStart } } }),
+            prisma.userLoginLog.count({ where: { loginAt: { gte: weekAgo } } }),
+            prisma.session.count({ where: { expiresAt: { gt: now } } }),
+        ])
+
+    return {
+        source: "audit" as const,
+        sessions: [],
+        totalLogins,
+        uniqueUsers,
+        loginsToday,
+        loginsThisWeek,
+        activeSessions,
+    }
+}

@@ -7,6 +7,7 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "render": "remotion render BraeheadShowcase out/braehead-showcase.mp4",
+    "render:training:highcross": "remotion render HighCrossSpacesTraining out/highcross-spaces-training.mp4",
     "lint": "tsc"
   },
   "dependencies": {
