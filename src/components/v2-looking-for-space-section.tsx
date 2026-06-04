@@ -29,7 +29,7 @@ export function V2LookingForSpaceSection() {
   const [activeStep, setActiveStep] = useState(1)
 
   return (
-    <section id="looking-for-space" className="py-16 bg-white">
+    <section id="looking-for-space" className="py-16 bg-white scroll-mt-20">
       <div className="container mx-auto px-4">
         {/* Hero */}
         <div className="text-center space-y-4 mb-16 max-w-3xl mx-auto">

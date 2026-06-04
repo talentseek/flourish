@@ -66,7 +66,7 @@ export function V2LocationsSection() {
   const showResults = searchQuery.trim().length > 0
 
   return (
-    <section id="locations" className="py-16 bg-[#F7F4F2]">
+    <section id="locations" className="py-16 bg-[#F7F4F2] scroll-mt-20">
       <div className="container mx-auto px-4">
         <div className="text-center space-y-2 mb-8">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#4D4A46]">Our Locations</h2>

@@ -13,7 +13,7 @@ import Link from "next/link"
 
 export function V2JoinPortfolioSection() {
   return (
-    <section id="join-portfolio" className="py-16 bg-[#F7F4F2]">
+    <section id="join-portfolio" className="py-16 bg-[#F7F4F2] scroll-mt-20">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center space-y-4 mb-16 max-w-3xl mx-auto">

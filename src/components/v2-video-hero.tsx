@@ -106,7 +106,7 @@ export function V2VideoHero() {
     <div
       ref={containerRef}
       className={cn(
-        "top-0 left-0 right-0 h-screen w-full overflow-hidden -z-10",
+        "top-0 left-0 right-0 h-screen w-full overflow-hidden z-0",
         isFixed ? "fixed" : "absolute"
       )}
     >

@@ -42,35 +42,38 @@ export default function HomePage() {
           {/* Spacer to account for fixed hero section */}
           <div className="h-screen w-full" aria-hidden="true" />
 
-          {/* Locations Section */}
-          <V2LocationsSection />
+          {/* Main Content Areas - stacked above fixed video hero */}
+          <div className="relative z-10 bg-white">
+            {/* Locations Section */}
+            <V2LocationsSection />
 
-          {/* NMTF Section */}
-          <V2NMTFSection />
+            {/* NMTF Section */}
+            <V2NMTFSection />
 
-          {/* Looking For Space Section */}
-          <V2LookingForSpaceSection />
+            {/* Looking For Space Section */}
+            <V2LookingForSpaceSection />
 
-          {/* Join our portfolio Section */}
-          <V2JoinPortfolioSection />
+            {/* Join our portfolio Section */}
+            <V2JoinPortfolioSection />
 
-          {/* Trader Stories Section */}
-          <V2TraderStoriesSection />
+            {/* Trader Stories Section */}
+            <V2TraderStoriesSection />
 
-          {/* Team/About Us Section */}
-          <V2TeamSection />
+            {/* Team/About Us Section */}
+            <V2TeamSection />
 
-          {/* Video Section */}
-          <V2VideoSection />
+            {/* Video Section */}
+            <V2VideoSection />
 
-          {/* Podcast Section */}
-          <V2PodcastSection />
+            {/* Podcast Section */}
+            <V2PodcastSection />
 
-          {/* Contact Us Section */}
-          <V2ContactSection />
+            {/* Contact Us Section */}
+            <V2ContactSection />
 
-          {/* Footer */}
-          <V2Footer />
+            {/* Footer */}
+            <V2Footer />
+          </div>
         </main>
       </div>
     </div>

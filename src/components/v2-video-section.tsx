@@ -4,7 +4,7 @@ import { Play } from "lucide-react"
 
 export function V2VideoSection() {
   return (
-    <section id="video" className="py-16 bg-[#4D4A46]">
+    <section id="video" className="py-16 bg-[#4D4A46] scroll-mt-20">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center space-y-4 mb-12 max-w-3xl mx-auto">
