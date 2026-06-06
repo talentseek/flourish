@@ -18,7 +18,59 @@ export function V2PodcastSection() {
                     </p>
                 </div>
 
-                {/* Latest Episode — Chris Wade */}
+                {/* Latest Episode — Will Lankston */}
+                <div className="max-w-4xl mx-auto">
+                    <Card className="border-[#D8D8D6] overflow-hidden">
+                        <CardContent className="p-0">
+                            <div className="aspect-video bg-[#D8D8D6]">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/LZHTnep6l3Y"
+                                    title="The Upside-Down High Street? Will Lankston on Timpson's Radical People-First Culture"
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowFullScreen
+                                />
+                            </div>
+                            <div className="p-6 md:p-8">
+                                <div className="flex items-start gap-4">
+                                    <Quote className="h-6 w-6 text-[#E6FB60] flex-shrink-0 mt-1" />
+                                    <div className="space-y-4">
+                                        <h3 className="text-xl md:text-2xl font-bold text-[#4D4A46]">
+                                            The Upside-Down High Street? Timpson&apos;s Radical People-First Culture
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Paul Clifford sits down with Will Lankston, Managing Director of
+                                            Timpson Direct, to unpack the famous &quot;upside-down management&quot;
+                                            philosophy that puts frontline teams in total control. From radical
+                                            autonomy and hiring ex-offenders to measuring success by employee
+                                            happiness, Will reveals why trusting your people isn&apos;t just good
+                                            ethics — it&apos;s a proven driver of commercial growth on the British
+                                            high street.
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #Leadership
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #CompanyCulture
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #HighStreet
+                                            </span>
+                                            <span className="px-3 py-1 bg-[#E6FB60] text-[#4D4A46] text-sm font-medium rounded-full">
+                                                #UpsideDownManagement
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Previous Episode — Chris Wade */}
                 <div className="max-w-4xl mx-auto">
                     <Card className="border-[#D8D8D6] overflow-hidden">
                         <CardContent className="p-0">
