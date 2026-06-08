@@ -3,6 +3,19 @@
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
+async function verifyAdminOrRM() {
+    const sessionUser = await getSessionUser()
+    if (!sessionUser) throw new Error('Unauthorized')
+    const dbUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { role: true }
+    })
+    if (!dbUser || (dbUser.role !== 'ADMIN' && dbUser.role !== 'REGIONAL_MANAGER')) {
+        throw new Error('Unauthorized: Admin or RM access required')
+    }
+    return dbUser
+}
+
 async function verifyAdmin() {
     const sessionUser = await getSessionUser()
     if (!sessionUser) throw new Error('Unauthorized')
@@ -26,6 +39,47 @@ export async function uploadFile(formData: FormData): Promise<string> {
     // Use Vercel Blob REST API directly — avoids undici/webpack incompatibility
     const response = await fetch(
         `https://blob.vercel-storage.com/${encodeURIComponent(file.name)}`,
+        {
+            method: 'PUT',
+            headers: {
+                'authorization': `Bearer ${token}`,
+                'x-content-type': file.type || 'application/octet-stream',
+                'x-add-random-suffix': '1',
+            },
+            body: file,
+            // @ts-expect-error — duplex is needed for streaming request bodies
+            duplex: 'half',
+        }
+    )
+
+    if (!response.ok) {
+        const text = await response.text()
+        throw new Error(`Upload failed: ${text}`)
+    }
+
+    const result = await response.json() as { url: string }
+    return result.url
+}
+
+export async function uploadComplianceDoc(
+    formData: FormData,
+    type: 'pat' | 'pli',
+    entityId: string
+): Promise<string> {
+    await verifyAdminOrRM()
+
+    const file = formData.get('file') as File
+    if (!file) throw new Error('No file provided')
+
+    const token = process.env.BLOB_READ_WRITE_TOKEN
+    if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')
+
+    const timestamp = Date.now()
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const path = `compliance/${type}/${entityId}/${timestamp}-${safeName}`
+
+    const response = await fetch(
+        `https://blob.vercel-storage.com/${encodeURIComponent(path)}`,
         {
             method: 'PUT',
             headers: {

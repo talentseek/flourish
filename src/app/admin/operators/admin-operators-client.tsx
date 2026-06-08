@@ -30,6 +30,7 @@ import {
     removeLicense,
     checkCompaniesHouse,
 } from '@/actions/operator-actions'
+import { uploadComplianceDoc } from '@/actions/upload-actions'
 import { OperatorType, LicenseCategory, ComplianceStatus } from '@prisma/client'
 import {
     Plus,
@@ -42,6 +43,8 @@ import {
     AlertTriangle,
     RefreshCw,
     Building2,
+    Paperclip,
+    Download,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -54,6 +57,7 @@ interface LicenseData {
     endDate: string
     isVerified: boolean
     notes: string | null
+    documentUrl: string | null
 }
 
 interface OperatorData {
@@ -132,6 +136,7 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     const [selectedTypes, setSelectedTypes] = useState<OperatorType[]>([])
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState('')
+    const [licenseFile, setLicenseFile] = useState<File | null>(null)
 
     const filtered = operators.filter(op =>
         op.companyName.toLowerCase().includes(search.toLowerCase()) ||
@@ -201,6 +206,14 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         const form = new FormData(e.currentTarget)
 
         try {
+            // Upload document if selected
+            let docUrl: string | undefined
+            if (licenseFile) {
+                const uploadData = new FormData()
+                uploadData.set('file', licenseFile)
+                docUrl = await uploadComplianceDoc(uploadData, 'pli', licenseForOperator)
+            }
+
             await addLicense({
                 operatorId: licenseForOperator,
                 type: form.get('type') as LicenseCategory,
@@ -211,10 +224,12 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                     ? parseFloat(form.get('coverValue') as string)
                     : undefined,
                 notes: (form.get('notes') as string) || undefined,
+                documentUrl: docUrl,
             })
 
             setLicenseDialogOpen(false)
             setLicenseForOperator(null)
+            setLicenseFile(null)
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to add license')
@@ -469,6 +484,19 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                         {formatDate(lic.startDate)} — {formatDate(lic.endDate)}
                                                                     </span>
                                                                     <ExpiryBadge endDate={lic.endDate} />
+                                                                    {lic.documentUrl && (
+                                                                        <a
+                                                                            href={lic.documentUrl}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="inline-flex items-center gap-1 text-primary hover:underline text-xs"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                            <Paperclip className="h-3 w-3" />
+                                                                            <Download className="h-3 w-3" />
+                                                                            Document
+                                                                        </a>
+                                                                    )}
                                                                 </div>
                                                                 <Button
                                                                     variant="ghost"
@@ -629,6 +657,23 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                         <div className="space-y-2">
                             <Label htmlFor="licNotes">Notes</Label>
                             <Input id="licNotes" name="notes" placeholder="Optional notes" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>Supporting Document</Label>
+                            <Input
+                                type="file"
+                                className="text-xs"
+                                onChange={(e) => setLicenseFile(e.target.files?.[0] || null)}
+                            />
+                            {licenseFile && (
+                                <p className="text-xs text-muted-foreground">
+                                    📎 {licenseFile.name}
+                                </p>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                                Upload a copy of the certificate or insurance policy.
+                            </p>
                         </div>
 
                         <DialogFooter>

@@ -98,6 +98,10 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         dailyRate: b.dailyRate ? Number(b.dailyRate) : null,
         totalValue: b.totalValue ? Number(b.totalValue) : null,
         notes: b.notes,
+        patCertNumber: b.patCertNumber,
+        patExpiryDate: b.patExpiryDate,
+        equipmentList: b.equipmentList,
+        patDocumentUrl: b.patDocumentUrl,
         operator: b.operator || null,
     }))
 

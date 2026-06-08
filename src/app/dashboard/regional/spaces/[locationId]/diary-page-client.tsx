@@ -31,6 +31,10 @@ interface BookingData {
     dailyRate?: number | null
     totalValue?: number | null
     notes?: string | null
+    patCertNumber?: string | null
+    patExpiryDate?: Date | string | null
+    equipmentList?: string | null
+    patDocumentUrl?: string | null
     operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 

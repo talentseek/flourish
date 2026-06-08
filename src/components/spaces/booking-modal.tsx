@@ -14,10 +14,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { createBooking, updateBooking, updateBookingStatus, createCentreEvent } from '@/actions/space-actions'
+import { uploadComplianceDoc } from '@/actions/upload-actions'
 import { searchOperators } from '@/actions/operator-actions'
 import { BookingStatus } from '@prisma/client'
 import { format } from 'date-fns'
-import { Search, ShieldCheck, ShieldAlert, AlertTriangle } from 'lucide-react'
+import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Paperclip, Download } from 'lucide-react'
 import { checkBookingCompliance } from '@/lib/compliance-utils'
 
 interface OperatorResult {
@@ -50,6 +51,7 @@ interface BookingData {
     patCertNumber?: string | null
     patExpiryDate?: Date | string | null
     equipmentList?: string | null
+    patDocumentUrl?: string | null
     operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 
@@ -83,6 +85,7 @@ export function BookingModal({
     )
     const isCentreEvent = activeTab === 'centre'
     const isEditingCentreEvent = mode === 'edit' && booking?.bookingType === 'CENTRE_EVENT'
+    const [patFile, setPatFile] = useState<File | null>(null)
 
     // Operator picker state
     const [operatorSearch, setOperatorSearch] = useState('')
@@ -183,6 +186,14 @@ export function BookingModal({
         const formData = new FormData(e.currentTarget)
 
         try {
+            // Upload PAT document if selected
+            let patDocUrl: string | undefined
+            if (patFile) {
+                const uploadData = new FormData()
+                uploadData.set('file', patFile)
+                patDocUrl = await uploadComplianceDoc(uploadData, 'pat', booking?.id || 'new')
+            }
+
             if (mode === 'create') {
                 await createBooking({
                     spaceId,
@@ -199,6 +210,7 @@ export function BookingModal({
                     patCertNumber: (formData.get('patCertNumber') as string) || undefined,
                     patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
                     equipmentList: (formData.get('equipmentList') as string) || undefined,
+                    patDocumentUrl: patDocUrl,
                 })
             } else if (booking) {
                 await updateBooking(booking.id, {
@@ -215,6 +227,7 @@ export function BookingModal({
                     patCertNumber: (formData.get('patCertNumber') as string) || undefined,
                     patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
                     equipmentList: (formData.get('equipmentList') as string) || undefined,
+                    patDocumentUrl: patDocUrl,
                 })
             }
 
@@ -591,6 +604,49 @@ export function BookingModal({
                                 rows={2}
                             />
                         </div>
+
+                        {/* PAT Document Upload */}
+                        <div className="space-y-2">
+                            <Label>PAT Certificate Document</Label>
+                            {booking?.patDocumentUrl && !patFile && (
+                                <div className="flex items-center gap-2 text-sm bg-background rounded-md p-2 border">
+                                    <Paperclip className="h-3.5 w-3.5 text-muted-foreground" />
+                                    <a
+                                        href={booking.patDocumentUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline flex items-center gap-1"
+                                    >
+                                        <Download className="h-3 w-3" />
+                                        View Document
+                                    </a>
+                                    <span className="text-xs text-muted-foreground">|</span>
+                                    <label className="text-xs text-muted-foreground hover:text-foreground cursor-pointer">
+                                        Replace
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            onChange={(e) => setPatFile(e.target.files?.[0] || null)}
+                                        />
+                                    </label>
+                                </div>
+                            )}
+                            {(!booking?.patDocumentUrl || patFile) && (
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        type="file"
+                                        className="text-xs"
+                                        onChange={(e) => setPatFile(e.target.files?.[0] || null)}
+                                    />
+                                    {patFile && (
+                                        <span className="text-xs text-muted-foreground truncate max-w-[150px]">
+                                            📎 {patFile.name}
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
                         <p className="text-xs text-muted-foreground">
                             PAT certificate is required to confirm this booking.
                         </p>

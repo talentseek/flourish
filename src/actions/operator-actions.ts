@@ -242,6 +242,7 @@ interface AddLicenseData {
     coverValue?: number
     isVerified?: boolean
     notes?: string
+    documentUrl?: string
 }
 
 export async function addLicense(data: AddLicenseData) {
@@ -257,6 +258,7 @@ export async function addLicense(data: AddLicenseData) {
             coverValue: data.coverValue,
             isVerified: data.isVerified || false,
             notes: data.notes,
+            documentUrl: data.documentUrl,
         }
     })
 
@@ -271,6 +273,7 @@ interface UpdateLicenseData {
     endDate?: string
     isVerified?: boolean
     notes?: string
+    documentUrl?: string
 }
 
 export async function updateLicense(id: string, data: UpdateLicenseData) {

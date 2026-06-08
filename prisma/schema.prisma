@@ -314,6 +314,7 @@ model SpaceBooking {
   patCertNumber String?
   patExpiryDate DateTime?
   equipmentList String?
+  patDocumentUrl String?
 
   createdById   String?
   createdAt     DateTime      @default(now())
