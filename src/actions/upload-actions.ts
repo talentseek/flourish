@@ -36,7 +36,6 @@ export async function uploadFile(formData: FormData): Promise<string> {
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')
 
-    // Use Vercel Blob REST API directly — avoids undici/webpack incompatibility
     const response = await fetch(
         `https://blob.vercel-storage.com/${encodeURIComponent(file.name)}`,
         {
@@ -61,15 +60,19 @@ export async function uploadFile(formData: FormData): Promise<string> {
     return result.url
 }
 
-export async function uploadComplianceDoc(
-    formData: FormData,
-    type: 'pat' | 'pli',
-    entityId: string
-): Promise<string> {
+/**
+ * Upload a compliance document (PAT cert or PLI policy).
+ * FormData must include: file, type ('pat'|'pli'), entityId
+ */
+export async function uploadComplianceDoc(formData: FormData): Promise<string> {
     await verifyAdminOrRM()
 
     const file = formData.get('file') as File
+    const type = formData.get('type') as string
+    const entityId = formData.get('entityId') as string
+
     if (!file) throw new Error('No file provided')
+    if (!type || !entityId) throw new Error('Missing type or entityId')
 
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')

@@ -211,7 +211,9 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
             if (licenseFile) {
                 const uploadData = new FormData()
                 uploadData.set('file', licenseFile)
-                docUrl = await uploadComplianceDoc(uploadData, 'pli', licenseForOperator)
+                uploadData.set('type', 'pli')
+                uploadData.set('entityId', licenseForOperator)
+                docUrl = await uploadComplianceDoc(uploadData)
             }
 
             await addLicense({

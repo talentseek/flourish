@@ -191,7 +191,9 @@ export function BookingModal({
             if (patFile) {
                 const uploadData = new FormData()
                 uploadData.set('file', patFile)
-                patDocUrl = await uploadComplianceDoc(uploadData, 'pat', booking?.id || 'new')
+                uploadData.set('type', 'pat')
+                uploadData.set('entityId', booking?.id || 'new')
+                patDocUrl = await uploadComplianceDoc(uploadData)
             }
 
             if (mode === 'create') {
