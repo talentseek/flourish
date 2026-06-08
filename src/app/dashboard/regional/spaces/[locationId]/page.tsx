@@ -2,9 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
 import { getSpacesForLocation, getBookingsForDiary } from '@/actions/space-actions'
-import { SpaceDiaryGrid } from '@/components/spaces/space-diary-grid'
-import { SpaceMapView } from '@/components/spaces/space-map-view'
-import { startOfDay, addDays } from 'date-fns'
+import { startOfDay, startOfWeek, endOfWeek } from 'date-fns'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SiteHeader } from '@/components/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
@@ -48,8 +46,8 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         redirect('/dashboard/regional')
     }
 
-    const windowStart = startOfDay(new Date())
-    const windowEnd = addDays(windowStart, 9)
+    const windowStart = startOfWeek(startOfDay(new Date()), { weekStartsOn: 1 })
+    const windowEnd = endOfWeek(startOfDay(new Date()), { weekStartsOn: 1 })
 
     const [spaces, bookings, floorMaps] = await Promise.all([
         getSpacesForLocation(location.id),
