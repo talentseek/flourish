@@ -95,20 +95,42 @@ export function BookingModal({
         ? format(new Date(booking.endDate), 'yyyy-MM-dd')
         : initialStart
 
-    // Pre-populate operator on edit
+    // Pre-populate operator on edit — fetch full data including licenses
     useEffect(() => {
         if (mode === 'edit' && booking?.operator) {
-            setSelectedOperator({
-                id: booking.operator.id,
-                companyName: booking.operator.companyName,
-                tradingName: booking.operator.tradingName || null,
-                contactName: null,
-                contactEmail: null,
-                contactPhone: null,
-                types: [],
-                licenses: []
-            })
             setOperatorSearch(booking.operator.companyName)
+            // Fetch full operator data so we have licenses for PLI check
+            searchOperators(booking.operator.companyName).then(results => {
+                const match = (results as unknown as OperatorResult[]).find(
+                    r => r.id === booking.operator!.id
+                )
+                if (match) {
+                    setSelectedOperator(match)
+                } else {
+                    // Fallback if not found in search
+                    setSelectedOperator({
+                        id: booking.operator!.id,
+                        companyName: booking.operator!.companyName,
+                        tradingName: booking.operator!.tradingName || null,
+                        contactName: null,
+                        contactEmail: null,
+                        contactPhone: null,
+                        types: [],
+                        licenses: []
+                    })
+                }
+            }).catch(() => {
+                setSelectedOperator({
+                    id: booking.operator!.id,
+                    companyName: booking.operator!.companyName,
+                    tradingName: booking.operator!.tradingName || null,
+                    contactName: null,
+                    contactEmail: null,
+                    contactPhone: null,
+                    types: [],
+                    licenses: []
+                })
+            })
         } else if (mode === 'create') {
             setSelectedOperator(null)
             setOperatorSearch('')
