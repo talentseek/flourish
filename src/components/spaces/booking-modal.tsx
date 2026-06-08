@@ -29,6 +29,7 @@ interface OperatorResult {
     contactEmail: string | null
     contactPhone: string | null
     types: string[]
+    entityType?: string
     licenses: { type: string; endDate: Date | string; coverValue?: number | string | null }[]
 }
 

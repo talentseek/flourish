@@ -45,6 +45,7 @@ import {
     Building2,
     Paperclip,
     Download,
+    User,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -70,6 +71,7 @@ interface OperatorData {
     address: string | null
     website: string | null
     types: OperatorType[]
+    entityType: string
     companiesHouseCheck: ComplianceStatus
     companiesHouseDate: string | null
     companiesHouseRef: string | null
@@ -94,12 +96,17 @@ const OPERATOR_TYPES: { value: OperatorType; label: string }[] = [
 const LICENSE_TYPES: { value: LicenseCategory; label: string }[] = [
     { value: 'PUBLIC_LIABILITY_INSURANCE', label: 'Public Liability Insurance' },
     { value: 'FOOD_HYGIENE', label: 'Food Hygiene Certificate' },
+    { value: 'PHOTOGRAPHIC_ID', label: 'Photographic ID' },
+    { value: 'PROOF_OF_ADDRESS', label: 'Proof of Address' },
     { value: 'GENERAL_LICENSE', label: 'General License' },
     { value: 'STREET_TRADING', label: 'Street Trading License' },
     { value: 'ALCOHOL_LICENSE', label: 'Alcohol License' },
     { value: 'FIRE_SAFETY', label: 'Fire Safety Certificate' },
     { value: 'OTHER', label: 'Other' },
 ]
+
+const PHOTO_ID_TYPES = ['Passport', 'Driving Licence', 'National ID Card', 'Other']
+const ADDRESS_PROOF_TYPES = ['Utility Bill', 'Bank Statement', 'Council Tax Bill', 'Other']
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -137,6 +144,8 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState('')
     const [licenseFile, setLicenseFile] = useState<File | null>(null)
+    const [selectedEntityType, setSelectedEntityType] = useState<string>('LIMITED_COMPANY')
+    const [selectedLicenseType, setSelectedLicenseType] = useState<string>('PUBLIC_LIABILITY_INSURANCE')
 
     const filtered = operators.filter(op =>
         op.companyName.toLowerCase().includes(search.toLowerCase()) ||
@@ -146,12 +155,14 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     function openCreate() {
         setEditingOperator(null)
         setSelectedTypes([])
+        setSelectedEntityType('LIMITED_COMPANY')
         setOperatorDialogOpen(true)
     }
 
     function openEdit(op: OperatorData) {
         setEditingOperator(op)
         setSelectedTypes(op.types)
+        setSelectedEntityType(op.entityType || 'LIMITED_COMPANY')
         setOperatorDialogOpen(true)
     }
 
@@ -169,9 +180,10 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                 contactPhone: (form.get('contactPhone') as string) || undefined,
                 address: (form.get('address') as string) || undefined,
                 website: (form.get('website') as string) || undefined,
-                companiesHouseRef: (form.get('companiesHouseRef') as string) || undefined,
+                companiesHouseRef: selectedEntityType === 'LIMITED_COMPANY' ? ((form.get('companiesHouseRef') as string) || undefined) : undefined,
                 notes: (form.get('notes') as string) || undefined,
                 types: selectedTypes,
+                entityType: selectedEntityType as 'LIMITED_COMPANY' | 'SOLE_TRADER',
             }
 
             if (editingOperator) {
@@ -342,7 +354,7 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                 <TableHead>Types</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>PLI</TableHead>
-                                <TableHead>Companies House</TableHead>
+                                <TableHead>Verification</TableHead>
                                 <TableHead>Credit</TableHead>
                                 <TableHead>Bookings</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
@@ -377,7 +389,13 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                 <Badge variant="destructive" className="text-xs">✗ Missing</Badge>
                                             )}
                                         </TableCell>
-                                        <TableCell><ComplianceBadge status={op.companiesHouseCheck} /></TableCell>
+                                        <TableCell>
+                                            {op.entityType === 'SOLE_TRADER' ? (
+                                                <Badge variant="outline" className="text-xs gap-1"><User className="h-3 w-3" />Sole Trader</Badge>
+                                            ) : (
+                                                <ComplianceBadge status={op.companiesHouseCheck} />
+                                            )}
+                                        </TableCell>
                                         <TableCell><ComplianceBadge status={op.creditCheck} /></TableCell>
                                         <TableCell className="text-center">{op._count.bookings}</TableCell>
                                         <TableCell className="text-right" onClick={e => e.stopPropagation()}>
@@ -401,7 +419,8 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                     {expandedId === op.id && (
                                         <TableRow key={`${op.id}-licenses`}>
                                             <TableCell colSpan={9} className="bg-muted/30 p-4">
-                                                {/* Companies House Section */}
+                                                {/* Companies House Section — LTD only */}
+                                                {op.entityType !== 'SOLE_TRADER' && (
                                                 <div className="mb-4 rounded-md border p-3 bg-background">
                                                     <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center gap-2">
@@ -447,6 +466,29 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                         <p className="text-xs text-muted-foreground mt-1">Last checked: {formatDate(op.companiesHouseDate)}</p>
                                                     )}
                                                 </div>
+                                                )}
+
+                                                {/* ID Verification Section — Sole Trader only */}
+                                                {op.entityType === 'SOLE_TRADER' && (
+                                                <div className="mb-4 rounded-md border p-3 bg-background">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <User className="h-4 w-4 text-muted-foreground" />
+                                                        <h4 className="font-medium text-sm">Sole Trader — ID Verification</h4>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-sm">
+                                                        {op.licenses.some(l => l.type === 'PHOTOGRAPHIC_ID') ? (
+                                                            <Badge className="bg-green-600 text-xs gap-1"><ShieldCheck className="h-3 w-3" />Photographic ID ✓</Badge>
+                                                        ) : (
+                                                            <Badge variant="destructive" className="text-xs gap-1"><ShieldAlert className="h-3 w-3" />Photographic ID Missing</Badge>
+                                                        )}
+                                                        {op.licenses.some(l => l.type === 'PROOF_OF_ADDRESS') ? (
+                                                            <Badge className="bg-green-600 text-xs gap-1"><ShieldCheck className="h-3 w-3" />Proof of Address ✓</Badge>
+                                                        ) : (
+                                                            <Badge variant="destructive" className="text-xs gap-1"><ShieldAlert className="h-3 w-3" />Proof of Address Missing</Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                )}
 
                                                 {/* Licenses Section */}
                                                 <div className="flex items-center justify-between mb-3">
@@ -584,9 +626,45 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                         </div>
 
                         <div className="space-y-2">
+                            <Label>Entity Type</Label>
+                            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                                <button
+                                    type="button"
+                                    className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                        selectedEntityType === 'LIMITED_COMPANY'
+                                            ? 'bg-background shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    }`}
+                                    onClick={() => setSelectedEntityType('LIMITED_COMPANY')}
+                                >
+                                    🏢 Limited Company
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                                        selectedEntityType === 'SOLE_TRADER'
+                                            ? 'bg-background shadow-sm'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    }`}
+                                    onClick={() => setSelectedEntityType('SOLE_TRADER')}
+                                >
+                                    👤 Sole Trader
+                                </button>
+                            </div>
+                        </div>
+
+                        {selectedEntityType === 'LIMITED_COMPANY' && (
+                        <div className="space-y-2">
                             <Label htmlFor="companiesHouseRef">Companies House Number</Label>
                             <Input id="companiesHouseRef" name="companiesHouseRef" defaultValue={editingOperator?.companiesHouseRef || ''} placeholder="e.g. 12345678" />
                         </div>
+                        )}
+
+                        {selectedEntityType === 'SOLE_TRADER' && (
+                        <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+                            <p className="text-sm text-amber-800">👤 Sole Trader — two forms of ID required (Photographic ID + Proof of Address). Add these via the Licenses section after creating.</p>
+                        </div>
+                        )}
 
                         <div className="space-y-2">
                             <Label htmlFor="notes">Notes</Label>
@@ -605,7 +683,10 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
             {/* Add License Dialog */}
             <Dialog open={licenseDialogOpen} onOpenChange={(open) => {
                 setLicenseDialogOpen(open)
-                if (!open) setLicenseForOperator(null)
+                if (!open) {
+                    setLicenseForOperator(null)
+                    setSelectedLicenseType('PUBLIC_LIABILITY_INSURANCE')
+                }
             }}>
                 <DialogContent>
                     <DialogHeader>
@@ -619,6 +700,8 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                 name="type"
                                 required
                                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                                value={selectedLicenseType}
+                                onChange={(e) => setSelectedLicenseType(e.target.value)}
                             >
                                 {LICENSE_TYPES.map(lt => (
                                     <option key={lt.value} value={lt.value}>{lt.label}</option>
@@ -626,10 +709,44 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                             </select>
                         </div>
 
+                        {selectedLicenseType === 'PHOTOGRAPHIC_ID' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="docSubType">Document Type *</Label>
+                            <select
+                                id="docSubType"
+                                name="reference"
+                                required
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                            >
+                                {PHOTO_ID_TYPES.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        )}
+
+                        {selectedLicenseType === 'PROOF_OF_ADDRESS' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="docSubType">Document Type *</Label>
+                            <select
+                                id="docSubType"
+                                name="reference"
+                                required
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                            >
+                                {ADDRESS_PROOF_TYPES.map(t => (
+                                    <option key={t} value={t}>{t}</option>
+                                ))}
+                            </select>
+                        </div>
+                        )}
+
+                        {selectedLicenseType !== 'PHOTOGRAPHIC_ID' && selectedLicenseType !== 'PROOF_OF_ADDRESS' && (
                         <div className="space-y-2">
                             <Label htmlFor="reference">Reference / Policy Number</Label>
                             <Input id="reference" name="reference" placeholder="e.g. PLI-2024-001" />
                         </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">

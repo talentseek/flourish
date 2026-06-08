@@ -1,15 +1,19 @@
 /**
  * Compliance gate logic for booking confirmation.
  *
- * Operator-level rules:
- * 1. All operators must have a valid (non-expired) PLI
+ * Operator-level rules (all operators):
+ * 1. Valid (non-expired) PLI required
  * 2. Non-F&B operators: PLI cover ≥ £5,000,000
  * 3. F&B operators: PLI cover ≥ £10,000,000
  * 4. F&B operators must also have a valid Food Hygiene certificate
  *
+ * Sole Trader additional rules:
+ * 5. At least one PHOTOGRAPHIC_ID license on file
+ * 6. At least one PROOF_OF_ADDRESS license on file
+ *
  * Booking-level rules:
- * 5. All bookings must have a PAT certificate number
- * 6. PAT certificate must not be expired
+ * 7. All bookings must have a PAT certificate number
+ * 8. PAT certificate must not be expired
  */
 
 export interface LicenseForCheck {
@@ -20,6 +24,7 @@ export interface LicenseForCheck {
 
 export interface OperatorForCheck {
     types: string[] // OperatorType enum values
+    entityType?: string // EntityType enum value
     licenses: LicenseForCheck[]
 }
 
@@ -45,6 +50,7 @@ export function checkBookingCompliance(
     const now = new Date()
 
     const isFoodOperator = operator.types.includes('FOOD_AND_BEVERAGE')
+    const isSoleTrader = operator.entityType === 'SOLE_TRADER'
 
     // --- Operator-level checks ---
 
@@ -76,6 +82,23 @@ export function checkBookingCompliance(
         )
         if (!validFoodHygiene) {
             issues.push('Food Hygiene certificate required for Food & Beverage operators')
+        }
+    }
+
+    // Sole Trader: check for two forms of ID
+    if (isSoleTrader) {
+        const hasPhotoId = operator.licenses.some(
+            (l) => l.type === 'PHOTOGRAPHIC_ID'
+        )
+        const hasProofOfAddress = operator.licenses.some(
+            (l) => l.type === 'PROOF_OF_ADDRESS'
+        )
+
+        if (!hasPhotoId) {
+            issues.push('Photographic ID required for sole trader (e.g. Passport, Driving Licence)')
+        }
+        if (!hasProofOfAddress) {
+            issues.push('Proof of address required for sole trader (e.g. Utility Bill, Bank Statement)')
         }
     }
 

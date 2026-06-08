@@ -3,7 +3,7 @@
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { ComplianceStatus, LicenseCategory, OperatorType } from '@prisma/client'
+import { ComplianceStatus, EntityType, LicenseCategory, OperatorType } from '@prisma/client'
 
 // --- Auth Helpers ---
 
@@ -91,6 +91,7 @@ interface CreateOperatorData {
     address?: string
     website?: string
     types: OperatorType[]
+    entityType?: EntityType
     companiesHouseRef?: string
     notes?: string
 }
@@ -108,15 +109,18 @@ export async function createOperator(data: CreateOperatorData) {
             address: data.address,
             website: data.website,
             types: data.types,
+            entityType: data.entityType || 'LIMITED_COMPANY',
             companiesHouseRef: data.companiesHouseRef,
             notes: data.notes,
         }
     })
 
-    // Auto-trigger Companies House check (fire-and-forget)
-    runCompaniesHouseCheck(operator.id, operator.companyName, data.companiesHouseRef).catch(
-        err => console.error('Auto CH check failed:', err)
-    )
+    // Auto-trigger Companies House check for LTD companies only
+    if ((data.entityType || 'LIMITED_COMPANY') === 'LIMITED_COMPANY') {
+        runCompaniesHouseCheck(operator.id, operator.companyName, data.companiesHouseRef).catch(
+            err => console.error('Auto CH check failed:', err)
+        )
+    }
 
     revalidatePath('/admin/operators')
     return { success: true, operator }
@@ -199,6 +203,7 @@ interface UpdateOperatorData {
     companiesHouseRef?: string
     creditCheck?: ComplianceStatus
     creditCheckDate?: string
+    entityType?: EntityType
     notes?: string
     isActive?: boolean
 }
@@ -337,11 +342,17 @@ export async function searchOperators(query: string) {
                 { contactName: { contains: query, mode: 'insensitive' } },
             ]
         },
-        include: {
+        select: {
+            id: true,
+            companyName: true,
+            tradingName: true,
+            contactName: true,
+            contactEmail: true,
+            contactPhone: true,
+            types: true,
+            entityType: true,
             licenses: {
-                where: {
-                    endDate: { gte: new Date() }
-                },
+                where: { endDate: { gte: new Date() } },
                 select: { type: true, endDate: true, coverValue: true }
             }
         },

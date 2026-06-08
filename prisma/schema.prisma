@@ -169,9 +169,16 @@ enum OperatorType {
   PROMOTIONAL
 }
 
+enum EntityType {
+  LIMITED_COMPANY
+  SOLE_TRADER
+}
+
 enum LicenseCategory {
   PUBLIC_LIABILITY_INSURANCE
   FOOD_HYGIENE
+  PHOTOGRAPHIC_ID
+  PROOF_OF_ADDRESS
   GENERAL_LICENSE
   STREET_TRADING
   ALCOHOL_LICENSE
@@ -189,6 +196,7 @@ enum ComplianceStatus {
 
 model Operator {
   id                  String            @id @default(cuid())
+  entityType          EntityType        @default(LIMITED_COMPANY)
   companyName         String
   tradingName         String?
   contactName         String?
