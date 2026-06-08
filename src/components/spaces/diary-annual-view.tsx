@@ -24,6 +24,7 @@ interface BookingData {
     reference: string
     spaceId: string
     operatorId: string | null
+    bookingType?: string
     startDate: Date
     endDate: Date
     status: BookingStatus
@@ -46,7 +47,11 @@ interface DiaryAnnualViewProps {
     onBookingClick: (booking: BookingData, space: SpaceData) => void
 }
 
-function getBarColor(status: string) {
+function getBarColor(status: string, bookingType?: string) {
+    if (bookingType === 'CENTRE_EVENT') {
+        if (status === 'CANCELLED') return 'bg-red-400/50 hover:bg-red-400/70'
+        return 'bg-blue-500 hover:bg-blue-600'
+    }
     switch (status) {
         case 'CONFIRMED': return 'bg-emerald-500 hover:bg-emerald-600'
         case 'UNCONFIRMED': return 'bg-amber-400 hover:bg-amber-500'
@@ -226,7 +231,9 @@ export function DiaryAnnualView({
                                             {arranged.map(({ booking, rowIdx }) => {
                                                 const bar = getBarInMonth(booking, month)
                                                 if (!bar) return null
-                                                const displayName = booking.operator?.companyName || booking.companyName || 'Unknown'
+                                                const displayName = booking.bookingType === 'CENTRE_EVENT'
+                                                    ? `🏢 ${booking.companyName || 'Centre Event'}`
+                                                    : (booking.operator?.companyName || booking.companyName || 'Unknown')
 
                                                 return (
                                                     <Tooltip key={booking.id}>
@@ -234,7 +241,7 @@ export function DiaryAnnualView({
                                                             <button
                                                                 className={cn(
                                                                     'absolute rounded-sm transition-colors',
-                                                                    getBarColor(booking.status)
+                                                                    getBarColor(booking.status, booking.bookingType)
                                                                 )}
                                                                 style={{
                                                                     top: `${4 + rowIdx * 16}px`,

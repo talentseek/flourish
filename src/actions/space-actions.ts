@@ -302,6 +302,43 @@ export async function createBooking(data: CreateBookingData) {
     return { success: true, booking }
 }
 
+interface CreateCentreEventData {
+    spaceId: string
+    eventName: string
+    startDate: string
+    endDate: string
+    notes?: string
+}
+
+export async function createCentreEvent(data: CreateCentreEventData) {
+    const space = await prisma.space.findUnique({
+        where: { id: data.spaceId },
+        select: { locationId: true }
+    })
+    if (!space) throw new Error('Space not found')
+
+    const user = await verifyRMOrAdmin(space.locationId)
+    const reference = await generateBookingReference()
+
+    const booking = await prisma.spaceBooking.create({
+        data: {
+            spaceId: data.spaceId,
+            reference,
+            bookingType: 'CENTRE_EVENT',
+            startDate: new Date(data.startDate),
+            endDate: new Date(data.endDate),
+            companyName: data.eventName,
+            status: 'CONFIRMED',
+            notes: data.notes,
+            createdById: user.id,
+        }
+    })
+
+    revalidatePath(`/dashboard/regional/spaces/${space.locationId}`)
+    revalidatePath('/dashboard/regional')
+    return { success: true, booking }
+}
+
 interface UpdateBookingData {
     operatorId?: string
     startDate?: string

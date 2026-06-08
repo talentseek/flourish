@@ -149,6 +149,11 @@ model Location {
 // GENERAL, CHARITY, PREMIUM, PROMOTIONAL, FOOD_AND_BEVERAGE,
 // KIOSK, MARKET_STALL, EVENT_SPACE, STORAGE, SEASONAL, SERVICES
 
+enum BookingType {
+  OPERATOR_BOOKING
+  CENTRE_EVENT
+}
+
 enum BookingStatus {
   CONFIRMED
   UNCONFIRMED
@@ -290,6 +295,7 @@ model SpaceBooking {
   spaceId       String
   operatorId    String?
   reference     String        @unique
+  bookingType   BookingType   @default(OPERATOR_BOOKING)
   startDate     DateTime
   endDate       DateTime
   status        BookingStatus @default(UNCONFIRMED)

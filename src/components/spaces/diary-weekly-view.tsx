@@ -19,6 +19,7 @@ interface BookingData {
     reference: string
     spaceId: string
     operatorId: string | null
+    bookingType?: string
     startDate: Date
     endDate: Date
     status: BookingStatus
@@ -173,6 +174,7 @@ export function DiaryWeeklyView({
                                                     >
                                                         <BookingCard
                                                             status={booking.status}
+                                                            bookingType={booking.bookingType}
                                                             companyName={booking.companyName}
                                                             brand={booking.brand}
                                                             operator={booking.operator}

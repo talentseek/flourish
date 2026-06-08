@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { createBooking, updateBooking, updateBookingStatus } from '@/actions/space-actions'
+import { createBooking, updateBooking, updateBookingStatus, createCentreEvent } from '@/actions/space-actions'
 import { searchOperators } from '@/actions/operator-actions'
 import { BookingStatus } from '@prisma/client'
 import { format } from 'date-fns'
@@ -36,6 +36,7 @@ interface BookingData {
     reference: string
     spaceId: string
     operatorId: string | null
+    bookingType?: string
     startDate: Date
     endDate: Date
     status: BookingStatus
@@ -77,6 +78,11 @@ export function BookingModal({
 }: BookingModalProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [activeTab, setActiveTab] = useState<'operator' | 'centre'>(
+        booking?.bookingType === 'CENTRE_EVENT' ? 'centre' : 'operator'
+    )
+    const isCentreEvent = activeTab === 'centre'
+    const isEditingCentreEvent = mode === 'edit' && booking?.bookingType === 'CENTRE_EVENT'
 
     // Operator picker state
     const [operatorSearch, setOperatorSearch] = useState('')
@@ -221,6 +227,46 @@ export function BookingModal({
         }
     }
 
+    async function handleCentreEventSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        setLoading(true)
+        setError(null)
+
+        try {
+            const formData = new FormData(e.currentTarget)
+            const eventName = formData.get('eventName') as string
+
+            if (!eventName?.trim()) {
+                setError('Event name is required')
+                setLoading(false)
+                return
+            }
+
+            if (mode === 'create') {
+                await createCentreEvent({
+                    spaceId,
+                    eventName: eventName.trim(),
+                    startDate: formData.get('startDate') as string,
+                    endDate: formData.get('endDate') as string,
+                    notes: (formData.get('notes') as string) || undefined,
+                })
+            } else if (booking) {
+                await updateBooking(booking.id, {
+                    startDate: formData.get('startDate') as string,
+                    endDate: formData.get('endDate') as string,
+                    notes: (formData.get('notes') as string) || undefined,
+                })
+            }
+
+            onSuccess()
+            onOpenChange(false)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     async function handleStatusChange(status: BookingStatus) {
         if (!booking) return
         setLoading(true)
@@ -245,7 +291,85 @@ export function BookingModal({
                     <p className="text-sm text-muted-foreground">{spaceName}</p>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={isCentreEvent ? handleCentreEventSubmit : handleSubmit} className="space-y-6">
+                    {/* Tab switcher — only in create mode */}
+                    {mode === 'create' && (
+                        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setActiveTab('operator'); setError(null) }}
+                                className={`flex-1 h-8 text-xs ${
+                                    activeTab === 'operator'
+                                        ? 'bg-background shadow-sm text-foreground'
+                                        : ''
+                                }`}
+                            >
+                                Operator Booking
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => { setActiveTab('centre'); setError(null) }}
+                                className={`flex-1 h-8 text-xs ${
+                                    activeTab === 'centre'
+                                        ? 'bg-background shadow-sm text-foreground'
+                                        : ''
+                                }`}
+                            >
+                                🏢 Centre Event
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Edit mode: show badge for centre events */}
+                    {isEditingCentreEvent && (
+                        <div className="flex items-center gap-2">
+                            <Badge className="bg-blue-100 text-blue-800 border-blue-200">🏢 Centre Event</Badge>
+                        </div>
+                    )}
+
+                    {isCentreEvent || isEditingCentreEvent ? (
+                        /* ─── Centre Event Form ─── */
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="eventName">Event Name *</Label>
+                                <Input
+                                    id="eventName"
+                                    name="eventName"
+                                    required
+                                    defaultValue={isEditingCentreEvent ? (booking?.companyName || '') : ''}
+                                    placeholder="e.g. Christmas Display, Centre Maintenance"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="startDate">Start Date *</Label>
+                                    <Input type="date" id="startDate" name="startDate" defaultValue={initialStart} required />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="endDate">End Date *</Label>
+                                    <Input type="date" id="endDate" name="endDate" defaultValue={initialEnd} required />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="notes">Notes</Label>
+                                <Textarea
+                                    id="notes"
+                                    name="notes"
+                                    defaultValue={isEditingCentreEvent ? (booking?.notes || '') : ''}
+                                    placeholder="Optional notes..."
+                                    rows={2}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        /* ─── Operator Booking Form ─── */
+                        <>
                     {/* Operator Picker */}
                     <div className="space-y-2">
                         <Label>Operator *</Label>
@@ -472,7 +596,10 @@ export function BookingModal({
                         </p>
                     </div>
 
-                    {booking?.totalValue != null && (
+                        </>
+                    )}
+
+                    {booking?.totalValue != null && !isCentreEvent && (
                         <div className="text-sm text-muted-foreground">
                             Total Value: £{Number(booking.totalValue).toFixed(2)}
                         </div>
@@ -486,6 +613,21 @@ export function BookingModal({
                         {mode === 'edit' && booking && (
                             <div className="flex gap-2 mr-auto">
                                 {booking.status !== 'CONFIRMED' && (() => {
+                                    if (isEditingCentreEvent) {
+                                        // Centre events: no compliance needed
+                                        return (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleStatusChange('CONFIRMED')}
+                                                disabled={loading}
+                                                className="text-emerald-600 border-emerald-300 hover:bg-emerald-50"
+                                            >
+                                                Confirm
+                                            </Button>
+                                        )
+                                    }
                                     const compliance = selectedOperator && selectedOperator.types.length > 0
                                         ? checkBookingCompliance(selectedOperator, {
                                             patCertNumber: booking.patCertNumber,
@@ -533,7 +675,7 @@ export function BookingModal({
                                 {loading
                                     ? 'Saving...'
                                     : mode === 'create'
-                                        ? 'Create Booking'
+                                        ? (isCentreEvent ? 'Create Event' : 'Create Booking')
                                         : 'Save Changes'}
                             </Button>
                         </div>

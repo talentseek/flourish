@@ -87,6 +87,7 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         reference: b.reference,
         spaceId: b.spaceId,
         operatorId: b.operatorId,
+        bookingType: b.bookingType,
         startDate: b.startDate,
         endDate: b.endDate,
         status: b.status,

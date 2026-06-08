@@ -24,6 +24,7 @@ interface BookingData {
     reference: string
     spaceId: string
     operatorId: string | null
+    bookingType?: string
     startDate: Date
     endDate: Date
     status: BookingStatus
@@ -46,7 +47,11 @@ interface DiaryMonthlyViewProps {
     onBookingClick: (booking: BookingData, space: SpaceData) => void
 }
 
-function getBarColor(status: string) {
+function getBarColor(status: string, bookingType?: string) {
+    if (bookingType === 'CENTRE_EVENT') {
+        if (status === 'CANCELLED') return 'bg-red-400/60 hover:bg-red-400/80 border-red-500 line-through opacity-50'
+        return 'bg-blue-500/80 hover:bg-blue-500 border-blue-600'
+    }
     switch (status) {
         case 'CONFIRMED': return 'bg-emerald-500/80 hover:bg-emerald-500 border-emerald-600'
         case 'UNCONFIRMED': return 'bg-amber-400/80 hover:bg-amber-400 border-amber-500'
@@ -230,8 +235,12 @@ export function DiaryMonthlyView({
                                         >
                                             {barsStartingHere.map(({ booking, rowIdx }) => {
                                                 const { span } = getBarPosition(booking)
-                                                const displayName = booking.operator?.companyName || booking.companyName || ''
-                                                const barLabel = span >= 3 ? displayName : ''
+                                                const displayName = booking.bookingType === 'CENTRE_EVENT'
+                                                    ? (booking.companyName || 'Centre Event')
+                                                    : (booking.operator?.companyName || booking.companyName || '')
+                                                const barLabel = span >= 3
+                                                    ? (booking.bookingType === 'CENTRE_EVENT' ? `🏢 ${displayName}` : displayName)
+                                                    : ''
 
                                                 return (
                                                     <Tooltip key={booking.id}>
@@ -239,7 +248,7 @@ export function DiaryMonthlyView({
                                                             <button
                                                                 className={cn(
                                                                     'absolute text-[9px] text-white font-medium rounded-sm px-1 truncate cursor-pointer border transition-colors',
-                                                                    getBarColor(booking.status)
+                                                                    getBarColor(booking.status, booking.bookingType)
                                                                 )}
                                                                 style={{
                                                                     top: `${4 + rowIdx * 22}px`,

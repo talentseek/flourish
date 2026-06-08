@@ -20,6 +20,7 @@ interface BookingData {
     reference: string
     spaceId: string
     operatorId: string | null
+    bookingType?: string
     startDate: Date
     endDate: Date
     status: BookingStatus
