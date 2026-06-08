@@ -101,6 +101,7 @@ interface SpaceData {
     types: string[]
     width: number | null
     length: number | null
+    heightRestriction: number | null
     hasPower: boolean
     powerPhase: string | null
     powerAmperage: string | null
@@ -408,9 +409,12 @@ export function AdminSpacesClient({ locations }: AdminSpacesClientProps) {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-sm text-muted-foreground">
-                                                {space.width && space.length
+                                                <div>{space.width && space.length
                                                     ? `${space.width}m × ${space.length}m`
-                                                    : '—'}
+                                                    : '—'}</div>
+                                                {space.heightRestriction && (
+                                                    <div className="text-xs text-amber-600">↕ {space.heightRestriction}m max</div>
+                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-1.5">
@@ -557,6 +561,7 @@ function SpaceForm({
         types: string[]
         width?: number
         length?: number
+        heightRestriction?: number
         hasPower: boolean
         powerPhase?: string
         powerAmperage?: string
@@ -603,6 +608,7 @@ function SpaceForm({
             types: selectedTypes,
             width: form.get('width') ? parseFloat(form.get('width') as string) : undefined,
             length: form.get('length') ? parseFloat(form.get('length') as string) : undefined,
+            heightRestriction: form.get('heightRestriction') ? parseFloat(form.get('heightRestriction') as string) : undefined,
             hasPower,
             powerPhase: hasPower ? powerPhase : undefined,
             powerAmperage: hasPower && powerAmperage ? powerAmperage : undefined,
@@ -676,7 +682,7 @@ function SpaceForm({
             </div>
 
             {/* Row 3: Dimensions + Rate */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="width">Width (m)</Label>
                     <Input
@@ -697,6 +703,17 @@ function SpaceForm({
                         name="length"
                         defaultValue={defaultValues?.length || ''}
                         placeholder="0.00"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="heightRestriction">Height Limit (m)</Label>
+                    <Input
+                        type="number"
+                        step="0.01"
+                        id="heightRestriction"
+                        name="heightRestriction"
+                        defaultValue={defaultValues?.heightRestriction || ''}
+                        placeholder="No limit"
                     />
                 </div>
                 <div className="space-y-2">

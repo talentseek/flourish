@@ -84,6 +84,7 @@ interface CreateSpaceData {
     types?: string[]
     width?: number
     length?: number
+    heightRestriction?: number
     hasPower?: boolean
     powerPhase?: string
     powerAmperage?: string
@@ -107,6 +108,7 @@ export async function createSpace(data: CreateSpaceData) {
             types: data.types || ['GENERAL'],
             width: data.width,
             length: data.length,
+            heightRestriction: data.heightRestriction,
             hasPower: data.hasPower || false,
             powerPhase: data.hasPower ? (data.powerPhase || null) : null,
             powerAmperage: data.hasPower ? (data.powerAmperage || null) : null,
@@ -131,6 +133,7 @@ interface UpdateSpaceData {
     types?: string[]
     width?: number | null
     length?: number | null
+    heightRestriction?: number | null
     hasPower?: boolean
     powerPhase?: string | null
     powerAmperage?: string | null

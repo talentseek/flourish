@@ -258,6 +258,7 @@ model Space {
   types            String[]  @default(["GENERAL"])
   width            Decimal?  @db.Decimal(5, 2)
   length           Decimal?  @db.Decimal(5, 2)
+  heightRestriction Decimal? @db.Decimal(5, 2) // Max height in metres, null = no restriction
   hasPower         Boolean   @default(false)
   powerPhase       String?   // "SINGLE_PHASE" or "THREE_PHASE"
   powerAmperage    String?   // "13A", "16A", "32A", "63A", "100A_PLUS"
