@@ -32,6 +32,7 @@ export interface BookingForCheck {
     patCertNumber?: string | null
     patExpiryDate?: Date | string | null
     equipmentList?: string | null
+    patExempt?: boolean
 }
 
 export interface ComplianceResult {
@@ -104,14 +105,17 @@ export function checkBookingCompliance(
 
     // --- Booking-level checks ---
 
-    if (!booking?.patCertNumber) {
-        issues.push('PAT certificate number is required')
-    }
+    // PAT checks are skipped when equipment is less than 1 year old
+    if (!booking?.patExempt) {
+        if (!booking?.patCertNumber) {
+            issues.push('PAT certificate number is required')
+        }
 
-    if (!booking?.patExpiryDate) {
-        issues.push('PAT certificate expiry date is required')
-    } else if (new Date(booking.patExpiryDate) <= now) {
-        issues.push('PAT certificate has expired')
+        if (!booking?.patExpiryDate) {
+            issues.push('PAT certificate expiry date is required')
+        } else if (new Date(booking.patExpiryDate) <= now) {
+            issues.push('PAT certificate has expired')
+        }
     }
 
     return { canConfirm: issues.length === 0, issues }

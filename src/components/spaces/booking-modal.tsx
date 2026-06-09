@@ -53,6 +53,7 @@ interface BookingData {
     patExpiryDate?: Date | string | null
     equipmentList?: string | null
     patDocumentUrl?: string | null
+    patExempt?: boolean
     operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 
@@ -87,6 +88,7 @@ export function BookingModal({
     const isCentreEvent = activeTab === 'centre'
     const isEditingCentreEvent = mode === 'edit' && booking?.bookingType === 'CENTRE_EVENT'
     const [patFile, setPatFile] = useState<File | null>(null)
+    const [patExempt, setPatExempt] = useState(booking?.patExempt ?? false)
 
     // Operator picker state
     const [operatorSearch, setOperatorSearch] = useState('')
@@ -210,10 +212,11 @@ export function BookingModal({
                         ? parseFloat(formData.get('dailyRate') as string)
                         : undefined,
                     notes: (formData.get('notes') as string) || undefined,
-                    patCertNumber: (formData.get('patCertNumber') as string) || undefined,
-                    patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
+                    patCertNumber: patExempt ? undefined : ((formData.get('patCertNumber') as string) || undefined),
+                    patExpiryDate: patExempt ? undefined : ((formData.get('patExpiryDate') as string) || undefined),
                     equipmentList: (formData.get('equipmentList') as string) || undefined,
                     patDocumentUrl: patDocUrl,
+                    patExempt,
                 })
             } else if (booking) {
                 await updateBooking(booking.id, {
@@ -227,10 +230,11 @@ export function BookingModal({
                         ? parseFloat(formData.get('dailyRate') as string)
                         : undefined,
                     notes: (formData.get('notes') as string) || undefined,
-                    patCertNumber: (formData.get('patCertNumber') as string) || undefined,
-                    patExpiryDate: (formData.get('patExpiryDate') as string) || undefined,
+                    patCertNumber: patExempt ? undefined : ((formData.get('patCertNumber') as string) || undefined),
+                    patExpiryDate: patExempt ? undefined : ((formData.get('patExpiryDate') as string) || undefined),
                     equipmentList: (formData.get('equipmentList') as string) || undefined,
                     patDocumentUrl: patDocUrl,
+                    patExempt,
                 })
             }
 
@@ -476,6 +480,7 @@ export function BookingModal({
                             const compliance = checkBookingCompliance(selectedOperator, {
                                 patCertNumber: (document.getElementById('patCertNumber') as HTMLInputElement)?.value || null,
                                 patExpiryDate: (document.getElementById('patExpiryDate') as HTMLInputElement)?.value || null,
+                                patExempt,
                             })
                             if (compliance.canConfirm) return null
                             return (
@@ -570,9 +575,27 @@ export function BookingModal({
 
                     {/* PAT Testing Section */}
                     <div className="border rounded-md p-4 space-y-3 bg-muted/20">
-                        <h4 className="font-medium text-sm flex items-center gap-2">
-                            ⚡ PAT Testing
-                        </h4>
+                        <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-sm flex items-center gap-2">
+                                ⚡ PAT Testing
+                            </h4>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={patExempt}
+                                    onChange={(e) => setPatExempt(e.target.checked)}
+                                    className="rounded border-gray-300"
+                                />
+                                <span className="text-sm text-muted-foreground">Equipment is less than 1 year old (PAT exempt)</span>
+                            </label>
+                        </div>
+
+                        {patExempt ? (
+                            <div className="rounded-md border border-green-200 bg-green-50 p-3">
+                                <p className="text-sm text-green-800">✅ PAT testing not required — equipment declared as less than 1 year old.</p>
+                            </div>
+                        ) : (
+                            <>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="patCertNumber">Certificate Number</Label>
@@ -653,6 +676,8 @@ export function BookingModal({
                         <p className="text-xs text-muted-foreground">
                             PAT certificate is required to confirm this booking.
                         </p>
+                            </>
+                        )}
                     </div>
 
                         </>
@@ -691,6 +716,7 @@ export function BookingModal({
                                         ? checkBookingCompliance(selectedOperator, {
                                             patCertNumber: booking.patCertNumber,
                                             patExpiryDate: booking.patExpiryDate,
+                                            patExempt: booking.patExempt,
                                         })
                                         : { canConfirm: false, issues: ['Operator data not loaded'] }
                                     return (

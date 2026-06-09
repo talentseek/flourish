@@ -252,6 +252,7 @@ interface CreateBookingData {
     patExpiryDate?: string
     equipmentList?: string
     patDocumentUrl?: string
+    patExempt?: boolean
 }
 
 export async function createBooking(data: CreateBookingData) {
@@ -295,6 +296,7 @@ export async function createBooking(data: CreateBookingData) {
             patExpiryDate: data.patExpiryDate ? new Date(data.patExpiryDate) : undefined,
             equipmentList: data.equipmentList,
             patDocumentUrl: data.patDocumentUrl,
+            patExempt: data.patExempt ?? false,
             createdById: user.id
         }
     })
@@ -354,6 +356,7 @@ interface UpdateBookingData {
     patExpiryDate?: string
     equipmentList?: string
     patDocumentUrl?: string
+    patExempt?: boolean
 }
 
 export async function updateBooking(bookingId: string, data: UpdateBookingData) {

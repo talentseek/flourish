@@ -35,6 +35,7 @@ interface BookingData {
     patExpiryDate?: Date | string | null
     equipmentList?: string | null
     patDocumentUrl?: string | null
+    patExempt?: boolean
     operator?: { id: string; companyName: string; tradingName?: string | null } | null
 }
 

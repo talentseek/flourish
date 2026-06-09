@@ -102,6 +102,7 @@ export default async function SpaceDiaryPage({ params }: PageProps) {
         patExpiryDate: b.patExpiryDate,
         equipmentList: b.equipmentList,
         patDocumentUrl: b.patDocumentUrl,
+        patExempt: b.patExempt,
         operator: b.operator || null,
     }))
 

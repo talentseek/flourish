@@ -319,6 +319,7 @@ model SpaceBooking {
   notes         String?
 
   // PAT Testing
+  patExempt     Boolean       @default(false)
   patCertNumber String?
   patExpiryDate DateTime?
   equipmentList String?
