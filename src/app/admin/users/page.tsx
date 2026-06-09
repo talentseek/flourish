@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -42,7 +43,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Loader2, Shield, MapPin, User, Plus, Trash2 } from "lucide-react"
+import { Users, Loader2, Shield, MapPin, User, Plus, Trash2, LogIn } from "lucide-react"
 import { getUsersForAdmin, updateUserRole, createUser, deleteUser } from "../actions"
 import { Role } from "@prisma/client"
 
@@ -70,6 +71,7 @@ export default function UsersPage() {
     const [users, setUsers] = useState<UserData[]>([])
     const [loading, setLoading] = useState(true)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     // Create user form state
     const [createOpen, setCreateOpen] = useState(false)
@@ -141,6 +143,26 @@ export default function UsersPage() {
                 alert(error instanceof Error ? error.message : "Failed to delete user")
             }
         })
+    }
+
+    // Impersonate user
+    const handleImpersonate = async (userId: string) => {
+        if (!confirm('You will be logged in as this user. Your current admin session will end. Continue?')) return
+        try {
+            const res = await fetch('/api/admin/impersonate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            })
+            const data = await res.json()
+            if (data.success) {
+                router.push(data.redirectUrl)
+            } else {
+                alert(data.error || 'Impersonation failed')
+            }
+        } catch {
+            alert('Failed to impersonate user')
+        }
     }
 
     return (
@@ -265,7 +287,7 @@ export default function UsersPage() {
                                         <TableHead>Current Role</TableHead>
                                         <TableHead>Change Role</TableHead>
                                         <TableHead>Joined</TableHead>
-                                        <TableHead className="w-[60px]"></TableHead>
+                                        <TableHead className="w-[100px] text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -302,7 +324,17 @@ export default function UsersPage() {
                                                 <TableCell className="text-muted-foreground">
                                                     {new Date(user.createdAt).toLocaleDateString()}
                                                 </TableCell>
-                                                <TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-muted-foreground hover:text-blue-500"
+                                                            title={`Login as ${user.name || user.email}`}
+                                                            onClick={() => handleImpersonate(user.id)}
+                                                        >
+                                                            <LogIn className="h-4 w-4" />
+                                                        </Button>
                                                     <AlertDialog>
                                                         <AlertDialogTrigger asChild>
                                                             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-red-500">
@@ -328,6 +360,7 @@ export default function UsersPage() {
                                                             </AlertDialogFooter>
                                                         </AlertDialogContent>
                                                     </AlertDialog>
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         )
