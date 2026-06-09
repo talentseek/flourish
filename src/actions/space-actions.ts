@@ -303,7 +303,7 @@ export async function createBooking(data: CreateBookingData) {
 
     revalidatePath(`/dashboard/regional/spaces/${space.locationId}`)
     revalidatePath('/dashboard/regional')
-    return { success: true, booking }
+    return { success: true, bookingId: booking.id }
 }
 
 interface CreateCentreEventData {
@@ -340,7 +340,7 @@ export async function createCentreEvent(data: CreateCentreEventData) {
 
     revalidatePath(`/dashboard/regional/spaces/${space.locationId}`)
     revalidatePath('/dashboard/regional')
-    return { success: true, booking }
+    return { success: true, bookingId: booking.id }
 }
 
 interface UpdateBookingData {
@@ -397,7 +397,7 @@ export async function updateBooking(bookingId: string, data: UpdateBookingData) 
 
     revalidatePath(`/dashboard/regional/spaces/${existing.space.locationId}`)
     revalidatePath('/dashboard/regional')
-    return { success: true, booking }
+    return { success: true, bookingId: booking.id }
 }
 
 export async function updateBookingStatus(bookingId: string, status: BookingStatus) {
@@ -448,7 +448,7 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
 
     revalidatePath(`/dashboard/regional/spaces/${existing.space.locationId}`)
     revalidatePath('/dashboard/regional')
-    return { success: true, booking }
+    return { success: true, bookingId: booking.id }
 }
 
 export async function searchBookings(
