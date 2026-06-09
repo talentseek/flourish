@@ -72,13 +72,21 @@ export async function POST(req: NextRequest) {
         impersonating: { name: targetUser.name, email: targetUser.email, role: targetUser.role },
     })
 
-    // Set the session cookie — Better Auth uses "better-auth.session_token" by default
-    response.cookies.set("better-auth.session_token", newSession.token, {
+    const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "lax" as const,
         path: "/",
         maxAge: 7 * 24 * 60 * 60, // 7 days
+    }
+
+    // Better Auth uses "better-auth.session_token" in dev,
+    // "__Secure-better-auth.session_token" in production (HTTPS).
+    // Set both to cover all environments, and delete old session cookies.
+    response.cookies.set("better-auth.session_token", newSession.token, cookieOptions)
+    response.cookies.set("__Secure-better-auth.session_token", newSession.token, {
+        ...cookieOptions,
+        secure: true,
     })
 
     return response
