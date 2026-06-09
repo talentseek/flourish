@@ -6,9 +6,8 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 
 /**
- * Admin-only impersonation endpoint.
- * Creates a new session for the target user and sets the session cookie.
- * The admin's original session is replaced — they must log in again to return to admin.
+ * Admin-only impersonation endpoint using Better Auth's admin plugin.
+ * Uses auth.api.impersonateUser to properly create a session.
  */
 export async function POST(req: NextRequest) {
     // Verify the current user is an ADMIN
@@ -44,50 +43,53 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Create a new session for the target user using Better Auth's internal API
-    const now = new Date()
-    const newSession = await prisma.session.create({
-        data: {
-            id: crypto.randomUUID(),
-            userId: targetUser.id,
-            token: crypto.randomUUID(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            createdAt: now,
-            updatedAt: now,
-            ipAddress: req.headers.get("x-forwarded-for") || "impersonation",
-            userAgent: req.headers.get("user-agent") || "admin-impersonation",
-        },
-    })
+    try {
+        // Use Better Auth's admin plugin to properly create an impersonation session
+        const impersonationResult = await auth.api.impersonateUser({
+            body: { userId: targetUser.id },
+            headers: await headers(),
+        })
 
-    // Build redirect response based on target user's role
-    const redirectUrl = targetUser.role === "ADMIN"
-        ? "/admin"
-        : targetUser.role === "REGIONAL_MANAGER"
-            ? "/dashboard/regional"
-            : "/dashboard"
+        // Build redirect URL based on target user's role
+        const redirectUrl = targetUser.role === "ADMIN"
+            ? "/admin"
+            : targetUser.role === "REGIONAL_MANAGER"
+                ? "/dashboard/regional"
+                : "/dashboard"
 
-    const response = NextResponse.json({
-        success: true,
-        redirectUrl,
-        impersonating: { name: targetUser.name, email: targetUser.email, role: targetUser.role },
-    })
+        const response = NextResponse.json({
+            success: true,
+            redirectUrl,
+            impersonating: { name: targetUser.name, email: targetUser.email, role: targetUser.role },
+        })
 
-    const cookieOptions = {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax" as const,
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60, // 7 days
+        // Set the session cookie from the impersonation result
+        const token = impersonationResult.session?.token
+        if (token) {
+            const cookieOptions = {
+                httpOnly: true,
+                sameSite: "lax" as const,
+                path: "/",
+                maxAge: 7 * 24 * 60 * 60,
+            }
+
+            // Set both cookie variants for dev (HTTP) and production (HTTPS)
+            response.cookies.set("better-auth.session_token", token, {
+                ...cookieOptions,
+                secure: process.env.NODE_ENV === "production",
+            })
+            response.cookies.set("__Secure-better-auth.session_token", token, {
+                ...cookieOptions,
+                secure: true,
+            })
+        }
+
+        return response
+    } catch (error) {
+        console.error("[Impersonate] Error:", error)
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Impersonation failed" },
+            { status: 500 }
+        )
     }
-
-    // Better Auth uses "better-auth.session_token" in dev,
-    // "__Secure-better-auth.session_token" in production (HTTPS).
-    // Set both to cover all environments, and delete old session cookies.
-    response.cookies.set("better-auth.session_token", newSession.token, cookieOptions)
-    response.cookies.set("__Secure-better-auth.session_token", newSession.token, {
-        ...cookieOptions,
-        secure: true,
-    })
-
-    return response
 }

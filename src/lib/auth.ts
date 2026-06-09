@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
-import { organization } from "better-auth/plugins";
+import { organization, admin } from "better-auth/plugins";
 import { headers } from "next/headers";
 
 const prisma = new PrismaClient();
@@ -46,7 +46,11 @@ export const auth = betterAuth({
   },
 
   plugins: [
-    organization()
+    organization(),
+    admin({
+      defaultRole: "USER",
+      adminRoles: ["ADMIN"],
+    }),
   ],
 
   // Record every login to the permanent audit log
