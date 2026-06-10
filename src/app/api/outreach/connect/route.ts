@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
         const payload = {
             type: "create",
             providers: [providerMap[provider]],
-            api_url: dsn,
             expiresOn,
             success_redirect_url: `${origin}/outreach?connected=true`,
             failure_redirect_url: `${origin}/outreach?error=auth_failed`,
@@ -59,7 +58,10 @@ export async function GET(request: NextRequest) {
         if (!res.ok) {
             const text = await res.text()
             console.error("[Unipile] Auth link failed:", res.status, text)
-            return NextResponse.json({ error: "Failed to create auth link" }, { status: 500 })
+            return NextResponse.json(
+                { error: "Failed to create auth link", status: res.status, detail: text },
+                { status: 500 }
+            )
         }
 
         const data = (await res.json()) as { url?: string }
@@ -70,6 +72,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "No auth URL returned" }, { status: 500 })
     } catch (err) {
         console.error("[Unipile] Connect error:", err)
-        return NextResponse.json({ error: "Connection failed" }, { status: 500 })
+        return NextResponse.json(
+            { error: "Connection failed", detail: err instanceof Error ? err.message : String(err) },
+            { status: 500 }
+        )
     }
 }
