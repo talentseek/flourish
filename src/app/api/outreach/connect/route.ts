@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
         const payload = {
             type: "create",
             providers: [providerMap[provider]],
+            api_url: dsn,
             expiresOn,
             success_redirect_url: `${origin}/outreach?connected=true`,
             failure_redirect_url: `${origin}/outreach?error=auth_failed`,
