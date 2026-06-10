@@ -30,6 +30,9 @@ import {
     Reply,
     AlertTriangle,
     X,
+    Sparkles,
+    Loader2,
+    Zap,
 } from 'lucide-react'
 import {
     launchCampaign,
@@ -60,7 +63,10 @@ interface LeadData {
     contactName: string | null
     contactEmail: string | null
     linkedinUrl: string | null
+    website: string | null
     status: string
+    enrichmentStatus: string | null
+    enrichmentScore: number | null
     linkedinInviteSentAt: string | null
     linkedinMessageSentAt: string | null
     emailSentAt: string | null
@@ -114,11 +120,18 @@ function getLastActivity(lead: LeadData): string {
 export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
     const router = useRouter()
     const [loading, setLoading] = useState<string | null>(null)
+    const [enriching, setEnriching] = useState(false)
+    const [enrichProgress, setEnrichProgress] = useState<{ done: number; total: number } | null>(null)
 
     const stats = computeStats(campaign.leads)
     const statusCfg = STATUS_CONFIG[campaign.status] ?? { label: campaign.status, variant: 'secondary' as const }
     const canModify = campaign.status === 'DRAFT' || campaign.status === 'PAUSED'
     const hasTemplates = !!(campaign.linkedinMessage || campaign.emailBody)
+
+    const pendingLeads = campaign.leads.filter(
+        (l) => !l.enrichmentStatus || l.enrichmentStatus === 'PENDING'
+    )
+    const hasUnenrichedLeads = pendingLeads.length > 0
 
     async function handleAction(action: string) {
         setLoading(action)
@@ -148,6 +161,37 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
         } finally {
             setLoading(null)
         }
+    }
+
+    async function handleEnrichLeads() {
+        setEnriching(true)
+        setEnrichProgress({ done: 0, total: pendingLeads.length })
+
+        // Process in batches of 10
+        const batchSize = 10
+        let done = 0
+
+        for (let i = 0; i < pendingLeads.length; i += batchSize) {
+            const batch = pendingLeads.slice(i, i + batchSize)
+            const leadIds = batch.map((l) => l.id)
+
+            try {
+                await fetch('/api/outreach/enrich', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ leadIds }),
+                })
+            } catch {
+                // Continue on error
+            }
+
+            done += batch.length
+            setEnrichProgress({ done, total: pendingLeads.length })
+        }
+
+        setEnriching(false)
+        setEnrichProgress(null)
+        router.refresh()
     }
 
     const statCards = [
@@ -220,6 +264,29 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                         >
                             <Trash2 className="h-4 w-4 mr-1" />
                             {loading === 'delete' ? 'Deleting…' : 'Delete'}
+                        </Button>
+                    )}
+                </div>
+                <div className="flex items-center gap-2">
+                    {hasUnenrichedLeads && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleEnrichLeads}
+                            disabled={enriching}
+                            className="gap-1.5 border-primary/30 text-primary hover:bg-primary/10"
+                        >
+                            {enriching ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Enriching {enrichProgress?.done}/{enrichProgress?.total}…
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="h-4 w-4" />
+                                    Enrich {pendingLeads.length} Lead{pendingLeads.length !== 1 ? 's' : ''}
+                                </>
+                            )}
                         </Button>
                     )}
                 </div>
@@ -324,6 +391,7 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                                         <TableHead>Email</TableHead>
                                         <TableHead>LinkedIn</TableHead>
                                         <TableHead>Status</TableHead>
+                                        <TableHead>Enrichment</TableHead>
                                         <TableHead>Last Activity</TableHead>
                                         {canModify && <TableHead className="w-10" />}
                                     </TableRow>
@@ -364,6 +432,20 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                                                     <span className={ls.className}>
                                                         {ls.emoji} {ls.label}
                                                     </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {lead.enrichmentStatus === 'ENRICHED' ? (
+                                                        <Badge variant="outline" className="gap-1 text-emerald-400 border-emerald-400/30">
+                                                            <Zap className="h-3 w-3" />
+                                                            {lead.enrichmentScore ?? 0}%
+                                                        </Badge>
+                                                    ) : lead.enrichmentStatus === 'FAILED' ? (
+                                                        <Badge variant="outline" className="text-red-400 border-red-400/30">
+                                                            Failed
+                                                        </Badge>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">Pending</span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-sm text-muted-foreground">
                                                     {getLastActivity(lead)}

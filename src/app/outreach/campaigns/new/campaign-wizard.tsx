@@ -39,6 +39,7 @@ import {
     Star,
     ExternalLink,
     MapPin,
+    Sparkles,
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -404,6 +405,10 @@ export function CampaignWizard() {
                     setMessages={setMessages}
                     mergeTemplate={mergeTemplate}
                     hasLeads={leads.length > 0}
+                    campaignName={campaignName}
+                    businessCategory={categoryLabel}
+                    postcode={postcode}
+                    sampleLeads={leads.slice(0, 3).map(l => ({ businessName: l.businessName, contactName: l.contactName || null }))}
                 />
             )}
             {step === 3 && (
@@ -953,17 +958,97 @@ function StepWriteMessages({
     setMessages,
     mergeTemplate,
     hasLeads,
+    campaignName,
+    businessCategory,
+    postcode,
+    sampleLeads,
 }: {
     messages: Messages
     setMessages: (m: Messages) => void
     mergeTemplate: (t: string) => string
     hasLeads: boolean
+    campaignName: string
+    businessCategory: string
+    postcode: string
+    sampleLeads: Array<{ businessName: string; contactName: string | null }>
 }) {
+    const [isGenerating, setIsGenerating] = useState(false)
+    const [generateError, setGenerateError] = useState<string | null>(null)
     const linkedinLength = messages.linkedinMessage.length
     const linkedinOverLimit = linkedinLength > LINKEDIN_MAX_CHARS
 
+    const handleAIGenerate = async () => {
+        setIsGenerating(true)
+        setGenerateError(null)
+        try {
+            const res = await fetch('/api/outreach/generate-messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    campaignName,
+                    businessCategory,
+                    location: postcode,
+                    sampleLeads,
+                    tone: 'friendly',
+                    channel: 'both',
+                }),
+            })
+            if (!res.ok) throw new Error('AI generation failed')
+            const data = await res.json()
+            setMessages({
+                linkedinMessage: data.linkedinMessage || messages.linkedinMessage,
+                emailSubject: data.emailSubject || messages.emailSubject,
+                emailBody: data.emailBody || messages.emailBody,
+            })
+        } catch (err) {
+            setGenerateError(err instanceof Error ? err.message : 'Failed to generate')
+        } finally {
+            setIsGenerating(false)
+        }
+    }
+
     return (
         <div className="space-y-4">
+            {/* AI Generate Button */}
+            <Card className="border-dashed border-primary/30 bg-primary/5">
+                <CardContent className="flex items-center justify-between py-4">
+                    <div className="space-y-1">
+                        <div className="text-sm font-medium flex items-center gap-2">
+                            <Sparkles className="h-4 w-4 text-primary" />
+                            AI Message Generation
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Let AI write your outreach messages based on your campaign details and leads.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={handleAIGenerate}
+                        disabled={isGenerating}
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 shrink-0"
+                    >
+                        {isGenerating ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Generating…
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles className="h-4 w-4" />
+                                Generate with AI
+                            </>
+                        )}
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {generateError && (
+                <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    {generateError}
+                </div>
+            )}
             {/* LinkedIn Message */}
             <Card>
                 <CardHeader>
