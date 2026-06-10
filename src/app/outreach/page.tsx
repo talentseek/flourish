@@ -1,76 +1,61 @@
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
-import { prisma } from "@/lib/db"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Target } from "lucide-react"
-import { Location } from "@/types/location"
-import { OutreachGapsClient } from "@/components/outreach-gaps-client"
+import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
+import { getSessionUser } from '@/lib/auth'
+import { getCampaigns, getUserIntegrations } from '@/actions/outreach-actions'
+import { AppSidebar } from '@/components/app-sidebar'
+import { SiteHeader } from '@/components/site-header'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { OutreachClient } from './outreach-client'
 
 export const runtime = 'nodejs'
 
-function serializeLocation(l: any): Location {
-  return {
-    id: l.id,
-    name: l.name,
-    type: l.type,
-    address: l.address,
-    city: l.city,
-    county: l.county,
-    postcode: l.postcode,
-    latitude: Number(l.latitude),
-    longitude: Number(l.longitude),
-    tenants: [],
-    numberOfStores: l.numberOfStores ?? undefined,
-  } as any
-}
-
 export default async function OutreachPage() {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  });
-  if (!session) redirect("/")
+    const sessionUser = await getSessionUser()
+    if (!sessionUser) redirect('/login')
 
-  const locations = await prisma.location.findMany({
-    select: { id: true, name: true, type: true, address: true, city: true, county: true, postcode: true, latitude: true, longitude: true, numberOfStores: true },
-    orderBy: { name: 'asc' }
-  })
+    const dbUser = await prisma.user.findUnique({
+        where: { id: sessionUser.id },
+        select: { role: true, name: true }
+    })
 
-  const serialized = locations.map(serializeLocation)
+    if (!dbUser) redirect('/login')
+    if (dbUser.role !== 'ADMIN' && dbUser.role !== 'REGIONAL_MANAGER') {
+        redirect('/dashboard')
+    }
 
-  return (
-    <SidebarProvider>
-      <AppSidebar variant="inset" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col gap-2">
-            <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Outreach
-                  </CardTitle>
-                  <CardDescription>
-                    Select a shopping centre to view proposed gaps and choose an action to fulfill them
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <OutreachGapsClient locations={serialized as any} />
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  )
+    const [campaigns, integrations] = await Promise.all([
+        getCampaigns(),
+        getUserIntegrations(),
+    ])
+
+    // Serialize Decimal fields to plain numbers for client component
+    const serializedCampaigns = campaigns.map((c) => ({
+        ...c,
+        leads: c.leads.map((l) => ({ status: l.status })),
+        createdAt: c.createdAt.toISOString(),
+        updatedAt: c.updatedAt.toISOString(),
+    }))
+
+    const serializedIntegrations = integrations.map((i) => ({
+        ...i,
+        createdAt: i.createdAt.toISOString(),
+        updatedAt: i.updatedAt.toISOString(),
+    }))
+
+    return (
+        <SidebarProvider>
+            <AppSidebar variant="inset" userRole={dbUser.role} />
+            <SidebarInset>
+                <SiteHeader />
+                <div className="flex flex-1 flex-col">
+                    <div className="p-4 md:p-6 space-y-4 max-w-[1600px] mx-auto w-full">
+                        <OutreachClient
+                            campaigns={serializedCampaigns}
+                            integrations={serializedIntegrations}
+                        />
+                    </div>
+                </div>
+            </SidebarInset>
+        </SidebarProvider>
+    )
 }
-

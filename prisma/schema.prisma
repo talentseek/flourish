@@ -31,6 +31,10 @@ model User {
   crmActivities           CrmActivity[]
   crmFollowUps            CrmFollowUp[]
   crmNotificationSettings CrmNotificationSettings?
+
+  // Outreach relations
+  integrations        UserIntegration[]
+  outreachCampaigns   OutreachCampaign[]
 }
 
 model Location {
@@ -676,4 +680,126 @@ model UserLoginLog {
   @@index([userId])
   @@index([loginAt])
   @@map("user_login_logs")
+}
+
+// ─── Outreach Models ─────────────────────────────────────────
+
+model UserIntegration {
+  id               String   @id @default(cuid())
+  userId           String
+  provider         String   // LINKEDIN | MICROSOFT
+  unipileAccountId String
+  email            String?
+  displayName      String?
+  status           String   @default("ACTIVE") // ACTIVE | EXPIRED | DISCONNECTED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@map("user_integrations")
+}
+
+model OutreachCampaign {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  status      String   @default("DRAFT") // DRAFT | ACTIVE | PAUSED | COMPLETED
+
+  // Search parameters (Phase 2 self-serve)
+  businessCategory String?
+  searchPostcode   String?
+  searchRadius     Int?     // miles
+
+  // Message templates
+  linkedinMessage  String?  @db.Text
+  emailSubject     String?
+  emailBody        String?  @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User             @relation(fields: [userId], references: [id])
+  leads OutreachLead[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("outreach_campaigns")
+}
+
+model OutreachLead {
+  id         String @id @default(cuid())
+  campaignId String
+
+  // Business info (from Google Places)
+  businessName  String
+  address       String?
+  phone         String?
+  website       String?
+  googleRating  Decimal? @db.Decimal(2, 1)
+  googleReviews Int?
+  placeId       String?  // Google Places ID for dedup
+  latitude      Decimal? @db.Decimal(10, 7)
+  longitude     Decimal? @db.Decimal(10, 7)
+
+  // Contact info (from enrichment)
+  contactName  String?
+  contactEmail String?
+  linkedinUrl  String?
+  jobTitle     String?
+
+  // Enrichment metadata
+  enrichmentScore  Int?
+  enrichmentStatus String @default("PENDING") // PENDING | ENRICHED | FAILED
+
+  // Outreach status
+  status String @default("QUEUED")
+  // QUEUED | IN_PROGRESS | COMPLETED | REPLIED | OPTED_OUT | FAILED
+
+  linkedinInviteSentAt   DateTime?
+  linkedinInviteAccepted DateTime?
+  linkedinMessageSentAt  DateTime?
+  emailSentAt            DateTime?
+  repliedAt              DateTime?
+  replyChannel           String? // LINKEDIN | EMAIL
+
+  personalization Json? // Dynamic key-value pairs for message templates
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaign OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  events   OutreachEvent[]
+
+  @@unique([campaignId, placeId])
+  @@index([campaignId])
+  @@index([status])
+  @@map("outreach_leads")
+}
+
+model OutreachEvent {
+  id        String   @id @default(cuid())
+  leadId    String
+  channel   String   // LINKEDIN_INVITE | LINKEDIN_MESSAGE | EMAIL
+  subject   String?
+  body      String?  @db.Text
+  status    String   @default("SENT") // SENT | BOUNCED | OPENED | REPLIED
+  createdAt DateTime @default(now())
+
+  lead OutreachLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@map("outreach_events")
+}
+
+model DailySendCount {
+  id      String   @id @default(cuid())
+  userId  String
+  date    DateTime @db.Date
+  channel String   // LINKEDIN | EMAIL
+  count   Int      @default(0)
+
+  @@unique([userId, date, channel])
+  @@map("daily_send_counts")
 }
