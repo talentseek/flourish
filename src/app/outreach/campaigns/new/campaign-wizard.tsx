@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createCampaign, addLeadsToCampaign } from '@/actions/outreach-actions'
+import { createCampaign, addLeadsToCampaign, getUserCentres } from '@/actions/outreach-actions'
 import { getCategoryOptions } from '@/lib/business-categories'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -40,6 +40,7 @@ import {
     ExternalLink,
     MapPin,
     Sparkles,
+    Building2,
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -119,8 +120,21 @@ export function CampaignWizard() {
     // Step 1 — Campaign Details
     const [campaignName, setCampaignName] = useState('')
     const [category, setCategory] = useState('')
+    const [selectedCentreId, setSelectedCentreId] = useState('')
     const [postcode, setPostcode] = useState('')
     const [radius, setRadius] = useState<number>(10)
+
+    // Centres from database
+    const [centres, setCentres] = useState<Array<{ id: string; name: string; city: string; postcode: string; type: string; label: string }>>([])
+    const [centresLoading, setCentresLoading] = useState(true)
+
+    // Load centres on mount
+    useEffect(() => {
+        getUserCentres()
+            .then(setCentres)
+            .catch(() => setCentres([]))
+            .finally(() => setCentresLoading(false))
+    }, [])
 
     // Step 2 — Find Leads
     const [leads, setLeads] = useState<Lead[]>([])
@@ -140,13 +154,21 @@ export function CampaignWizard() {
 
     const categoryOptions = getCategoryOptions()
     const categoryLabel = categoryOptions.find(c => c.value === category)?.label ?? ''
+    const selectedCentre = centres.find(c => c.id === selectedCentreId)
+
+    // When centre changes, update postcode
+    useEffect(() => {
+        if (selectedCentre) {
+            setPostcode(selectedCentre.postcode)
+        }
+    }, [selectedCentreId, selectedCentre])
 
     // Auto-generate campaign name
     useEffect(() => {
-        if (category && postcode.trim()) {
-            setCampaignName(`${categoryLabel} — ${postcode.trim().toUpperCase()}`)
+        if (category && selectedCentre) {
+            setCampaignName(`${categoryLabel} — ${selectedCentre.name}`)
         }
-    }, [category, postcode, categoryLabel])
+    }, [category, selectedCentreId, categoryLabel, selectedCentre])
 
     const canProceed = (): boolean => {
         switch (step) {
@@ -154,7 +176,7 @@ export function CampaignWizard() {
                 return (
                     campaignName.trim().length > 0 &&
                     category.length > 0 &&
-                    postcode.trim().length > 0 &&
+                    selectedCentreId.length > 0 &&
                     radius > 0
                 )
             case 1:
@@ -372,11 +394,13 @@ export function CampaignWizard() {
                     setName={setCampaignName}
                     category={category}
                     setCategory={setCategory}
-                    postcode={postcode}
-                    setPostcode={setPostcode}
+                    selectedCentreId={selectedCentreId}
+                    setSelectedCentreId={setSelectedCentreId}
                     radius={radius}
                     setRadius={setRadius}
                     categoryOptions={categoryOptions}
+                    centres={centres}
+                    centresLoading={centresLoading}
                 />
             )}
             {step === 1 && (
@@ -474,21 +498,25 @@ function StepCampaignDetails({
     setName,
     category,
     setCategory,
-    postcode,
-    setPostcode,
+    selectedCentreId,
+    setSelectedCentreId,
     radius,
     setRadius,
     categoryOptions,
+    centres,
+    centresLoading,
 }: {
     name: string
     setName: (v: string) => void
     category: string
     setCategory: (v: string) => void
-    postcode: string
-    setPostcode: (v: string) => void
+    selectedCentreId: string
+    setSelectedCentreId: (v: string) => void
     radius: number
     setRadius: (v: number) => void
     categoryOptions: { value: string; label: string }[]
+    centres: Array<{ id: string; name: string; city: string; postcode: string; type: string; label: string }>
+    centresLoading: boolean
 }) {
     return (
         <Card>
@@ -498,11 +526,39 @@ function StepCampaignDetails({
                     Campaign Details
                 </CardTitle>
                 <CardDescription>
-                    Define the business type and area you want to target.
+                    Select your centre and the business type you want to target.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="campaign-centre">
+                            <Building2 className="inline h-3.5 w-3.5 mr-1" />
+                            Centre <span className="text-destructive">*</span>
+                        </Label>
+                        <select
+                            id="campaign-centre"
+                            value={selectedCentreId}
+                            onChange={e => setSelectedCentreId(e.target.value)}
+                            disabled={centresLoading}
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+                        >
+                            <option value="">
+                                {centresLoading ? 'Loading centres…' : 'Select a centre…'}
+                            </option>
+                            {centres.map(c => (
+                                <option key={c.id} value={c.id}>
+                                    {c.label} ({c.postcode})
+                                </option>
+                            ))}
+                        </select>
+                        {centres.length === 0 && !centresLoading && (
+                            <p className="text-xs text-destructive">
+                                No centres assigned to your account. Contact an admin.
+                            </p>
+                        )}
+                    </div>
+
                     <div className="space-y-2">
                         <Label htmlFor="campaign-category">
                             Business Category <span className="text-destructive">*</span>
@@ -520,18 +576,6 @@ function StepCampaignDetails({
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="campaign-postcode">
-                            Postcode <span className="text-destructive">*</span>
-                        </Label>
-                        <Input
-                            id="campaign-postcode"
-                            placeholder="e.g. SW1A 1AA"
-                            value={postcode}
-                            onChange={e => setPostcode(e.target.value)}
-                        />
                     </div>
 
                     <div className="space-y-2">
@@ -558,12 +602,12 @@ function StepCampaignDetails({
                         </Label>
                         <Input
                             id="campaign-name"
-                            placeholder="e.g. Coffee Shops — SW1A 1AA"
+                            placeholder="e.g. Coffee Shops — Arndale Centre"
                             value={name}
                             onChange={e => setName(e.target.value)}
                         />
                         <p className="text-xs text-muted-foreground">
-                            Auto-generated from category and postcode. You can edit it.
+                            Auto-generated from category and centre. You can edit it.
                         </p>
                     </div>
                 </div>

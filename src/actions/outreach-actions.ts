@@ -85,6 +85,37 @@ export async function disconnectIntegration(integrationId: string) {
     return { success: true }
 }
 
+// ─── Centres (Locations) ────────────────────────────────────
+
+export async function getUserCentres() {
+    const user = await verifyRMOrAdmin()
+
+    const where = user.role === 'ADMIN'
+        ? { isManaged: true }
+        : { isManaged: true, regionalManager: user.name }
+
+    const locations = await prisma.location.findMany({
+        where,
+        select: {
+            id: true,
+            name: true,
+            city: true,
+            postcode: true,
+            type: true,
+        },
+        orderBy: { name: 'asc' },
+    })
+
+    return locations.map((loc) => ({
+        id: loc.id,
+        name: loc.name,
+        city: loc.city,
+        postcode: loc.postcode,
+        type: loc.type,
+        label: `${loc.name}, ${loc.city}`,
+    }))
+}
+
 // ─── Campaigns ──────────────────────────────────────────────
 
 export async function getCampaigns() {
