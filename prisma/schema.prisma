@@ -766,25 +766,34 @@ model OutreachLead {
   status String @default("QUEUED")
   // QUEUED | IN_PROGRESS | COMPLETED | REPLIED | OPTED_OUT | FAILED
 
+  // Worker pipeline fields
+  linkedinProviderId String?  // Unipile provider ID for LinkedIn profile
+  currentStep        Int      @default(0)  // Which pipeline step the lead is on
+  nextStepAt         DateTime? // When the next action is scheduled
+
   linkedinInviteSentAt   DateTime?
   linkedinInviteAccepted DateTime?
   linkedinMessageSentAt  DateTime?
   emailSentAt            DateTime?
   repliedAt              DateTime?
   replyChannel           String? // LINKEDIN | EMAIL
+  replyDetectedVia       String? // WEBHOOK | POLL | PRE_DM_CHECK
+  optedOutAt             DateTime?
 
   personalization Json? // Dynamic key-value pairs for message templates
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  campaign OutreachCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  events   OutreachEvent[]
+  campaign   OutreachCampaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  events     OutreachEvent[]
+  invitation OutreachInvitation?
 
   @@unique([campaignId, placeId])
   @@index([campaignId])
   @@index([status])
   @@index([enrichmentStatus])
+  @@index([nextStepAt])
   @@map("outreach_leads")
 }
 
@@ -807,11 +816,44 @@ model DailySendCount {
   id      String   @id @default(cuid())
   userId  String
   date    DateTime @db.Date
-  channel String   // LINKEDIN | EMAIL
+  channel String   // LINKEDIN_INVITE | LINKEDIN_MESSAGE | EMAIL
   count   Int      @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date, channel])
   @@map("daily_send_counts")
+}
+
+// ─── Outreach Invitation (LinkedIn Connection Tracking) ─────
+
+model OutreachInvitation {
+  id         String    @id @default(cuid())
+  leadId     String    @unique
+  providerId String    // Unipile provider ID
+  status     String    @default("PENDING") // PENDING | ACCEPTED | EXPIRED
+  sentAt     DateTime  @default(now())
+  acceptedAt DateTime?
+
+  lead OutreachLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("outreach_invitations")
+}
+
+// ─── Batch Log (Pipeline Run Metrics) ───────────────────────
+
+model BatchLog {
+  id              String    @id @default(cuid())
+  batchNumber     Int
+  invitesSent     Int       @default(0)
+  messagesSent    Int       @default(0)
+  emailsSent      Int       @default(0)
+  repliesDetected Int       @default(0)
+  bouncesDetected Int       @default(0)
+  errors          Int       @default(0)
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  @@map("batch_logs")
 }

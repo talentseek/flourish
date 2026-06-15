@@ -422,7 +422,7 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                     )}
                 </div>
                 <div className="flex items-center gap-2">
-                    {hasUnenrichedLeads && (
+                    {hasUnenrichedLeads && campaign.status !== 'ACTIVE' && (
                         <Button
                             size="sm"
                             variant="outline"
@@ -446,13 +446,24 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                 </div>
             </div>
 
+            {/* Auto-enrichment in progress */}
+            {campaign.status === 'ACTIVE' && hasUnenrichedLeads && (
+                <Alert className="border-blue-500/50 bg-blue-500/10">
+                    <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+                    <AlertTitle className="text-blue-500">Enriching Leads</AlertTitle>
+                    <AlertDescription className="text-blue-400/80">
+                        {pendingLeads.length} lead{pendingLeads.length !== 1 ? 's are' : ' is'} being enriched in the background. The pipeline will start sending once enrichment completes. Refresh to see progress.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Active campaign notice */}
-            {campaign.status === 'ACTIVE' && (
-                <Alert className="border-yellow-500/50 bg-yellow-500/10">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    <AlertTitle className="text-yellow-500">Coming Soon</AlertTitle>
-                    <AlertDescription className="text-yellow-400/80">
-                        Automated sending is coming soon. Your campaign is marked as active and will begin sending automatically once this feature is enabled.
+            {campaign.status === 'ACTIVE' && !hasUnenrichedLeads && (
+                <Alert className="border-emerald-500/50 bg-emerald-500/10">
+                    <AlertTriangle className="h-4 w-4 text-emerald-500" />
+                    <AlertTitle className="text-emerald-500">Campaign Active</AlertTitle>
+                    <AlertDescription className="text-emerald-400/80">
+                        This campaign is live. LinkedIn invites and follow-up messages are being sent automatically during UK business hours (Mon–Fri). Replies and acceptances are tracked in real-time.
                     </AlertDescription>
                 </Alert>
             )}

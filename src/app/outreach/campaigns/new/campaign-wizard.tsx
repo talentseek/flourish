@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createCampaign, addLeadsToCampaign, getUserCentres } from '@/actions/outreach-actions'
+import { createAndLaunchCampaign, getUserCentres, getIntegrationStatus } from '@/actions/outreach-actions'
 import { getCategoryOptions } from '@/lib/business-categories'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -21,15 +21,10 @@ import {
 } from '@/components/ui/table'
 import {
     Megaphone,
-    Search,
     MessageSquare,
     Rocket,
-    Plus,
-    Trash2,
     ChevronRight,
     ChevronLeft,
-    ChevronDown,
-    ChevronUp,
     Loader2,
     Check,
     AlertCircle,
@@ -41,6 +36,10 @@ import {
     MapPin,
     Sparkles,
     Building2,
+    AlertTriangle,
+    CheckCircle2,
+    Calendar,
+    ShieldCheck,
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -81,11 +80,18 @@ interface Messages {
     emailBody: string
 }
 
+interface IntegrationStatus {
+    hasLinkedIn: boolean
+    hasEmail: boolean
+    linkedInName: string | null
+    emailAddress: string | null
+    connected: boolean
+}
+
 const STEPS = [
-    { label: 'Campaign Details', icon: Megaphone },
-    { label: 'Find Leads', icon: Search },
-    { label: 'Write Messages', icon: MessageSquare },
-    { label: 'Review & Launch', icon: Rocket },
+    { label: 'Setup', icon: Megaphone },
+    { label: 'Messages', icon: MessageSquare },
+    { label: 'Preview & Launch', icon: Rocket },
 ] as const
 
 const LINKEDIN_MAX_CHARS = 300
@@ -98,17 +104,6 @@ const RADIUS_OPTIONS = [
     { value: 25, label: '25 miles' },
 ]
 
-const emptyLead = (): Lead => ({
-    id: crypto.randomUUID(),
-    businessName: '',
-    contactName: '',
-    contactEmail: '',
-    linkedinUrl: '',
-    phone: '',
-    website: '',
-    address: '',
-})
-
 // ─── Wizard ─────────────────────────────────────────────────
 
 export function CampaignWizard() {
@@ -117,7 +112,11 @@ export function CampaignWizard() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // Step 1 — Campaign Details
+    // Integration gate
+    const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus | null>(null)
+    const [integrationLoading, setIntegrationLoading] = useState(true)
+
+    // Step 1 — Setup
     const [campaignName, setCampaignName] = useState('')
     const [category, setCategory] = useState('')
     const [selectedCentreId, setSelectedCentreId] = useState('')
@@ -128,24 +127,15 @@ export function CampaignWizard() {
     const [centres, setCentres] = useState<Array<{ id: string; name: string; city: string; postcode: string; type: string; latitude: number; longitude: number; label: string }>>([])
     const [centresLoading, setCentresLoading] = useState(true)
 
-    // Load centres on mount
-    useEffect(() => {
-        getUserCentres()
-            .then(setCentres)
-            .catch(() => setCentres([]))
-            .finally(() => setCentresLoading(false))
-    }, [])
-
-    // Step 2 — Find Leads
+    // Leads (populated from discovery)
     const [leads, setLeads] = useState<Lead[]>([])
-    const [currentLead, setCurrentLead] = useState<Lead>(emptyLead())
     const [discoveredLeads, setDiscoveredLeads] = useState<DiscoveredLead[]>([])
     const [selectedPlaceIds, setSelectedPlaceIds] = useState<Set<string>>(new Set())
     const [isSearching, setIsSearching] = useState(false)
     const [searchError, setSearchError] = useState<string | null>(null)
     const [hasSearched, setHasSearched] = useState(false)
 
-    // Step 3 — Messages
+    // Step 2 — Messages
     const [messages, setMessages] = useState<Messages>({
         linkedinMessage: '',
         emailSubject: '',
@@ -155,6 +145,19 @@ export function CampaignWizard() {
     const categoryOptions = getCategoryOptions()
     const categoryLabel = categoryOptions.find(c => c.value === category)?.label ?? ''
     const selectedCentre = centres.find(c => c.id === selectedCentreId)
+
+    // Load centres + integration status on mount
+    useEffect(() => {
+        getUserCentres()
+            .then(setCentres)
+            .catch(() => setCentres([]))
+            .finally(() => setCentresLoading(false))
+
+        getIntegrationStatus()
+            .then(setIntegrationStatus)
+            .catch(() => setIntegrationStatus({ hasLinkedIn: false, hasEmail: false, linkedInName: null, emailAddress: null, connected: false }))
+            .finally(() => setIntegrationLoading(false))
+    }, [])
 
     // When centre changes, update postcode
     useEffect(() => {
@@ -170,6 +173,29 @@ export function CampaignWizard() {
         }
     }, [category, selectedCentreId, categoryLabel, selectedCentre])
 
+    // Sync leads from selectedPlaceIds whenever selection changes
+    useEffect(() => {
+        if (discoveredLeads.length === 0) return
+        const newLeads: Lead[] = discoveredLeads
+            .filter(d => selectedPlaceIds.has(d.placeId))
+            .map(d => ({
+                id: crypto.randomUUID(),
+                businessName: d.businessName,
+                contactName: '',
+                contactEmail: '',
+                linkedinUrl: '',
+                phone: d.phone ?? '',
+                website: d.website ?? '',
+                address: d.address ?? '',
+                googleRating: d.googleRating,
+                googleReviews: d.googleReviews,
+                placeId: d.placeId,
+                latitude: d.latitude,
+                longitude: d.longitude,
+            }))
+        setLeads(newLeads)
+    }, [selectedPlaceIds, discoveredLeads])
+
     const canProceed = (): boolean => {
         switch (step) {
             case 0:
@@ -177,27 +203,16 @@ export function CampaignWizard() {
                     campaignName.trim().length > 0 &&
                     category.length > 0 &&
                     selectedCentreId.length > 0 &&
-                    radius > 0
+                    radius > 0 &&
+                    leads.length > 0
                 )
             case 1:
-                return leads.length > 0
-            case 2:
                 return messages.linkedinMessage.trim().length > 0 || messages.emailBody.trim().length > 0
-            case 3:
+            case 2:
                 return true
             default:
                 return false
         }
-    }
-
-    const handleAddLead = () => {
-        if (!currentLead.businessName.trim()) return
-        setLeads(prev => [...prev, { ...currentLead, id: crypto.randomUUID() }])
-        setCurrentLead(emptyLead())
-    }
-
-    const handleRemoveLead = (id: string) => {
-        setLeads(prev => prev.filter(l => l.id !== id))
     }
 
     const handleDiscover = async () => {
@@ -225,7 +240,10 @@ export function CampaignWizard() {
             }
             const data = await res.json()
             const results: DiscoveredLead[] = data.results ?? data.leads ?? data ?? []
-            setDiscoveredLeads(Array.isArray(results) ? results : [])
+            const validResults = Array.isArray(results) ? results : []
+            setDiscoveredLeads(validResults)
+            // Auto-select all leads
+            setSelectedPlaceIds(new Set(validResults.map(d => d.placeId)))
         } catch (err) {
             setSearchError(err instanceof Error ? err.message : 'Search failed')
         } finally {
@@ -250,52 +268,50 @@ export function CampaignWizard() {
         }
     }
 
-    const handleAddSelectedToLeads = () => {
-        const existingPlaceIds = new Set(leads.map(l => l.placeId).filter(Boolean))
-        const newLeads: Lead[] = discoveredLeads
-            .filter(d => selectedPlaceIds.has(d.placeId) && !existingPlaceIds.has(d.placeId))
-            .map(d => ({
-                id: crypto.randomUUID(),
-                businessName: d.businessName,
-                contactName: '',
-                contactEmail: '',
-                linkedinUrl: '',
-                phone: d.phone ?? '',
-                website: d.website ?? '',
-                address: d.address ?? '',
-                googleRating: d.googleRating,
-                googleReviews: d.googleReviews,
-                placeId: d.placeId,
-                latitude: d.latitude,
-                longitude: d.longitude,
-            }))
-        setLeads(prev => [...prev, ...newLeads])
-        setSelectedPlaceIds(new Set())
+    const handleNext = async () => {
+        if (step === 0) {
+            // Auto-search if not searched yet, then advance
+            if (!hasSearched || discoveredLeads.length === 0) {
+                await handleDiscover()
+            }
+            // Only advance if we have leads after search
+            // Use a slight delay to let state settle from the discover call
+            setTimeout(() => {
+                setStep(s => s + 1)
+            }, 0)
+            return
+        }
+        setStep(s => s + 1)
     }
 
-    const handleSubmit = async () => {
+    const mergeTemplate = (template: string, lead?: Lead): string => {
+        const target = lead || leads[0]
+        if (!target || !template) return template
+        const firstName = target.contactName?.split(' ')[0] || 'there'
+        return template
+            .replace(/\{\{firstName\}\}/g, firstName)
+            .replace(/\{\{businessName\}\}/g, target.businessName)
+            .replace(/\{\{contactName\}\}/g, target.contactName || '')
+            .replace(/\{\{centreName\}\}/g, selectedCentre?.name || '')
+    }
+
+    const handleSubmit = async (asDraft: boolean) => {
         setIsSubmitting(true)
         setError(null)
 
         try {
-            const result = await createCampaign({
-                name: campaignName.trim(),
-                businessCategory: category || undefined,
-                searchPostcode: postcode.trim() || undefined,
-                searchRadius: radius || undefined,
-                locationId: selectedCentreId || undefined,
-                locationName: selectedCentre?.name || undefined,
-                linkedinMessage: messages.linkedinMessage.trim() || undefined,
-                emailSubject: messages.emailSubject.trim() || undefined,
-                emailBody: messages.emailBody.trim() || undefined,
-            })
-
-            if (!result.success || !result.campaignId) {
-                throw new Error('Failed to create campaign')
-            }
-
-            await addLeadsToCampaign(
-                result.campaignId,
+            const result = await createAndLaunchCampaign(
+                {
+                    name: campaignName.trim(),
+                    businessCategory: category || undefined,
+                    searchPostcode: postcode.trim() || undefined,
+                    searchRadius: radius || undefined,
+                    locationId: selectedCentreId || undefined,
+                    locationName: selectedCentre?.name || undefined,
+                    linkedinMessage: messages.linkedinMessage.trim() || undefined,
+                    emailSubject: messages.emailSubject.trim() || undefined,
+                    emailBody: messages.emailBody.trim() || undefined,
+                },
                 leads.map(l => ({
                     businessName: l.businessName,
                     contactName: l.contactName || undefined,
@@ -309,8 +325,13 @@ export function CampaignWizard() {
                     placeId: l.placeId || undefined,
                     latitude: l.latitude ?? undefined,
                     longitude: l.longitude ?? undefined,
-                }))
+                })),
+                asDraft
             )
+
+            if (!result.success || !result.campaignId) {
+                throw new Error('Failed to create campaign')
+            }
 
             router.push(`/outreach/campaigns/${result.campaignId}`)
         } catch (err) {
@@ -319,24 +340,48 @@ export function CampaignWizard() {
         }
     }
 
-    const mergeTemplate = (template: string): string => {
-        if (!leads.length || !template) return template
-        const lead = leads[0]
-        const firstName = lead.contactName?.split(' ')[0] || 'there'
-        return template
-            .replace(/\{\{firstName\}\}/g, firstName)
-            .replace(/\{\{businessName\}\}/g, lead.businessName)
-            .replace(/\{\{contactName\}\}/g, lead.contactName || '')
-            .replace(/\{\{centreName\}\}/g, selectedCentre?.name || '')
+    // ─── Loading state ──────────────────────────────────────
+    if (integrationLoading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        )
     }
 
+    // ─── Connected Accounts Gate ────────────────────────────
+    if (integrationStatus && !integrationStatus.connected) {
+        return (
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <Card className="max-w-md w-full">
+                    <CardHeader className="text-center">
+                        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                            <ShieldCheck className="h-6 w-6 text-primary" />
+                        </div>
+                        <CardTitle className="text-xl">Connect Your Accounts</CardTitle>
+                        <CardDescription>
+                            Before creating campaigns, you need to connect at least one LinkedIn or email account.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                        <Button onClick={() => router.push('/outreach')} className="gap-2">
+                            Go to Settings
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
+    // ─── Wizard ─────────────────────────────────────────────
     return (
         <div className="space-y-6">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold tracking-tight">Create Campaign</h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                    Set up your outreach campaign in four steps.
+                    Set up your outreach campaign in three steps.
                 </p>
             </div>
 
@@ -394,7 +439,7 @@ export function CampaignWizard() {
 
             {/* Step Content */}
             {step === 0 && (
-                <StepCampaignDetails
+                <StepSetup
                     name={campaignName}
                     setName={setCampaignName}
                     category={category}
@@ -406,29 +451,17 @@ export function CampaignWizard() {
                     categoryOptions={categoryOptions}
                     centres={centres}
                     centresLoading={centresLoading}
-                />
-            )}
-            {step === 1 && (
-                <StepFindLeads
-                    leads={leads}
-                    currentLead={currentLead}
-                    setCurrentLead={setCurrentLead}
-                    onAddManual={handleAddLead}
-                    onRemove={handleRemoveLead}
                     discoveredLeads={discoveredLeads}
                     selectedPlaceIds={selectedPlaceIds}
                     isSearching={isSearching}
                     searchError={searchError}
                     hasSearched={hasSearched}
-                    onDiscover={handleDiscover}
                     onTogglePlaceId={togglePlaceId}
                     onToggleSelectAll={toggleSelectAll}
-                    onAddSelected={handleAddSelectedToLeads}
-                    category={categoryLabel}
-                    postcode={postcode}
+                    leads={leads}
                 />
             )}
-            {step === 2 && (
+            {step === 1 && (
                 <StepWriteMessages
                     messages={messages}
                     setMessages={setMessages}
@@ -441,15 +474,17 @@ export function CampaignWizard() {
                     sampleLeads={leads.slice(0, 3).map(l => ({ businessName: l.businessName, contactName: l.contactName || null }))}
                 />
             )}
-            {step === 3 && (
-                <StepReviewLaunch
+            {step === 2 && (
+                <StepPreviewLaunch
                     campaignName={campaignName}
                     categoryLabel={categoryLabel}
                     centreName={selectedCentre?.name || ''}
                     postcode={postcode}
                     radius={radius}
-                    leadCount={leads.length}
+                    leads={leads}
                     messages={messages}
+                    integrationStatus={integrationStatus}
+                    mergeTemplate={mergeTemplate}
                 />
             )}
 
@@ -467,40 +502,72 @@ export function CampaignWizard() {
 
                 {step < STEPS.length - 1 ? (
                     <Button
-                        onClick={() => setStep(s => s + 1)}
-                        disabled={!canProceed()}
+                        onClick={handleNext}
+                        disabled={step === 0 ? (
+                            campaignName.trim().length === 0 ||
+                            category.length === 0 ||
+                            selectedCentreId.length === 0 ||
+                            radius <= 0 ||
+                            isSearching
+                        ) : !canProceed()}
                         className="gap-1.5"
                     >
-                        Next
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                ) : (
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="gap-1.5"
-                    >
-                        {isSubmitting ? (
+                        {isSearching ? (
                             <>
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                Creating…
+                                Searching…
                             </>
                         ) : (
                             <>
-                                <Rocket className="h-4 w-4" />
-                                Create Campaign
+                                Next
+                                <ChevronRight className="h-4 w-4" />
                             </>
                         )}
                     </Button>
+                ) : (
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() => handleSubmit(true)}
+                            disabled={isSubmitting}
+                            className="gap-1.5"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Saving…
+                                </>
+                            ) : (
+                                'Save as Draft'
+                            )}
+                        </Button>
+                        <Button
+                            onClick={() => handleSubmit(false)}
+                            disabled={isSubmitting}
+                            className="gap-1.5"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Launching…
+                                </>
+                            ) : (
+                                <>
+                                    Create & Launch
+                                    <Rocket className="h-4 w-4" />
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 )}
             </div>
         </div>
     )
 }
 
-// ─── Step 1: Campaign Details ───────────────────────────────
+// ─── Step 1: Setup ──────────────────────────────────────────
 
-function StepCampaignDetails({
+function StepSetup({
     name,
     setName,
     category,
@@ -512,6 +579,14 @@ function StepCampaignDetails({
     categoryOptions,
     centres,
     centresLoading,
+    discoveredLeads,
+    selectedPlaceIds,
+    isSearching,
+    searchError,
+    hasSearched,
+    onTogglePlaceId,
+    onToggleSelectAll,
+    leads,
 }: {
     name: string
     setName: (v: string) => void
@@ -524,314 +599,147 @@ function StepCampaignDetails({
     categoryOptions: { value: string; label: string }[]
     centres: Array<{ id: string; name: string; city: string; postcode: string; type: string; latitude: number; longitude: number; label: string }>
     centresLoading: boolean
-}) {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <Megaphone className="h-5 w-5 text-primary" />
-                    Campaign Details
-                </CardTitle>
-                <CardDescription>
-                    Select your centre and the business type you want to target.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="campaign-centre">
-                            <Building2 className="inline h-3.5 w-3.5 mr-1" />
-                            Centre <span className="text-destructive">*</span>
-                        </Label>
-                        <select
-                            id="campaign-centre"
-                            value={selectedCentreId}
-                            onChange={e => setSelectedCentreId(e.target.value)}
-                            disabled={centresLoading}
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
-                        >
-                            <option value="">
-                                {centresLoading ? 'Loading centres…' : 'Select a centre…'}
-                            </option>
-                            {centres.map(c => (
-                                <option key={c.id} value={c.id}>
-                                    {c.label} ({c.postcode})
-                                </option>
-                            ))}
-                        </select>
-                        {centres.length === 0 && !centresLoading && (
-                            <p className="text-xs text-destructive">
-                                No centres assigned to your account. Contact an admin.
-                            </p>
-                        )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="campaign-category">
-                            Business Category <span className="text-destructive">*</span>
-                        </Label>
-                        <select
-                            id="campaign-category"
-                            value={category}
-                            onChange={e => setCategory(e.target.value)}
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                        >
-                            <option value="">Select a category…</option>
-                            {categoryOptions.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="campaign-radius">
-                            Search Radius <span className="text-destructive">*</span>
-                        </Label>
-                        <select
-                            id="campaign-radius"
-                            value={radius}
-                            onChange={e => setRadius(Number(e.target.value))}
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                        >
-                            {RADIUS_OPTIONS.map(opt => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="campaign-name">
-                            Campaign Name <span className="text-destructive">*</span>
-                        </Label>
-                        <Input
-                            id="campaign-name"
-                            placeholder="e.g. Coffee Shops — Arndale Centre"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Auto-generated from category and centre. You can edit it.
-                        </p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
-// ─── Step 2: Find Leads ─────────────────────────────────────
-
-function StepFindLeads({
-    leads,
-    currentLead,
-    setCurrentLead,
-    onAddManual,
-    onRemove,
-    discoveredLeads,
-    selectedPlaceIds,
-    isSearching,
-    searchError,
-    hasSearched,
-    onDiscover,
-    onTogglePlaceId,
-    onToggleSelectAll,
-    onAddSelected,
-    category,
-    postcode,
-}: {
-    leads: Lead[]
-    currentLead: Lead
-    setCurrentLead: (l: Lead) => void
-    onAddManual: () => void
-    onRemove: (id: string) => void
     discoveredLeads: DiscoveredLead[]
     selectedPlaceIds: Set<string>
     isSearching: boolean
     searchError: string | null
     hasSearched: boolean
-    onDiscover: () => void
     onTogglePlaceId: (placeId: string) => void
     onToggleSelectAll: () => void
-    onAddSelected: () => void
-    category: string
-    postcode: string
+    leads: Lead[]
 }) {
-    const [manualOpen, setManualOpen] = useState(false)
-
-    const updateField = (field: keyof Lead, value: string) => {
-        setCurrentLead({ ...currentLead, [field]: value })
-    }
-
     const allSelected = discoveredLeads.length > 0 && selectedPlaceIds.size === discoveredLeads.length
 
     return (
         <div className="space-y-4">
-            {/* Discovery Search */}
             <Card>
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
-                        <Search className="h-5 w-5 text-primary" />
-                        Find Leads
+                        <Megaphone className="h-5 w-5 text-primary" />
+                        Campaign Setup
                     </CardTitle>
                     <CardDescription>
-                        Search for {category || 'businesses'} near {postcode.trim().toUpperCase() || 'your postcode'}. Select the ones you want in your campaign.
+                        Select your centre and the business type you want to target.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <Button onClick={onDiscover} disabled={isSearching} className="gap-2">
-                        {isSearching ? (
-                            <>
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                Searching for businesses…
-                            </>
-                        ) : (
-                            <>
-                                <Search className="h-4 w-4" />
-                                Search
-                            </>
-                        )}
-                    </Button>
-
-                    {searchError && (
-                        <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
-                            {searchError}
-                        </div>
-                    )}
-
-                    {/* Discovery Results */}
-                    {discoveredLeads.length > 0 && (
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm text-muted-foreground">
-                                    Found <span className="font-medium text-foreground">{discoveredLeads.length}</span> businesses
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="campaign-centre">
+                                <Building2 className="inline h-3.5 w-3.5 mr-1" />
+                                Centre <span className="text-destructive">*</span>
+                            </Label>
+                            <select
+                                id="campaign-centre"
+                                value={selectedCentreId}
+                                onChange={e => setSelectedCentreId(e.target.value)}
+                                disabled={centresLoading}
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+                            >
+                                <option value="">
+                                    {centresLoading ? 'Loading centres…' : 'Select a centre…'}
+                                </option>
+                                {centres.map(c => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.label} ({c.postcode})
+                                    </option>
+                                ))}
+                            </select>
+                            {centres.length === 0 && !centresLoading && (
+                                <p className="text-xs text-destructive">
+                                    No centres assigned to your account. Contact an admin.
                                 </p>
-                                <div className="flex items-center gap-2">
-                                    <Button variant="outline" size="sm" onClick={onToggleSelectAll}>
-                                        {allSelected ? 'Deselect All' : 'Select All'}
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        disabled={selectedPlaceIds.size === 0}
-                                        onClick={onAddSelected}
-                                        className="gap-1.5"
-                                    >
-                                        <Plus className="h-3.5 w-3.5" />
-                                        Add Selected ({selectedPlaceIds.size})
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="rounded-md border overflow-hidden">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[40px]">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={allSelected}
-                                                    onChange={onToggleSelectAll}
-                                                    className="rounded border-input"
-                                                />
-                                            </TableHead>
-                                            <TableHead>Business Name</TableHead>
-                                            <TableHead className="hidden md:table-cell">Address</TableHead>
-                                            <TableHead className="hidden sm:table-cell">Rating</TableHead>
-                                            <TableHead className="hidden sm:table-cell">Reviews</TableHead>
-                                            <TableHead className="hidden lg:table-cell">Website</TableHead>
-                                            <TableHead className="hidden md:table-cell">Distance</TableHead>
-                                            <TableHead className="hidden lg:table-cell">Score</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {discoveredLeads.map(d => {
-                                            const existsInCampaign = leads.some(l => l.placeId === d.placeId)
-                                            return (
-                                                <TableRow
-                                                    key={d.placeId}
-                                                    className={existsInCampaign ? 'opacity-50' : ''}
-                                                >
-                                                    <TableCell>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedPlaceIds.has(d.placeId)}
-                                                            onChange={() => onTogglePlaceId(d.placeId)}
-                                                            disabled={existsInCampaign}
-                                                            className="rounded border-input"
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell className="font-medium">
-                                                        {d.businessName}
-                                                        {existsInCampaign && (
-                                                            <Badge variant="outline" className="ml-2 text-xs">Added</Badge>
-                                                        )}
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-[200px] truncate">
-                                                        {d.address || '—'}
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell">
-                                                        {d.googleRating != null ? (
-                                                            <span className="flex items-center gap-1 text-sm">
-                                                                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                                                                {d.googleRating.toFixed(1)}
-                                                            </span>
-                                                        ) : '—'}
-                                                    </TableCell>
-                                                    <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-                                                        {d.googleReviews ?? '—'}
-                                                    </TableCell>
-                                                    <TableCell className="hidden lg:table-cell">
-                                                        {d.website ? (
-                                                            <a
-                                                                href={d.website}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                                                            >
-                                                                <ExternalLink className="h-3 w-3" />
-                                                                Link
-                                                            </a>
-                                                        ) : '—'}
-                                                    </TableCell>
-                                                    <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                                                        {d.distanceMiles.toFixed(1)} mi
-                                                    </TableCell>
-                                                    <TableCell className="hidden lg:table-cell">
-                                                        <Badge variant="secondary" className="text-xs font-mono">
-                                                            {d.score.toFixed(0)}
-                                                        </Badge>
-                                                    </TableCell>
-                                                </TableRow>
-                                            )
-                                        })}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                            )}
                         </div>
-                    )}
 
-                    {hasSearched && !isSearching && discoveredLeads.length === 0 && !searchError && (
-                        <div className="text-center py-6 text-muted-foreground text-sm border border-dashed rounded-lg">
-                            No businesses found. Try adjusting your category, postcode, or radius.
+                        <div className="space-y-2">
+                            <Label htmlFor="campaign-category">
+                                Business Category <span className="text-destructive">*</span>
+                            </Label>
+                            <select
+                                id="campaign-category"
+                                value={category}
+                                onChange={e => setCategory(e.target.value)}
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            >
+                                <option value="">Select a category…</option>
+                                {categoryOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="campaign-radius">
+                                Search Radius <span className="text-destructive">*</span>
+                            </Label>
+                            <select
+                                id="campaign-radius"
+                                value={radius}
+                                onChange={e => setRadius(Number(e.target.value))}
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                            >
+                                {RADIUS_OPTIONS.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="campaign-name">
+                                Campaign Name <span className="text-destructive">*</span>
+                            </Label>
+                            <Input
+                                id="campaign-name"
+                                placeholder="e.g. Coffee Shops — Arndale Centre"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                Auto-generated from category and centre. You can edit it.
+                            </p>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
 
-            {/* Campaign Leads */}
-            {leads.length > 0 && (
+            {/* Search status */}
+            {isSearching && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 border border-border/50 rounded-lg px-4 py-3">
+                    <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                    Searching for businesses…
+                </div>
+            )}
+
+            {searchError && (
+                <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    {searchError}
+                </div>
+            )}
+
+            {/* Discovered leads results */}
+            {hasSearched && !isSearching && discoveredLeads.length > 0 && (
                 <Card>
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-primary" />
-                                Campaign Leads
+                                Discovered Leads
                             </CardTitle>
-                            <Badge variant="secondary">{leads.length}</Badge>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="gap-1">
+                                    <Check className="h-3 w-3" />
+                                    {selectedPlaceIds.size} of {discoveredLeads.length} selected
+                                </Badge>
+                                <Button variant="outline" size="sm" onClick={onToggleSelectAll}>
+                                    {allSelected ? 'Deselect All' : 'Select All'}
+                                </Button>
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -839,52 +747,71 @@ function StepFindLeads({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Business</TableHead>
-                                        <TableHead className="hidden md:table-cell">Contact</TableHead>
-                                        <TableHead className="hidden md:table-cell">Channel</TableHead>
-                                        <TableHead className="w-[50px]" />
+                                        <TableHead className="w-[40px]">
+                                            <input
+                                                type="checkbox"
+                                                checked={allSelected}
+                                                onChange={onToggleSelectAll}
+                                                className="rounded border-input"
+                                            />
+                                        </TableHead>
+                                        <TableHead>Business Name</TableHead>
+                                        <TableHead className="hidden md:table-cell">Address</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Rating</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Reviews</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Website</TableHead>
+                                        <TableHead className="hidden md:table-cell">Distance</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Score</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {leads.map(lead => (
-                                        <TableRow key={lead.id}>
-                                            <TableCell className="font-medium">
-                                                {lead.businessName}
-                                                {lead.address && (
-                                                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">
-                                                        {lead.address}
-                                                    </div>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                <div className="text-sm">{lead.contactName || '—'}</div>
-                                                <div className="text-xs text-muted-foreground">{lead.contactEmail || ''}</div>
-                                            </TableCell>
-                                            <TableCell className="hidden md:table-cell">
-                                                <div className="flex gap-1.5">
-                                                    {lead.linkedinUrl && (
-                                                        <Badge variant="outline" className="text-xs gap-1">
-                                                            <Linkedin className="h-3 w-3" />
-                                                            LI
-                                                        </Badge>
-                                                    )}
-                                                    {lead.contactEmail && (
-                                                        <Badge variant="outline" className="text-xs gap-1">
-                                                            <Mail className="h-3 w-3" />
-                                                            Email
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                            </TableCell>
+                                    {discoveredLeads.map(d => (
+                                        <TableRow key={d.placeId}>
                                             <TableCell>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                    onClick={() => onRemove(lead.id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedPlaceIds.has(d.placeId)}
+                                                    onChange={() => onTogglePlaceId(d.placeId)}
+                                                    className="rounded border-input"
+                                                />
+                                            </TableCell>
+                                            <TableCell className="font-medium">
+                                                {d.businessName}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-[200px] truncate">
+                                                {d.address || '—'}
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                {d.googleRating != null ? (
+                                                    <span className="flex items-center gap-1 text-sm">
+                                                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                                                        {d.googleRating.toFixed(1)}
+                                                    </span>
+                                                ) : '—'}
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
+                                                {d.googleReviews ?? '—'}
+                                            </TableCell>
+                                            <TableCell className="hidden lg:table-cell">
+                                                {d.website ? (
+                                                    <a
+                                                        href={d.website}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                                                    >
+                                                        <ExternalLink className="h-3 w-3" />
+                                                        Link
+                                                    </a>
+                                                ) : '—'}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
+                                                {d.distanceMiles.toFixed(1)} mi
+                                            </TableCell>
+                                            <TableCell className="hidden lg:table-cell">
+                                                <Badge variant="secondary" className="text-xs font-mono">
+                                                    {d.score.toFixed(0)}
+                                                </Badge>
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -895,114 +822,24 @@ function StepFindLeads({
                 </Card>
             )}
 
-            {leads.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground text-sm border border-dashed rounded-lg">
-                    No leads added yet. Search above or add manually below.
+            {hasSearched && !isSearching && discoveredLeads.length === 0 && !searchError && (
+                <div className="text-center py-6 text-muted-foreground text-sm border border-dashed rounded-lg">
+                    No businesses found. Try adjusting your category, centre, or radius.
                 </div>
             )}
 
-            {/* Manual Add (Collapsible) */}
-            <Separator />
-            <div>
-                <button
-                    onClick={() => setManualOpen(!manualOpen)}
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full py-2"
-                >
-                    {manualOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    Or add leads manually
-                </button>
-
-                {manualOpen && (
-                    <Card className="mt-3">
-                        <CardContent className="pt-6 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-business">
-                                        Business Name <span className="text-destructive">*</span>
-                                    </Label>
-                                    <Input
-                                        id="lead-business"
-                                        placeholder="e.g. Brew & Bean"
-                                        value={currentLead.businessName}
-                                        onChange={e => updateField('businessName', e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && onAddManual()}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-contact">Contact Name</Label>
-                                    <Input
-                                        id="lead-contact"
-                                        placeholder="e.g. Sarah Johnson"
-                                        value={currentLead.contactName}
-                                        onChange={e => updateField('contactName', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-email">Contact Email</Label>
-                                    <Input
-                                        id="lead-email"
-                                        type="email"
-                                        placeholder="sarah@brewandbean.co.uk"
-                                        value={currentLead.contactEmail}
-                                        onChange={e => updateField('contactEmail', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-linkedin">LinkedIn URL</Label>
-                                    <Input
-                                        id="lead-linkedin"
-                                        placeholder="https://linkedin.com/in/..."
-                                        value={currentLead.linkedinUrl}
-                                        onChange={e => updateField('linkedinUrl', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-phone">Phone</Label>
-                                    <Input
-                                        id="lead-phone"
-                                        placeholder="07XXX XXXXXX"
-                                        value={currentLead.phone}
-                                        onChange={e => updateField('phone', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="lead-website">Website</Label>
-                                    <Input
-                                        id="lead-website"
-                                        placeholder="https://brewandbean.co.uk"
-                                        value={currentLead.website}
-                                        onChange={e => updateField('website', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-1.5 md:col-span-2">
-                                    <Label htmlFor="lead-address">Address</Label>
-                                    <Input
-                                        id="lead-address"
-                                        placeholder="123 High Street, Manchester, M1 1AA"
-                                        value={currentLead.address}
-                                        onChange={e => updateField('address', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-
-                            <Button
-                                onClick={onAddManual}
-                                disabled={!currentLead.businessName.trim()}
-                                size="sm"
-                                className="gap-1.5"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add Lead
-                            </Button>
-                        </CardContent>
-                    </Card>
-                )}
-            </div>
+            {/* Success count badge */}
+            {leads.length > 0 && (
+                <div className="flex items-center gap-2 text-sm text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-3">
+                    <Check className="h-4 w-4 shrink-0" />
+                    {leads.length} businesses found within {radius} miles
+                </div>
+            )}
         </div>
     )
 }
 
-// ─── Step 3: Write Messages ─────────────────────────────────
+// ─── Step 2: Write Messages ─────────────────────────────────
 
 function StepWriteMessages({
     messages,
@@ -1231,74 +1068,205 @@ function StepWriteMessages({
     )
 }
 
-// ─── Step 4: Review & Launch ────────────────────────────────
+// ─── Step 3: Preview & Launch ───────────────────────────────
 
-function StepReviewLaunch({
+function StepPreviewLaunch({
     campaignName,
     categoryLabel,
     centreName,
     postcode,
     radius,
-    leadCount,
+    leads,
     messages,
+    integrationStatus,
+    mergeTemplate,
 }: {
     campaignName: string
     categoryLabel: string
     centreName: string
     postcode: string
     radius: number
-    leadCount: number
+    leads: Lead[]
     messages: Messages
+    integrationStatus: IntegrationStatus | null
+    mergeTemplate: (t: string, lead?: Lead) => string
 }) {
-    const channels: string[] = []
-    if (messages.linkedinMessage.trim()) channels.push('LinkedIn (follow-up)')
-    if (messages.emailBody.trim()) channels.push('Email')
+    const hasLinkedInTemplate = messages.linkedinMessage.trim().length > 0
+    const hasEmailTemplate = messages.emailBody.trim().length > 0
+    const leadsWithoutLinkedIn = leads.filter(l => !l.linkedinUrl).length
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <Rocket className="h-5 w-5 text-primary" />
-                    Review & Launch
-                </CardTitle>
-                <CardDescription>
-                    Review your campaign details before creating it.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <SummaryItem label="Campaign Name" value={campaignName} />
-                    <SummaryItem label="Business Category" value={categoryLabel || '—'} />
-                    <SummaryItem label="Centre" value={centreName ? `${centreName} (${postcode.trim().toUpperCase()})` : postcode.trim().toUpperCase()} />
-                    <SummaryItem label="Search Radius" value={`${radius} miles`} />
-                    <SummaryItem label="Total Leads" value={String(leadCount)} />
-                    <SummaryItem
-                        label="Channels"
-                        value={
-                            channels.length > 0
-                                ? channels.join(', ')
-                                : 'None configured'
-                        }
-                    />
-                    <SummaryItem label="Status" value="Draft — will be created as a draft campaign" />
-                </div>
-
-                {channels.length === 1 && (
-                    <div className="flex items-center gap-2 text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 mt-4">
-                        <AlertCircle className="h-4 w-4 shrink-0" />
-                        Only {channels[0]} is configured. Leads without a matching contact method won&apos;t be reached through the other channel.
+        <div className="space-y-4">
+            {/* Campaign Summary */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                        <Rocket className="h-5 w-5 text-primary" />
+                        Campaign Summary
+                    </CardTitle>
+                    <CardDescription>
+                        Review everything before launching.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <SummaryItem label="Campaign Name" value={campaignName} />
+                        <SummaryItem label="Centre" value={centreName ? `${centreName} (${postcode.trim().toUpperCase()})` : postcode.trim().toUpperCase()} />
+                        <SummaryItem label="Category" value={categoryLabel || '—'} />
+                        <SummaryItem label="Radius" value={`${radius} miles`} />
+                        <SummaryItem label="Leads" value={String(leads.length)} />
                     </div>
-                )}
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            {/* Safety Checks */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-primary" />
+                        Safety Checks
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2">
+                        <SafetyCheck
+                            passed={integrationStatus?.hasLinkedIn ?? false}
+                            label={integrationStatus?.hasLinkedIn
+                                ? `LinkedIn connected (${integrationStatus.linkedInName || 'Connected'})`
+                                : 'LinkedIn not connected'
+                            }
+                        />
+                        <SafetyCheck
+                            passed={integrationStatus?.hasEmail ?? false}
+                            label={integrationStatus?.hasEmail
+                                ? `Email connected (${integrationStatus.emailAddress || 'Connected'})`
+                                : 'Email not connected'
+                            }
+                        />
+                        <SafetyCheck
+                            passed={hasLinkedInTemplate}
+                            label={hasLinkedInTemplate ? 'LinkedIn message template ready' : 'No LinkedIn message template'}
+                        />
+                        <SafetyCheck
+                            passed={hasEmailTemplate}
+                            label={hasEmailTemplate ? 'Email template ready' : 'No email template'}
+                        />
+                        <SafetyCheck
+                            passed={leads.length > 0}
+                            label={`${leads.length} leads ready`}
+                        />
+                        {leadsWithoutLinkedIn > 0 && (
+                            <div className="flex items-center gap-2 text-sm text-amber-500">
+                                <AlertTriangle className="h-4 w-4 shrink-0" />
+                                {leadsWithoutLinkedIn} leads missing LinkedIn (email only)
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Pipeline Preview */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        Pipeline Preview
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-3">
+                        <PipelineStep day="Day 1-2" description="LinkedIn invites (25/day max)" />
+                        <PipelineStep day="Day 3+" description="Wait for acceptances" />
+                        <PipelineStep day="Day 4+" description="Follow-up DMs to accepted" />
+                        <PipelineStep day="Day 7+" description="Email to remaining" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Sample Messages */}
+            {leads.length > 0 && (messages.linkedinMessage.trim() || messages.emailBody.trim()) && (
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-sm font-medium flex items-center gap-2">
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                            Sample Messages
+                            <Badge variant="outline" className="font-normal text-xs">First {Math.min(2, leads.length)} leads</Badge>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {leads.slice(0, 2).map((lead, idx) => (
+                            <div key={lead.id} className="space-y-3">
+                                {idx > 0 && <Separator />}
+                                <div className="text-xs font-medium text-muted-foreground">
+                                    {lead.businessName}
+                                </div>
+                                {messages.linkedinMessage.trim() && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                            <Linkedin className="h-3 w-3" />
+                                            LinkedIn
+                                        </div>
+                                        <div className="rounded-md bg-muted/50 p-3 text-sm whitespace-pre-wrap">
+                                            {mergeTemplate(messages.linkedinMessage, lead)}
+                                        </div>
+                                    </div>
+                                )}
+                                {messages.emailBody.trim() && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                            <Mail className="h-3 w-3" />
+                                            Email
+                                        </div>
+                                        {messages.emailSubject.trim() && (
+                                            <div className="text-sm font-medium">
+                                                Subject: {mergeTemplate(messages.emailSubject, lead)}
+                                            </div>
+                                        )}
+                                        <div className="rounded-md bg-muted/50 p-3 text-sm whitespace-pre-wrap">
+                                            {mergeTemplate(messages.emailBody, lead)}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+            )}
+        </div>
     )
 }
+
+// ─── Shared Components ──────────────────────────────────────
 
 function SummaryItem({ label, value }: { label: string; value: string }) {
     return (
         <div className="space-y-1 rounded-lg bg-muted/30 border border-border/50 px-4 py-3">
             <p className="text-xs font-medium text-muted-foreground">{label}</p>
             <p className="text-sm font-medium">{value}</p>
+        </div>
+    )
+}
+
+function SafetyCheck({ passed, label }: { passed: boolean; label: string }) {
+    return (
+        <div className={`flex items-center gap-2 text-sm ${passed ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+            {passed ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+            ) : (
+                <AlertCircle className="h-4 w-4 shrink-0" />
+            )}
+            {label}
+        </div>
+    )
+}
+
+function PipelineStep({ day, description }: { day: string; description: string }) {
+    return (
+        <div className="flex items-center gap-3">
+            <Badge variant="outline" className="font-mono text-xs shrink-0 w-16 justify-center">
+                {day}
+            </Badge>
+            <span className="text-sm text-muted-foreground">{description}</span>
         </div>
     )
 }

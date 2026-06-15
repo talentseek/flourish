@@ -332,6 +332,142 @@ export async function completeCampaign(id: string) {
     return { success: true }
 }
 
+// ─── Integration Status (for wizard gate) ───────────────────
+
+export async function getIntegrationStatus() {
+    const user = await verifyRMOrAdmin()
+
+    const integrations = await prisma.userIntegration.findMany({
+        where: { userId: user.id, status: 'ACTIVE' },
+        select: { provider: true, displayName: true, email: true },
+    })
+
+    return {
+        hasLinkedIn: integrations.some(i => i.provider === 'LINKEDIN'),
+        hasEmail: integrations.some(i => i.provider === 'MICROSOFT'),
+        linkedInName: integrations.find(i => i.provider === 'LINKEDIN')?.displayName ?? null,
+        emailAddress: integrations.find(i => i.provider === 'MICROSOFT')?.email ?? null,
+        connected: integrations.length > 0,
+    }
+}
+
+// ─── Create & Launch (combined action) ──────────────────────
+
+export async function createAndLaunchCampaign(
+    data: CreateCampaignData,
+    leads: LeadInput[],
+    asDraft: boolean = false,
+) {
+    const user = await verifyRMOrAdmin()
+
+    if (leads.length === 0) {
+        throw new Error('Add at least one lead before creating a campaign')
+    }
+    if (!data.linkedinMessage && !data.emailBody) {
+        throw new Error('Add at least one message template (LinkedIn or email)')
+    }
+
+    // If launching (not draft), verify connected accounts
+    if (!asDraft) {
+        const integrations = await prisma.userIntegration.findMany({
+            where: { userId: user.id, status: 'ACTIVE' },
+        })
+        if (integrations.length === 0) {
+            throw new Error('Connect your LinkedIn or email account before launching')
+        }
+    }
+
+    // Deduplicate campaign name
+    if (data.name) {
+        const existing = await prisma.outreachCampaign.findFirst({
+            where: { userId: user.id, name: data.name },
+        })
+        if (existing) {
+            const count = await prisma.outreachCampaign.count({
+                where: { userId: user.id, name: { startsWith: data.name } },
+            })
+            data.name = `${data.name} (${count + 1})`
+        }
+    }
+
+    // Create campaign
+    const campaign = await prisma.outreachCampaign.create({
+        data: {
+            userId: user.id,
+            name: data.name,
+            status: asDraft ? 'DRAFT' : 'ACTIVE',
+            businessCategory: data.businessCategory,
+            searchPostcode: data.searchPostcode,
+            searchRadius: data.searchRadius,
+            locationId: data.locationId,
+            locationName: data.locationName,
+            linkedinMessage: data.linkedinMessage,
+            emailSubject: data.emailSubject,
+            emailBody: data.emailBody,
+        },
+    })
+
+    // Add leads
+    await prisma.outreachLead.createMany({
+        data: leads.map((lead) => ({
+            campaignId: campaign.id,
+            businessName: lead.businessName,
+            address: lead.address,
+            phone: lead.phone,
+            website: lead.website,
+            googleRating: lead.googleRating,
+            googleReviews: lead.googleReviews,
+            placeId: lead.placeId,
+            latitude: lead.latitude,
+            longitude: lead.longitude,
+            contactName: lead.contactName,
+            contactEmail: lead.contactEmail,
+            linkedinUrl: lead.linkedinUrl,
+            jobTitle: lead.jobTitle,
+            enrichmentStatus: lead.contactEmail || lead.linkedinUrl ? 'ENRICHED' : 'PENDING',
+            personalization: {
+                firstName: lead.contactName?.split(' ')[0] || '',
+                businessName: lead.businessName,
+            },
+        })),
+        skipDuplicates: true,
+    })
+
+    // Auto-enrich: fire-and-forget background enrichment for PENDING leads
+    // Don't await — let it run in the background
+    triggerBackgroundEnrichment(campaign.id).catch(() => {})
+
+    revalidatePath('/outreach')
+    return { success: true, campaignId: campaign.id }
+}
+
+async function triggerBackgroundEnrichment(campaignId: string) {
+    const pendingLeads = await prisma.outreachLead.findMany({
+        where: { campaignId, enrichmentStatus: 'PENDING' },
+        select: { id: true },
+    })
+
+    if (pendingLeads.length === 0) return
+
+    // Call the enrich API internally — batch of 10 at a time
+    const batchSize = 10
+    for (let i = 0; i < pendingLeads.length; i += batchSize) {
+        const batch = pendingLeads.slice(i, i + batchSize)
+        try {
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
+                ? `https://${process.env.VERCEL_URL}`
+                : 'http://localhost:3000'
+            await fetch(`${baseUrl}/api/outreach/enrich`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ leadIds: batch.map(l => l.id) }),
+            })
+        } catch {
+            // Continue on error — enrichment can be retried manually
+        }
+    }
+}
+
 // ─── Leads ──────────────────────────────────────────────────
 
 interface LeadInput {
