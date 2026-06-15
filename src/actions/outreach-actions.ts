@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
+import { enrichLeadsByCampaignId } from '@/lib/enrich-pipeline'
 
 // ─── Auth Helper ────────────────────────────────────────────
 
@@ -434,38 +435,13 @@ export async function createAndLaunchCampaign(
     })
 
     // Auto-enrich: fire-and-forget background enrichment for PENDING leads
-    // Don't await — let it run in the background
-    triggerBackgroundEnrichment(campaign.id).catch(() => {})
+    // Calls the enrichment pipeline directly (not via HTTP) to avoid auth issues
+    enrichLeadsByCampaignId(campaign.id).catch((err) => {
+        console.error('[Auto-Enrich] Background enrichment error:', err)
+    })
 
     revalidatePath('/outreach')
     return { success: true, campaignId: campaign.id }
-}
-
-async function triggerBackgroundEnrichment(campaignId: string) {
-    const pendingLeads = await prisma.outreachLead.findMany({
-        where: { campaignId, enrichmentStatus: 'PENDING' },
-        select: { id: true },
-    })
-
-    if (pendingLeads.length === 0) return
-
-    // Call the enrich API internally — batch of 10 at a time
-    const batchSize = 10
-    for (let i = 0; i < pendingLeads.length; i += batchSize) {
-        const batch = pendingLeads.slice(i, i + batchSize)
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
-                ? `https://${process.env.VERCEL_URL}`
-                : 'http://localhost:3000'
-            await fetch(`${baseUrl}/api/outreach/enrich`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ leadIds: batch.map(l => l.id) }),
-            })
-        } catch {
-            // Continue on error — enrichment can be retried manually
-        }
-    }
 }
 
 // ─── Leads ──────────────────────────────────────────────────
