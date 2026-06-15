@@ -41,6 +41,7 @@ export default async function CampaignDetailPage({
         name: campaign.name,
         status: campaign.status,
         businessCategory: campaign.businessCategory,
+        locationId: campaign.locationId ?? null,
         locationName: campaign.locationName ?? null,
         searchPostcode: campaign.searchPostcode,
         searchRadius: campaign.searchRadius,

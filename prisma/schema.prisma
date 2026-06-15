@@ -35,6 +35,7 @@ model User {
   // Outreach relations
   integrations        UserIntegration[]
   outreachCampaigns   OutreachCampaign[]
+  dailySendCounts     DailySendCount[]
 }
 
 model Location {
@@ -725,13 +726,14 @@ model OutreachCampaign {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User             @relation(fields: [userId], references: [id])
-  location Location?        @relation(fields: [locationId], references: [id])
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location Location?        @relation(fields: [locationId], references: [id], onDelete: SetNull)
   leads    OutreachLead[]
 
   @@index([userId])
   @@index([status])
   @@index([locationId])
+  @@index([userId, createdAt])
   @@map("outreach_campaigns")
 }
 
@@ -782,6 +784,7 @@ model OutreachLead {
   @@unique([campaignId, placeId])
   @@index([campaignId])
   @@index([status])
+  @@index([enrichmentStatus])
   @@map("outreach_leads")
 }
 
@@ -806,6 +809,8 @@ model DailySendCount {
   date    DateTime @db.Date
   channel String   // LINKEDIN | EMAIL
   count   Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date, channel])
   @@map("daily_send_counts")

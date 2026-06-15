@@ -39,12 +39,16 @@ import {
     AlertCircle,
     ChevronDown,
     ChevronUp,
+    Pencil,
+    Save,
 } from 'lucide-react'
 import {
     launchCampaign,
     pauseCampaign,
     deleteCampaign,
     removeLeadFromCampaign,
+    updateCampaign,
+    completeCampaign,
 } from '@/actions/outreach-actions'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -54,6 +58,7 @@ interface CampaignData {
     name: string
     status: string
     businessCategory: string | null
+    locationId: string | null
     locationName: string | null
     searchPostcode: string | null
     searchRadius: number | null
@@ -165,6 +170,14 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
     const [dryRunResults, setDryRunResults] = useState<DryRunResult | null>(null)
     const [expandedLead, setExpandedLead] = useState<string | null>(null)
 
+    // Template editing state
+    const [editingTemplates, setEditingTemplates] = useState(false)
+    const [templateLinkedin, setTemplateLinkedin] = useState(campaign.linkedinMessage || '')
+    const [templateEmailSubject, setTemplateEmailSubject] = useState(campaign.emailSubject || '')
+    const [templateEmailBody, setTemplateEmailBody] = useState(campaign.emailBody || '')
+    const [savingTemplates, setSavingTemplates] = useState(false)
+    const [generatingMessages, setGeneratingMessages] = useState(false)
+
     const stats = computeStats(campaign.leads)
     const statusCfg = STATUS_CONFIG[campaign.status] ?? { label: campaign.status, variant: 'secondary' as const }
     const canModify = campaign.status === 'DRAFT' || campaign.status === 'PAUSED'
@@ -264,6 +277,51 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
             setErrorMsg(err.message ?? 'Dry run failed')
         } finally {
             setDryRunning(false)
+        }
+    }
+
+    async function handleSaveTemplates() {
+        setSavingTemplates(true)
+        setErrorMsg(null)
+        try {
+            await updateCampaign(campaign.id, {
+                linkedinMessage: templateLinkedin.trim() || undefined,
+                emailSubject: templateEmailSubject.trim() || undefined,
+                emailBody: templateEmailBody.trim() || undefined,
+            })
+            setEditingTemplates(false)
+            router.refresh()
+        } catch (err: any) {
+            setErrorMsg(err.message ?? 'Failed to save templates')
+        } finally {
+            setSavingTemplates(false)
+        }
+    }
+
+    async function handleGenerateMessages() {
+        setGeneratingMessages(true)
+        setErrorMsg(null)
+        try {
+            const res = await fetch('/api/outreach/generate-messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    category: campaign.businessCategory || campaign.name,
+                    location: campaign.searchPostcode || '',
+                    centreName: campaign.locationName || '',
+                    tone: 'friendly',
+                }),
+            })
+            if (!res.ok) throw new Error('Failed to generate messages')
+            const data = await res.json()
+            if (data.linkedinMessage) setTemplateLinkedin(data.linkedinMessage)
+            if (data.emailSubject) setTemplateEmailSubject(data.emailSubject)
+            if (data.emailBody) setTemplateEmailBody(data.emailBody)
+            setEditingTemplates(true)
+        } catch (err: any) {
+            setErrorMsg(err.message ?? 'Failed to generate messages')
+        } finally {
+            setGeneratingMessages(false)
         }
     }
 
@@ -416,14 +474,72 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
             {/* Message Templates */}
             <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Message Templates</h2>
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Message Templates</h2>
+                    <div className="flex items-center gap-2">
+                        {canModify && !editingTemplates && (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={handleGenerateMessages}
+                                    disabled={generatingMessages}
+                                    className="gap-1.5"
+                                >
+                                    {generatingMessages ? (
+                                        <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</>
+                                    ) : (
+                                        <><Sparkles className="h-4 w-4" /> Generate with AI</>
+                                    )}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setEditingTemplates(true)}
+                                    className="gap-1.5"
+                                >
+                                    <Pencil className="h-4 w-4" /> Edit
+                                </Button>
+                            </>
+                        )}
+                        {editingTemplates && (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => {
+                                        setEditingTemplates(false)
+                                        setTemplateLinkedin(campaign.linkedinMessage || '')
+                                        setTemplateEmailSubject(campaign.emailSubject || '')
+                                        setTemplateEmailBody(campaign.emailBody || '')
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    onClick={handleSaveTemplates}
+                                    disabled={savingTemplates}
+                                    className="gap-1.5"
+                                >
+                                    {savingTemplates ? (
+                                        <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</>
+                                    ) : (
+                                        <><Save className="h-4 w-4" /> Save Templates</>
+                                    )}
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                </div>
 
-                {!hasTemplates && (
+                {!hasTemplates && !editingTemplates && (
                     <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>No templates configured</AlertTitle>
                         <AlertDescription>
                             Add a LinkedIn message or email template before launching this campaign.
+                            Click &quot;Generate with AI&quot; or &quot;Edit&quot; above to get started.
                         </AlertDescription>
                     </Alert>
                 )}
@@ -437,7 +553,20 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            {campaign.linkedinMessage ? (
+                            {editingTemplates ? (
+                                <div className="space-y-2">
+                                    <textarea
+                                        value={templateLinkedin}
+                                        onChange={(e) => setTemplateLinkedin(e.target.value)}
+                                        className="w-full h-24 text-sm rounded-md border border-input bg-transparent px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                                        placeholder="Hi {{firstName}}, I saw your business {{businessName}}…"
+                                        maxLength={300}
+                                    />
+                                    <p className={`text-xs ${templateLinkedin.length > 280 ? 'text-red-400' : 'text-muted-foreground'}`}>
+                                        {templateLinkedin.length}/300 characters
+                                    </p>
+                                </div>
+                            ) : campaign.linkedinMessage ? (
                                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                                     {campaign.linkedinMessage}
                                 </p>
@@ -455,7 +584,29 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                            {campaign.emailSubject ? (
+                            {editingTemplates ? (
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-xs text-muted-foreground">Subject</label>
+                                        <input
+                                            type="text"
+                                            value={templateEmailSubject}
+                                            onChange={(e) => setTemplateEmailSubject(e.target.value)}
+                                            className="w-full text-sm rounded-md border border-input bg-transparent px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                            placeholder="Partnership opportunity with {{centreName}}"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-muted-foreground">Body</label>
+                                        <textarea
+                                            value={templateEmailBody}
+                                            onChange={(e) => setTemplateEmailBody(e.target.value)}
+                                            className="w-full h-32 text-sm rounded-md border border-input bg-transparent px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
+                                            placeholder="Dear {{firstName}},\n\nI'm reaching out because…"
+                                        />
+                                    </div>
+                                </div>
+                            ) : campaign.emailSubject ? (
                                 <>
                                     <div>
                                         <span className="text-xs text-muted-foreground">Subject: </span>

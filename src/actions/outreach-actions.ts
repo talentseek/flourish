@@ -174,6 +174,20 @@ interface CreateCampaignData {
 export async function createCampaign(data: CreateCampaignData) {
     const user = await verifyRMOrAdmin()
 
+    // Check for duplicate campaign name
+    if (data.name) {
+        const existing = await prisma.outreachCampaign.findFirst({
+            where: { userId: user.id, name: data.name },
+        })
+        if (existing) {
+            // Append a number to make it unique
+            const count = await prisma.outreachCampaign.count({
+                where: { userId: user.id, name: { startsWith: data.name } },
+            })
+            data.name = `${data.name} (${count + 1})`
+        }
+    }
+
     const campaign = await prisma.outreachCampaign.create({
         data: {
             userId: user.id,
@@ -284,10 +298,33 @@ export async function pauseCampaign(id: string) {
     if (!campaign || campaign.userId !== user.id) {
         throw new Error('Campaign not found')
     }
+    if (campaign.status !== 'ACTIVE') {
+        throw new Error('Only active campaigns can be paused')
+    }
 
     await prisma.outreachCampaign.update({
         where: { id },
         data: { status: 'PAUSED' },
+    })
+
+    revalidatePath('/outreach')
+    revalidatePath(`/outreach/campaigns/${id}`)
+    return { success: true }
+}
+
+export async function completeCampaign(id: string) {
+    const user = await verifyRMOrAdmin()
+
+    const campaign = await prisma.outreachCampaign.findUnique({
+        where: { id },
+    })
+    if (!campaign || campaign.userId !== user.id) {
+        throw new Error('Campaign not found')
+    }
+
+    await prisma.outreachCampaign.update({
+        where: { id },
+        data: { status: 'COMPLETED' },
     })
 
     revalidatePath('/outreach')
