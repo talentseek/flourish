@@ -531,40 +531,23 @@ export function CampaignWizard() {
                         )}
                     </Button>
                 ) : (
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={() => handleSubmit(true)}
-                            disabled={isSubmitting}
-                            className="gap-1.5"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Saving…
-                                </>
-                            ) : (
-                                'Save as Draft'
-                            )}
-                        </Button>
-                        <Button
-                            onClick={() => handleSubmit(false)}
-                            disabled={isSubmitting}
-                            className="gap-1.5"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Launching…
-                                </>
-                            ) : (
-                                <>
-                                    Create & Launch
-                                    <Rocket className="h-4 w-4" />
-                                </>
-                            )}
-                        </Button>
-                    </div>
+                    <Button
+                        onClick={() => handleSubmit(true)}
+                        disabled={isSubmitting}
+                        className="gap-1.5"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                Creating…
+                            </>
+                        ) : (
+                            <>
+                                Create Campaign
+                                <Rocket className="h-4 w-4" />
+                            </>
+                        )}
+                    </Button>
                 )}
             </div>
         </div>
@@ -1125,7 +1108,7 @@ function StepPreviewLaunch({
                         Campaign Summary
                     </CardTitle>
                     <CardDescription>
-                        Review everything before launching.
+                        After creating, you&apos;ll review enriched leads and remove any that aren&apos;t a good fit before launching.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

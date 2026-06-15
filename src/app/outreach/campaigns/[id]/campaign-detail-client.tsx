@@ -446,13 +446,28 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                 </div>
             </div>
 
-            {/* Auto-enrichment in progress */}
-            {campaign.status === 'ACTIVE' && hasUnenrichedLeads && (
+            {/* DRAFT: Review & Launch flow */}
+            {campaign.status === 'DRAFT' && (
+                <Alert className="border-primary/50 bg-primary/5">
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    <AlertTitle className="text-primary">Review Your Leads</AlertTitle>
+                    <AlertDescription className="text-primary/80">
+                        {hasUnenrichedLeads ? (
+                            <>Your leads are being enriched with contact details. Once complete, review the leads table below and remove any businesses that aren&apos;t a good fit. Then click <strong>Launch Campaign</strong> when you&apos;re ready.</>
+                        ) : (
+                            <>Enrichment complete. Review the leads table below — remove any businesses that aren&apos;t a good fit, then click <strong>Launch Campaign</strong> to go live.</>
+                        )}
+                    </AlertDescription>
+                </Alert>
+            )}
+
+            {/* Auto-enrichment in progress (for DRAFT campaigns too) */}
+            {hasUnenrichedLeads && (
                 <Alert className="border-blue-500/50 bg-blue-500/10">
                     <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
                     <AlertTitle className="text-blue-500">Enriching Leads</AlertTitle>
                     <AlertDescription className="text-blue-400/80">
-                        {pendingLeads.length} lead{pendingLeads.length !== 1 ? 's are' : ' is'} being enriched in the background. The pipeline will start sending once enrichment completes. Refresh to see progress.
+                        {pendingLeads.length} lead{pendingLeads.length !== 1 ? 's are' : ' is'} being enriched in the background. Contact names, emails and LinkedIn profiles will appear shortly. Refresh to see progress.
                     </AlertDescription>
                 </Alert>
             )}
@@ -909,6 +924,38 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                     </Card>
                 )}
             </div>
+
+            {/* Launch CTA for DRAFT campaigns */}
+            {campaign.status === 'DRAFT' && campaign.leads.length > 0 && !hasUnenrichedLeads && (
+                <Card className="border-primary/50 bg-primary/5">
+                    <CardContent className="flex items-center justify-between py-5">
+                        <div className="space-y-1">
+                            <p className="text-sm font-medium">Ready to launch?</p>
+                            <p className="text-xs text-muted-foreground">
+                                {campaign.leads.length} lead{campaign.leads.length !== 1 ? 's' : ''} will be contacted via LinkedIn and email over the coming days.
+                            </p>
+                        </div>
+                        <Button
+                            size="lg"
+                            onClick={() => handleAction('launch')}
+                            disabled={loading === 'launch'}
+                            className="gap-2"
+                        >
+                            {loading === 'launch' ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Launching…
+                                </>
+                            ) : (
+                                <>
+                                    <Play className="h-4 w-4" />
+                                    Launch Campaign
+                                </>
+                            )}
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
         </>
     )
 }
