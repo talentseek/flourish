@@ -33,6 +33,12 @@ import {
     Sparkles,
     Loader2,
     Zap,
+    FlaskConical,
+    Eye,
+    CheckCircle2,
+    AlertCircle,
+    ChevronDown,
+    ChevronUp,
 } from 'lucide-react'
 import {
     launchCampaign,
@@ -74,6 +80,34 @@ interface LeadData {
     emailSentAt: string | null
     repliedAt: string | null
     events: { createdAt: string }[]
+}
+
+interface DryRunLeadResult {
+    leadId: string
+    businessName: string
+    contactName: string | null
+    contactEmail: string | null
+    linkedinUrl: string | null
+    linkedinMessage: string | null
+    emailSubject: string | null
+    emailBody: string | null
+    canSendLinkedin: boolean
+    canSendEmail: boolean
+    issues: string[]
+    ready: boolean
+}
+
+interface DryRunResult {
+    simulated: boolean
+    summary: {
+        totalLeads: number
+        readyToSend: number
+        linkedinReady: number
+        emailReady: number
+        withIssues: number
+        notEnriched: number
+    }
+    leads: DryRunLeadResult[]
 }
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -125,6 +159,11 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [enriching, setEnriching] = useState(false)
     const [enrichProgress, setEnrichProgress] = useState<{ done: number; total: number } | null>(null)
+
+    // Dry run state
+    const [dryRunning, setDryRunning] = useState(false)
+    const [dryRunResults, setDryRunResults] = useState<DryRunResult | null>(null)
+    const [expandedLead, setExpandedLead] = useState<string | null>(null)
 
     const stats = computeStats(campaign.leads)
     const statusCfg = STATUS_CONFIG[campaign.status] ?? { label: campaign.status, variant: 'secondary' as const }
@@ -201,6 +240,31 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
         setEnriching(false)
         setEnrichProgress(null)
         router.refresh()
+    }
+
+    async function handleDryRun(simulate: boolean) {
+        setDryRunning(true)
+        setErrorMsg(null)
+        try {
+            const res = await fetch('/api/outreach/dry-run', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ campaignId: campaign.id, simulate }),
+            })
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}))
+                throw new Error(body.error || `Dry run failed (${res.status})`)
+            }
+            const data = await res.json()
+            setDryRunResults(data as DryRunResult)
+            if (simulate) {
+                router.refresh()
+            }
+        } catch (err: any) {
+            setErrorMsg(err.message ?? 'Dry run failed')
+        } finally {
+            setDryRunning(false)
+        }
     }
 
     const statCards = [
@@ -411,6 +475,174 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
             <Separator />
 
+            {/* 🧪 Dry Run Panel */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                        <FlaskConical className="h-5 w-5 text-amber-500" />
+                        Test &amp; Preview
+                    </h2>
+                    <div className="flex items-center gap-2">
+                        {dryRunResults && (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setDryRunResults(null)}
+                                className="text-muted-foreground"
+                            >
+                                <X className="h-4 w-4 mr-1" />
+                                Clear Results
+                            </Button>
+                        )}
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDryRun(false)}
+                            disabled={dryRunning || campaign.leads.length === 0}
+                            className="gap-1.5 border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                        >
+                            {dryRunning ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Running…
+                                </>
+                            ) : (
+                                <>
+                                    <Eye className="h-4 w-4" />
+                                    Preview Messages
+                                </>
+                            )}
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => {
+                                if (window.confirm('Simulate sending to all leads? This will update lead statuses and create test events. Use this to verify the full flow.')) {
+                                    handleDryRun(true)
+                                }
+                            }}
+                            disabled={dryRunning || campaign.leads.length === 0}
+                            className="gap-1.5 bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                            <FlaskConical className="h-4 w-4" />
+                            Simulate Send
+                        </Button>
+                    </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground">
+                    Preview resolved messages for each lead, or simulate sending to test the full lifecycle without contacting anyone.
+                </p>
+
+                {dryRunResults && (
+                    <>
+                        {/* Summary cards */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                            <DryRunStat label="Total Leads" value={dryRunResults.summary.totalLeads} />
+                            <DryRunStat label="Ready to Send" value={dryRunResults.summary.readyToSend} good />
+                            <DryRunStat label="LinkedIn Ready" value={dryRunResults.summary.linkedinReady} />
+                            <DryRunStat label="Email Ready" value={dryRunResults.summary.emailReady} />
+                            <DryRunStat label="With Issues" value={dryRunResults.summary.withIssues} warn={dryRunResults.summary.withIssues > 0} />
+                            <DryRunStat label="Not Enriched" value={dryRunResults.summary.notEnriched} warn={dryRunResults.summary.notEnriched > 0} />
+                        </div>
+
+                        {dryRunResults.simulated && (
+                            <Alert className="border-amber-500/50 bg-amber-500/10">
+                                <FlaskConical className="h-4 w-4 text-amber-500" />
+                                <AlertTitle className="text-amber-500">Simulation Complete</AlertTitle>
+                                <AlertDescription className="text-amber-400/80">
+                                    Lead statuses and events have been updated with test data. Refresh the page to see updated stats. Events are prefixed with [TEST].
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        {/* Per-lead results */}
+                        <div className="space-y-2">
+                            {dryRunResults.leads.map((lead) => (
+                                <Card key={lead.leadId} className={lead.issues.length > 0 && !lead.issues.every(i => i.includes('fallback')) ? 'border-amber-500/30' : ''}>
+                                    <div
+                                        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-muted/30 transition-colors"
+                                        onClick={() => setExpandedLead(expandedLead === lead.leadId ? null : lead.leadId)}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            {lead.canSendLinkedin || lead.canSendEmail ? (
+                                                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                                            ) : (
+                                                <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+                                            )}
+                                            <div>
+                                                <span className="font-medium text-sm">{lead.businessName}</span>
+                                                {lead.contactName && (
+                                                    <span className="text-muted-foreground text-sm"> — {lead.contactName}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                {lead.canSendLinkedin && (
+                                                    <Badge variant="outline" className="text-xs py-0">
+                                                        <Linkedin className="h-3 w-3 mr-1" />
+                                                        LinkedIn
+                                                    </Badge>
+                                                )}
+                                                {lead.canSendEmail && (
+                                                    <Badge variant="outline" className="text-xs py-0">
+                                                        <Mail className="h-3 w-3 mr-1" />
+                                                        Email
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {expandedLead === lead.leadId ? (
+                                            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                                        ) : (
+                                            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                        )}
+                                    </div>
+
+                                    {expandedLead === lead.leadId && (
+                                        <CardContent className="pt-0 pb-4 space-y-3">
+                                            {lead.issues.length > 0 && (
+                                                <div className="space-y-1">
+                                                    {lead.issues.map((issue, i) => (
+                                                        <div key={i} className="flex items-center gap-2 text-xs text-amber-500">
+                                                            <AlertTriangle className="h-3 w-3 shrink-0" />
+                                                            {issue}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {lead.linkedinMessage && (
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                                                        <Linkedin className="h-3 w-3" />
+                                                        LinkedIn Follow-up Message
+                                                    </div>
+                                                    <div className="rounded-md bg-muted/50 p-3 text-sm whitespace-pre-wrap">
+                                                        {lead.linkedinMessage}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {lead.emailSubject && (
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                                                        <Mail className="h-3 w-3" />
+                                                        Email
+                                                    </div>
+                                                    <div className="rounded-md bg-muted/50 p-3 text-sm space-y-2">
+                                                        <div className="font-medium">{lead.emailSubject}</div>
+                                                        <div className="whitespace-pre-wrap text-muted-foreground">{lead.emailBody}</div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    )}
+                                </Card>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
+
             {/* Leads Table */}
             <div className="space-y-4">
                 <h2 className="text-lg font-semibold">
@@ -516,5 +748,20 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                 )}
             </div>
         </>
+    )
+}
+
+function DryRunStat({ label, value, good, warn }: { label: string; value: number; good?: boolean; warn?: boolean }) {
+    return (
+        <Card>
+            <CardContent className="p-3 flex flex-col items-center text-center gap-0.5">
+                <span className={`text-xl font-bold tabular-nums ${
+                    warn ? 'text-amber-500' : good ? 'text-emerald-500' : ''
+                }`}>
+                    {value}
+                </span>
+                <span className="text-xs text-muted-foreground">{label}</span>
+            </CardContent>
+        </Card>
     )
 }
