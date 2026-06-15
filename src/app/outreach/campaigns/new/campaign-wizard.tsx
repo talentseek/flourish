@@ -864,6 +864,7 @@ function StepWriteMessages({
 }) {
     const [isGenerating, setIsGenerating] = useState(false)
     const [generateError, setGenerateError] = useState<string | null>(null)
+    const [hasGenerated, setHasGenerated] = useState(false)
     const linkedinLength = messages.linkedinMessage.length
     const linkedinOverLimit = linkedinLength > LINKEDIN_MAX_CHARS
 
@@ -891,6 +892,7 @@ function StepWriteMessages({
                 emailSubject: data.emailSubject || messages.emailSubject,
                 emailBody: data.emailBody || messages.emailBody,
             })
+            setHasGenerated(true)
         } catch (err) {
             setGenerateError(err instanceof Error ? err.message : 'Failed to generate')
         } finally {
@@ -898,18 +900,29 @@ function StepWriteMessages({
         }
     }
 
+    // Auto-generate on mount if messages are empty
+    useEffect(() => {
+        const isEmpty = !messages.linkedinMessage.trim() && !messages.emailBody.trim()
+        if (isEmpty && !hasGenerated && !isGenerating) {
+            handleAIGenerate()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     return (
         <div className="space-y-4">
-            {/* AI Generate Button */}
+            {/* AI Generate Banner */}
             <Card className="border-dashed border-primary/30 bg-primary/5">
                 <CardContent className="flex items-center justify-between py-4">
                     <div className="space-y-1">
                         <div className="text-sm font-medium flex items-center gap-2">
                             <Sparkles className="h-4 w-4 text-primary" />
-                            AI Message Generation
+                            {isGenerating ? 'Generating your messages…' : 'AI-Generated Messages'}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            Let AI write your outreach messages based on your campaign details and leads.
+                            {isGenerating
+                                ? 'Crafting personalized LinkedIn and email templates based on your campaign details.'
+                                : 'Messages have been auto-generated. Edit below or regenerate for a fresh version.'}
                         </p>
                     </div>
                     <Button
@@ -927,7 +940,7 @@ function StepWriteMessages({
                         ) : (
                             <>
                                 <Sparkles className="h-4 w-4" />
-                                Generate with AI
+                                Regenerate
                             </>
                         )}
                     </Button>
