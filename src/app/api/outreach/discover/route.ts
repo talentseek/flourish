@@ -158,6 +158,24 @@ function haversineDistance(
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
+// ─── Junk Name Filter ───────────────────────────────────────
+
+const CHAIN_BLOCKLIST = [
+    "sainsbury", "tesco", "asda", "morrisons", "aldi", "lidl",
+    "marks and spencer", "marks & spencer", "m&s ", "waitrose",
+    "co-op ", "costco", "amazon", "argos", "poundland", "wilko",
+    "home bargains", "b&m ", "b&q", "homebase",
+]
+
+function isValidLeadName(name: string): boolean {
+    if (!name || name.length < 3) return false
+    const lower = name.toLowerCase()
+    if (CHAIN_BLOCKLIST.some(c => lower.includes(c))) return false
+    // Filter out generic single-word names that are too vague
+    if (name.length < 4 && !name.includes(" ")) return false
+    return true
+}
+
 // ─── Scoring ────────────────────────────────────────────────
 
 function scoreLead(
@@ -307,6 +325,10 @@ export async function POST(req: NextRequest) {
 
             // Skip non-operational businesses
             if (place.businessStatus && place.businessStatus !== "OPERATIONAL") continue
+
+            // Skip junk/chain business names
+            const bizName = place.displayName?.text || ""
+            if (!isValidLeadName(bizName)) continue
 
             leads.push({
                 businessName: place.displayName?.text || "Unknown",

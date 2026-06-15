@@ -241,7 +241,7 @@ async function companiesHouseLookup(
     }
 }
 
-// ─── Layer 5: Apollo People Search ──────────────────────────
+// ─── Layer 5a: Apollo People Search ─────────────────────────
 
 async function apolloSearch(
     domain: string | null,
@@ -255,21 +255,28 @@ async function apolloSearch(
     if (!APOLLO_API_KEY) return { name: null, email: null, linkedinUrl: null, title: null }
 
     try {
-        // Try domain-based search first, fall back to name-based
         const searches: Array<Record<string, unknown>> = []
 
+        // Strategy 1: Domain + seniority (most accurate)
         if (domain) {
             searches.push({
-                per_page: 3,
-                person_titles: ["owner", "founder", "director", "managing director", "ceo"],
+                per_page: 5,
+                person_seniorities: ["founder", "owner", "c_suite", "director"],
                 q_organization_domains: domain,
             })
         }
-        // Always try name-based as fallback (especially for businesses without websites)
+        // Strategy 2: Name + seniority + UK location
+        searches.push({
+            per_page: 5,
+            person_seniorities: ["founder", "owner", "c_suite", "director"],
+            person_locations: ["United Kingdom"],
+            q_organization_name: companyName,
+        })
+        // Strategy 3: Name only, no filters (catch-all for tiny businesses)
         searches.push({
             per_page: 3,
-            person_titles: ["owner", "founder", "director", "managing director", "ceo"],
             q_organization_name: companyName,
+            organization_locations: ["United Kingdom"],
         })
 
         for (const body of searches) {
@@ -283,7 +290,7 @@ async function apolloSearch(
             })
 
             if (!res.ok) {
-                console.log(`[Enrich Apollo] ${res.status} for "${companyName}" (${domain || 'no domain'}):`, await res.text().catch(() => ''))
+                console.log(`[Enrich Apollo Search] ${res.status} for "${companyName}":`, await res.text().catch(() => ''))
                 continue
             }
 
@@ -298,7 +305,7 @@ async function apolloSearch(
 
             const person = data.people?.[0]
             if (person) {
-                console.log(`[Enrich Apollo] Found for "${companyName}":`, person.name, '|', person.title)
+                console.log(`[Enrich Apollo Search] Found for "${companyName}":`, person.name, '|', person.title)
                 return {
                     name: person.name || null,
                     email: person.email || null,
@@ -311,6 +318,70 @@ async function apolloSearch(
         return { name: null, email: null, linkedinUrl: null, title: null }
     } catch {
         return { name: null, email: null, linkedinUrl: null, title: null }
+    }
+}
+
+// ─── Layer 5b: Apollo People Match (LinkedIn discovery) ─────
+
+async function apolloMatch(
+    contactName: string,
+    businessName: string,
+    domain: string | null
+): Promise<{
+    email: string | null
+    linkedinUrl: string | null
+    title: string | null
+}> {
+    if (!APOLLO_API_KEY || !contactName) return { email: null, linkedinUrl: null, title: null }
+
+    try {
+        const nameParts = contactName.split(" ")
+        const body: Record<string, unknown> = {
+            organization_name: businessName,
+        }
+        if (nameParts.length >= 2) {
+            body.first_name = nameParts[0]
+            body.last_name = nameParts[nameParts.length - 1]
+        } else {
+            body.name = contactName
+        }
+        if (domain) body.domain = domain
+
+        const res = await fetch("https://api.apollo.io/v1/people/match", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": APOLLO_API_KEY,
+            },
+            body: JSON.stringify(body),
+        })
+
+        if (!res.ok) {
+            console.log(`[Enrich Apollo Match] ${res.status} for "${contactName}" at "${businessName}"`)
+            return { email: null, linkedinUrl: null, title: null }
+        }
+
+        const data = (await res.json()) as {
+            person?: {
+                email: string | null
+                linkedin_url: string | null
+                title: string | null
+                name: string | null
+            }
+        }
+
+        if (data.person) {
+            console.log(`[Enrich Apollo Match] Matched "${contactName}" → li=${data.person.linkedin_url || 'none'} email=${data.person.email || 'none'}`)
+            return {
+                email: data.person.email || null,
+                linkedinUrl: data.person.linkedin_url || null,
+                title: data.person.title || null,
+            }
+        }
+
+        return { email: null, linkedinUrl: null, title: null }
+    } catch {
+        return { email: null, linkedinUrl: null, title: null }
     }
 }
 
@@ -336,14 +407,76 @@ function constructEmails(
     ]
 }
 
+const PLATFORM_DOMAINS = [
+    "instagram.com", "facebook.com", "twitter.com", "x.com",
+    "tiktok.com", "youtube.com", "linkedin.com",
+    "square.site", "squarespace.com", "wix.com", "wixsite.com",
+    "wordpress.com", "blogspot.com", "tumblr.com",
+    "etsy.com", "amazon.co.uk", "amazon.com", "ebay.co.uk", "ebay.com",
+]
+
 function extractDomain(website: string | null): string | null {
     if (!website) return null
     try {
         const url = new URL(website.startsWith("http") ? website : `https://${website}`)
-        return url.hostname.replace(/^www\./, "")
+        const hostname = url.hostname.replace(/^www\./, "")
+        // Block social media & platform domains — these aren't real business domains
+        if (PLATFORM_DOMAINS.some(pd => hostname === pd || hostname.endsWith(`.${pd}`))) {
+            console.log(`[Enrich] Blocked platform domain: ${hostname}`)
+            return null
+        }
+        return hostname
     } catch {
         return null
     }
+}
+
+// ─── Layer 0: Website Discovery (Firecrawl Search) ──────────
+
+async function discoverWebsite(
+    businessName: string,
+    address: string | null
+): Promise<string | null> {
+    if (!FIRECRAWL_API_KEY) return null
+
+    try {
+        // Extract city from address for better search
+        const city = address?.split(",").slice(-2, -1)[0]?.trim() || ""
+        const query = `"${businessName}" ${city} website`
+
+        const res = await fetch("https://api.firecrawl.dev/v1/search", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${FIRECRAWL_API_KEY}`,
+            },
+            body: JSON.stringify({ query, limit: 3 }),
+        })
+
+        if (!res.ok) {
+            // Search endpoint may not be available on all Firecrawl plans
+            if (res.status !== 402 && res.status !== 404) {
+                console.log(`[Enrich L0] Firecrawl search ${res.status} for "${businessName}"`)
+            }
+            return null
+        }
+
+        const data = (await res.json()) as { data?: Array<{ url?: string }> }
+        const results = data.data || []
+
+        // Find a result that looks like a business website (not social media)
+        for (const r of results) {
+            if (!r.url) continue
+            const domain = extractDomain(r.url)
+            if (domain) {
+                console.log(`[Enrich L0] Discovered website for "${businessName}": ${r.url}`)
+                return r.url
+            }
+        }
+    } catch {
+        // Search not available — skip silently
+    }
+    return null
 }
 
 // ─── Layer 7: Email Verification (Reoon) ────────────────────
@@ -367,11 +500,16 @@ async function verifyEmail(email: string): Promise<boolean> {
 
 // ─── Enrichment Pipeline ────────────────────────────────────
 
-async function enrichLead(lead: {
-    id: string
-    businessName: string
-    website: string | null
-}): Promise<EnrichmentResult> {
+async function enrichLead(
+    lead: {
+        id: string
+        businessName: string
+        website: string | null
+        phone: string | null
+        address: string | null
+    },
+    directorUsageCount: Map<string, number>
+): Promise<EnrichmentResult> {
     const result: EnrichmentResult = {
         leadId: lead.id,
         contactName: null,
@@ -382,13 +520,24 @@ async function enrichLead(lead: {
         status: "FAILED",
     }
 
-    const domain = extractDomain(lead.website)
-    console.log(`[Enrich] Starting: "${lead.businessName}" | website: ${lead.website || 'NONE'} | domain: ${domain || 'NONE'}`)
+    let website = lead.website
+    let domain = extractDomain(website)
+    console.log(`[Enrich] Starting: "${lead.businessName}" | website: ${website || 'NONE'} | domain: ${domain || 'NONE'}`)
+
+    // Layer 0: Website discovery for leads without a usable website
+    if (!domain && lead.phone) {
+        const discovered = await discoverWebsite(lead.businessName, lead.address)
+        if (discovered) {
+            website = discovered
+            domain = extractDomain(discovered)
+            console.log(`[Enrich L0] Discovered: ${website} → domain: ${domain}`)
+        }
+    }
 
     // Layer 1: Scrape website
     let websiteContent: string | null = null
-    if (lead.website) {
-        websiteContent = await scrapeWebsite(lead.website)
+    if (website && domain) {
+        websiteContent = await scrapeWebsite(website)
         console.log(`[Enrich L1] Scrape: ${websiteContent ? websiteContent.length + ' chars' : 'FAILED'}`)
     }
 
@@ -404,15 +553,16 @@ async function enrichLead(lead: {
             result.linkedinUrl = llmResult.linkedinUrl
             result.jobTitle = llmResult.ownerRole
 
-            // Early exit if high confidence with both name and email
+            // Early exit if high confidence with name, email AND LinkedIn
             if (
                 llmResult.confidence === "HIGH" &&
                 result.contactName &&
-                result.contactEmail
+                result.contactEmail &&
+                result.linkedinUrl
             ) {
-                result.score = 90
+                result.score = 100
                 result.status = "ENRICHED"
-                console.log(`[Enrich] Early exit (HIGH confidence): ${result.contactName} | ${result.contactEmail}`)
+                console.log(`[Enrich] Early exit (FULL): ${result.contactName} | ${result.contactEmail} | ${result.linkedinUrl}`)
                 return result
             }
         }
@@ -431,14 +581,21 @@ async function enrichLead(lead: {
     if (!result.contactName) {
         const chResult = await companiesHouseLookup(lead.businessName)
         if (chResult.directorName) {
-            result.contactName = chResult.directorName
-            result.jobTitle = result.jobTitle || "Director"
-            console.log(`[Enrich L4] CH director: ${result.contactName}`)
+            // Check for duplicate directors (holding company detection)
+            const dirKey = chResult.directorName.toLowerCase()
+            const usageCount = directorUsageCount.get(dirKey) || 0
+            if (usageCount >= 2) {
+                console.log(`[Enrich L4] Skipping "${chResult.directorName}" — already used for ${usageCount} other businesses (likely holding company)`)
+            } else {
+                result.contactName = chResult.directorName
+                result.jobTitle = result.jobTitle || "Director"
+                directorUsageCount.set(dirKey, usageCount + 1)
+                console.log(`[Enrich L4] CH director: ${result.contactName}`)
+            }
         }
     }
 
-    // Layer 5: Apollo people search — always try for LinkedIn
-    // Run Apollo if we're missing email OR LinkedIn (most critical for outreach)
+    // Layer 5a: Apollo people search
     if (!result.contactEmail || !result.linkedinUrl) {
         const apolloResult = await apolloSearch(domain, lead.businessName)
         if (apolloResult.name && !result.contactName) {
@@ -452,6 +609,20 @@ async function enrichLead(lead: {
         }
         if (apolloResult.title && !result.jobTitle) {
             result.jobTitle = apolloResult.title
+        }
+    }
+
+    // Layer 5b: Apollo People Match — find LinkedIn for known contacts
+    if (result.contactName && !result.linkedinUrl) {
+        const matchResult = await apolloMatch(result.contactName, lead.businessName, domain)
+        if (matchResult.linkedinUrl) {
+            result.linkedinUrl = matchResult.linkedinUrl
+        }
+        if (matchResult.email && !result.contactEmail) {
+            result.contactEmail = matchResult.email
+        }
+        if (matchResult.title && !result.jobTitle) {
+            result.jobTitle = matchResult.title
         }
     }
 
@@ -525,6 +696,8 @@ export async function POST(req: NextRequest) {
             id: true,
             businessName: true,
             website: true,
+            phone: true,
+            address: true,
         },
     })
 
@@ -532,11 +705,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "No leads found" }, { status: 404 })
     }
 
+    // Track director names across the batch to detect holding companies
+    const directorUsageCount = new Map<string, number>()
+
     // Process leads sequentially (to respect API rate limits)
     const results: EnrichmentResult[] = []
     for (const lead of leads) {
         try {
-            const result = await enrichLead(lead)
+            const result = await enrichLead(lead, directorUsageCount)
             results.push(result)
 
             // Update lead in DB
