@@ -98,11 +98,40 @@ export function OutreachClient({ campaigns, integrations }: OutreachClientProps)
                 </p>
             </div>
 
-            <Tabs defaultValue="campaigns" className="space-y-4">
+            <Tabs defaultValue={(!linkedin && !microsoft) ? 'accounts' : 'campaigns'} className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-                    <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
+                    <TabsTrigger value="accounts">
+                        Connected Accounts
+                        {!linkedin && !microsoft && (
+                            <span className="ml-1.5 h-2 w-2 rounded-full bg-amber-500 inline-block animate-pulse" />
+                        )}
+                    </TabsTrigger>
                 </TabsList>
+
+                {/* Onboarding Banner */}
+                {!linkedin && !microsoft && campaigns.length === 0 && (
+                    <Card className="border-primary/30 bg-primary/5">
+                        <CardContent className="py-4">
+                            <div className="flex items-start gap-3">
+                                <Megaphone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium">Get started with Outreach</p>
+                                    <div className="space-y-1 text-sm text-muted-foreground">
+                                        <div className="flex items-center gap-2">
+                                            <Circle className="h-3.5 w-3.5 text-amber-500" />
+                                            <span><strong>Step 1:</strong> Connect your LinkedIn account in the <em>Connected Accounts</em> tab</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Circle className="h-3.5 w-3.5 text-muted-foreground/40" />
+                                            <span><strong>Step 2:</strong> Create your first campaign to discover and reach leads</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* ─── Campaigns Tab ─────────────────────────── */}
                 <TabsContent value="campaigns" className="space-y-4">
@@ -206,7 +235,7 @@ export function OutreachClient({ campaigns, integrations }: OutreachClientProps)
                                 <div className="flex-1">
                                     <CardTitle className="text-base">LinkedIn</CardTitle>
                                     <p className="text-xs text-muted-foreground">
-                                        Send connection requests and messages
+                                        Send connection requests &amp; follow-up messages
                                     </p>
                                 </div>
                             </CardHeader>
