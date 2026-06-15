@@ -10,6 +10,7 @@ interface GenerateRequest {
     businessCategory: string
     location: string
     centreName?: string
+    senderName?: string
     sampleLeads: Array<{
         businessName: string
         contactName?: string | null
@@ -36,7 +37,9 @@ IMPORTANT RULES:
 - Email body should be 3-5 short paragraphs
 - Never use exclamation marks excessively
 - Never say "I hope this email finds you well"
-- Never use "synergy", "leverage", "circle back", or corporate jargon`
+- Never use "synergy", "leverage", "circle back", or corporate jargon
+- NEVER use [Your Name] as a placeholder — always use the sender's actual name when provided
+- Sign off with just the sender's first name, not their full name`
 
 function buildUserPrompt(req: GenerateRequest): string {
     const leadExamples = req.sampleLeads.slice(0, 3).map(l =>
@@ -72,7 +75,9 @@ Return JSON only:
   "linkedinMessage": "string or null",
   "emailSubject": "string or null",
   "emailBody": "string or null"
-}`
+}
+
+${req.senderName ? `The sender's name is ${req.senderName}. Sign off with "${req.senderName.split(' ')[0]}" (first name only), NOT "[Your Name]".` : ''}`
 }
 
 export async function POST(req: NextRequest) {

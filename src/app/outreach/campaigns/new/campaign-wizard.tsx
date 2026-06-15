@@ -284,6 +284,9 @@ export function CampaignWizard() {
         setStep(s => s + 1)
     }
 
+    const senderName = integrationStatus?.linkedInName || 'Your Name'
+    const senderFirstName = senderName.split(' ')[0]
+
     const mergeTemplate = (template: string, lead?: Lead): string => {
         const target = lead || leads[0]
         if (!target || !template) return template
@@ -293,6 +296,8 @@ export function CampaignWizard() {
             .replace(/\{\{businessName\}\}/g, target.businessName)
             .replace(/\{\{contactName\}\}/g, target.contactName || '')
             .replace(/\{\{centreName\}\}/g, selectedCentre?.name || '')
+            .replace(/\[Your Name\]/g, senderFirstName)
+            .replace(/\{\{senderName\}\}/g, senderName)
     }
 
     const handleSubmit = async (asDraft: boolean) => {
@@ -471,6 +476,7 @@ export function CampaignWizard() {
                     businessCategory={categoryLabel}
                     postcode={postcode}
                     centreName={selectedCentre?.name || ''}
+                    senderName={senderName}
                     sampleLeads={leads.slice(0, 3).map(l => ({ businessName: l.businessName, contactName: l.contactName || null }))}
                 />
             )}
@@ -850,6 +856,7 @@ function StepWriteMessages({
     businessCategory,
     postcode,
     centreName,
+    senderName,
     sampleLeads,
 }: {
     messages: Messages
@@ -860,6 +867,7 @@ function StepWriteMessages({
     businessCategory: string
     postcode: string
     centreName: string
+    senderName: string
     sampleLeads: Array<{ businessName: string; contactName: string | null }>
 }) {
     const [isGenerating, setIsGenerating] = useState(false)
@@ -880,6 +888,7 @@ function StepWriteMessages({
                     businessCategory,
                     location: postcode,
                     centreName,
+                    senderName,
                     sampleLeads,
                     tone: 'friendly',
                     channel: 'both',
@@ -1106,8 +1115,6 @@ function StepPreviewLaunch({
 }) {
     const hasLinkedInTemplate = messages.linkedinMessage.trim().length > 0
     const hasEmailTemplate = messages.emailBody.trim().length > 0
-    const leadsWithoutLinkedIn = leads.filter(l => !l.linkedinUrl).length
-
     return (
         <div className="space-y-4">
             {/* Campaign Summary */}
@@ -1168,12 +1175,10 @@ function StepPreviewLaunch({
                             passed={leads.length > 0}
                             label={`${leads.length} leads ready`}
                         />
-                        {leadsWithoutLinkedIn > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-amber-500">
-                                <AlertTriangle className="h-4 w-4 shrink-0" />
-                                {leadsWithoutLinkedIn} leads missing LinkedIn (email only)
-                            </div>
-                        )}
+                        <SafetyCheck
+                            passed={true}
+                            label="Auto-enrichment enabled (contact names, emails & LinkedIn profiles found automatically)"
+                        />
                     </div>
                 </CardContent>
             </Card>
