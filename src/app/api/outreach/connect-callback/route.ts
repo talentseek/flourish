@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
     const normalizedProvider = normalizeProvider(provider)
 
     try {
-        await upsertIntegration(userId, normalizedProvider, accountId)
+        const details = await fetchAccountDetails(accountId)
+        await upsertIntegration(userId, normalizedProvider, accountId, details.displayName, details.email)
         return NextResponse.redirect(new URL("/outreach?connected=true", request.url))
     } catch (err) {
         console.error("[Unipile] Callback GET error:", err)
@@ -67,7 +68,8 @@ export async function POST(request: NextRequest) {
             ? normalizeProvider(provider)
             : "LINKEDIN" // default fallback
 
-        await upsertIntegration(userId, normalizedProvider, accountId)
+        const details = await fetchAccountDetails(accountId)
+        await upsertIntegration(userId, normalizedProvider, accountId, details.displayName, details.email)
 
         return NextResponse.json({ ok: true })
     } catch (err) {
@@ -88,7 +90,9 @@ function normalizeProvider(provider: string): string {
 async function upsertIntegration(
     userId: string,
     provider: string,
-    unipileAccountId: string
+    unipileAccountId: string,
+    displayName?: string | null,
+    email?: string | null
 ) {
     await prisma.userIntegration.upsert({
         where: {
@@ -98,11 +102,52 @@ async function upsertIntegration(
             userId,
             provider,
             unipileAccountId,
+            displayName: displayName || null,
+            email: email || null,
             status: "ACTIVE",
         },
         update: {
             unipileAccountId,
+            displayName: displayName || undefined,
+            email: email || undefined,
             status: "ACTIVE",
         },
     })
+}
+
+/**
+ * Fetch account details from Unipile to get display name + email.
+ * Returns { displayName, email } or nulls if the API call fails.
+ */
+async function fetchAccountDetails(
+    unipileAccountId: string
+): Promise<{ displayName: string | null; email: string | null }> {
+    const dsn = process.env.UNIPILE_DSN || ""
+    const apiKey = process.env.UNIPILE_API_KEY || ""
+    if (!dsn || !apiKey) return { displayName: null, email: null }
+
+    try {
+        const res = await fetch(`${dsn}/api/v1/accounts/${unipileAccountId}`, {
+            headers: {
+                "X-API-KEY": apiKey,
+                "Accept": "application/json",
+            },
+        })
+        if (!res.ok) {
+            console.error(`[Unipile] Failed to fetch account ${unipileAccountId}: ${res.status}`)
+            return { displayName: null, email: null }
+        }
+
+        const data = (await res.json()) as {
+            name?: string
+            identifier?: string
+        }
+        return {
+            displayName: data.name || null,
+            email: data.identifier || null,
+        }
+    } catch (err) {
+        console.error("[Unipile] Failed to fetch account details:", err)
+        return { displayName: null, email: null }
+    }
 }
