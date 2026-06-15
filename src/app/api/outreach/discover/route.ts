@@ -119,20 +119,26 @@ async function placesNearbySearch(
     return data.places || []
 }
 
-// ─── Geocode postcode ───────────────────────────────────────
+// ─── Geocode postcode (postcodes.io — free, UK-specific) ────
 
 async function geocodePostcode(
     postcode: string
 ): Promise<{ lat: number; lng: number } | null> {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(postcode)}&key=${GOOGLE_PLACES_API_KEY}&components=country:GB`
-    const res = await fetch(url)
-    if (!res.ok) return null
+    const cleaned = postcode.replace(/\s+/g, "").toUpperCase()
+    const url = `https://api.postcodes.io/postcodes/${encodeURIComponent(cleaned)}`
+    try {
+        const res = await fetch(url)
+        if (!res.ok) return null
 
-    const data = (await res.json()) as {
-        results?: Array<{ geometry: { location: { lat: number; lng: number } } }>
+        const data = (await res.json()) as {
+            status: number
+            result?: { latitude: number; longitude: number }
+        }
+        if (data.status !== 200 || !data.result) return null
+        return { lat: data.result.latitude, lng: data.result.longitude }
+    } catch {
+        return null
     }
-    const loc = data.results?.[0]?.geometry?.location
-    return loc ? { lat: loc.lat, lng: loc.lng } : null
 }
 
 // ─── Distance calculation ───────────────────────────────────
