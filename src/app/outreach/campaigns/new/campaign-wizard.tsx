@@ -125,7 +125,7 @@ export function CampaignWizard() {
     const [radius, setRadius] = useState<number>(10)
 
     // Centres from database
-    const [centres, setCentres] = useState<Array<{ id: string; name: string; city: string; postcode: string; type: string; label: string }>>([])
+    const [centres, setCentres] = useState<Array<{ id: string; name: string; city: string; postcode: string; type: string; latitude: number; longitude: number; label: string }>>([])
     const [centresLoading, setCentresLoading] = useState(true)
 
     // Load centres on mount
@@ -215,6 +215,8 @@ export function CampaignWizard() {
                     category,
                     postcode: postcode.trim(),
                     radiusMiles: radius,
+                    lat: selectedCentre?.latitude,
+                    lng: selectedCentre?.longitude,
                 }),
             })
             if (!res.ok) {
@@ -515,7 +517,7 @@ function StepCampaignDetails({
     radius: number
     setRadius: (v: number) => void
     categoryOptions: { value: string; label: string }[]
-    centres: Array<{ id: string; name: string; city: string; postcode: string; type: string; label: string }>
+    centres: Array<{ id: string; name: string; city: string; postcode: string; type: string; latitude: number; longitude: number; label: string }>
     centresLoading: boolean
 }) {
     return (

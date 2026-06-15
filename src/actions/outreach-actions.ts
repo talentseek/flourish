@@ -102,6 +102,8 @@ export async function getUserCentres() {
             city: true,
             postcode: true,
             type: true,
+            latitude: true,
+            longitude: true,
         },
         orderBy: { name: 'asc' },
     })
@@ -112,6 +114,8 @@ export async function getUserCentres() {
         city: loc.city,
         postcode: loc.postcode,
         type: loc.type,
+        latitude: Number(loc.latitude),
+        longitude: Number(loc.longitude),
         label: `${loc.name}, ${loc.city}`,
     }))
 }

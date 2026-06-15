@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Access denied" }, { status: 403 })
     }
 
-    const { category, postcode, radiusMiles } = await req.json()
+    const { category, postcode, radiusMiles, lat, lng } = await req.json()
 
     if (!category || !postcode || !radiusMiles) {
         return NextResponse.json(
@@ -226,8 +226,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Invalid category" }, { status: 400 })
     }
 
-    // Geocode postcode
-    const centre = await geocodePostcode(postcode)
+    // Use provided coordinates or geocode the postcode
+    let centre: { lat: number; lng: number } | null = null
+    if (typeof lat === "number" && typeof lng === "number") {
+        centre = { lat, lng }
+    } else {
+        centre = await geocodePostcode(postcode)
+    }
     if (!centre) {
         return NextResponse.json(
             { error: "Could not geocode postcode. Please check and try again." },
