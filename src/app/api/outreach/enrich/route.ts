@@ -146,6 +146,30 @@ function extractEmails(text: string): string[] {
 
 // ─── Layer 4: Companies House Lookup ────────────────────────
 
+/**
+ * Fuzzy match: check if a CH company title is a reasonable match
+ * for our business name. Prevents "Tropicana Florists" matching
+ * "CLUB TROPICANA LIMITED".
+ */
+function isReasonableCompanyMatch(businessName: string, chTitle: string): boolean {
+    const normalize = (s: string) =>
+        s.toLowerCase()
+            .replace(/\b(ltd|limited|llp|plc|inc|group|uk|the)\b/gi, "")
+            .replace(/[^a-z0-9]/g, "")
+    const a = normalize(businessName)
+    const b = normalize(chTitle)
+    if (!a || !b) return false
+    // One should contain the other, or they share >60% of characters
+    if (b.includes(a) || a.includes(b)) return true
+    const shorter = a.length < b.length ? a : b
+    const longer = a.length >= b.length ? a : b
+    let matches = 0
+    for (const ch of shorter) {
+        if (longer.includes(ch)) matches++
+    }
+    return matches / shorter.length > 0.7
+}
+
 async function companiesHouseLookup(
     businessName: string
 ): Promise<{ directorName: string | null; companyNumber: string | null }> {
@@ -153,7 +177,7 @@ async function companiesHouseLookup(
 
     try {
         const searchRes = await fetch(
-            `https://api.company-information.service.gov.uk/search/companies?q=${encodeURIComponent(businessName)}&items_per_page=3`,
+            `https://api.company-information.service.gov.uk/search/companies?q=${encodeURIComponent(businessName)}&items_per_page=5`,
             {
                 headers: {
                     Authorization: `Basic ${Buffer.from(COMPANIES_HOUSE_API_KEY + ":").toString("base64")}`,
@@ -164,10 +188,22 @@ async function companiesHouseLookup(
         if (!searchRes.ok) return { directorName: null, companyNumber: null }
 
         const searchData = (await searchRes.json()) as {
-            items?: Array<{ company_number: string; title: string }>
+            items?: Array<{ company_number: string; title: string; company_status?: string }>
         }
-        const company = searchData.items?.[0]
-        if (!company) return { directorName: null, companyNumber: null }
+
+        // Find the best match: active company with a reasonable name match
+        const company = searchData.items?.find(
+            (c) => c.company_status === "active" && isReasonableCompanyMatch(businessName, c.title)
+        ) || searchData.items?.find(
+            (c) => isReasonableCompanyMatch(businessName, c.title)
+        )
+
+        if (!company) {
+            console.log(`[Enrich CH] No reasonable match for "${businessName}" in:`, searchData.items?.map(c => c.title))
+            return { directorName: null, companyNumber: null }
+        }
+
+        console.log(`[Enrich CH] Matched "${businessName}" → "${company.title}" (${company.company_number})`)
 
         // Fetch officers
         const officersRes = await fetch(
@@ -219,45 +255,60 @@ async function apolloSearch(
     if (!APOLLO_API_KEY) return { name: null, email: null, linkedinUrl: null, title: null }
 
     try {
-        const body: Record<string, unknown> = {
+        // Try domain-based search first, fall back to name-based
+        const searches: Array<Record<string, unknown>> = []
+
+        if (domain) {
+            searches.push({
+                per_page: 3,
+                person_titles: ["owner", "founder", "director", "managing director", "ceo"],
+                q_organization_domains: domain,
+            })
+        }
+        // Always try name-based as fallback (especially for businesses without websites)
+        searches.push({
             per_page: 3,
             person_titles: ["owner", "founder", "director", "managing director", "ceo"],
-        }
-        if (domain) {
-            body.q_organization_domains = domain
-        } else {
-            body.q_organization_name = companyName
-        }
-
-        const res = await fetch("https://api.apollo.io/v1/mixed_people/search", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Api-Key": APOLLO_API_KEY,
-            },
-            body: JSON.stringify(body),
+            q_organization_name: companyName,
         })
 
-        if (!res.ok) return { name: null, email: null, linkedinUrl: null, title: null }
+        for (const body of searches) {
+            const res = await fetch("https://api.apollo.io/v1/mixed_people/api_search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Api-Key": APOLLO_API_KEY,
+                },
+                body: JSON.stringify(body),
+            })
 
-        const data = (await res.json()) as {
-            people?: Array<{
-                name: string
-                email: string
-                linkedin_url: string
-                title: string
-            }>
+            if (!res.ok) {
+                console.log(`[Enrich Apollo] ${res.status} for "${companyName}" (${domain || 'no domain'}):`, await res.text().catch(() => ''))
+                continue
+            }
+
+            const data = (await res.json()) as {
+                people?: Array<{
+                    name: string
+                    email: string
+                    linkedin_url: string
+                    title: string
+                }>
+            }
+
+            const person = data.people?.[0]
+            if (person) {
+                console.log(`[Enrich Apollo] Found for "${companyName}":`, person.name, '|', person.title)
+                return {
+                    name: person.name || null,
+                    email: person.email || null,
+                    linkedinUrl: person.linkedin_url || null,
+                    title: person.title || null,
+                }
+            }
         }
 
-        const person = data.people?.[0]
-        if (!person) return { name: null, email: null, linkedinUrl: null, title: null }
-
-        return {
-            name: person.name || null,
-            email: person.email || null,
-            linkedinUrl: person.linkedin_url || null,
-            title: person.title || null,
-        }
+        return { name: null, email: null, linkedinUrl: null, title: null }
     } catch {
         return { name: null, email: null, linkedinUrl: null, title: null }
     }
@@ -332,11 +383,13 @@ async function enrichLead(lead: {
     }
 
     const domain = extractDomain(lead.website)
+    console.log(`[Enrich] Starting: "${lead.businessName}" | website: ${lead.website || 'NONE'} | domain: ${domain || 'NONE'}`)
 
     // Layer 1: Scrape website
     let websiteContent: string | null = null
     if (lead.website) {
         websiteContent = await scrapeWebsite(lead.website)
+        console.log(`[Enrich L1] Scrape: ${websiteContent ? websiteContent.length + ' chars' : 'FAILED'}`)
     }
 
     // Layer 2: LLM extraction
@@ -345,6 +398,7 @@ async function enrichLead(lead: {
         llmResult = await llmExtract(websiteContent, lead.businessName)
 
         if (llmResult) {
+            console.log(`[Enrich L2] LLM: name=${llmResult.ownerName}, email=${llmResult.ownerEmail}, li=${llmResult.linkedinUrl}, confidence=${llmResult.confidence}`)
             result.contactName = llmResult.ownerName
             result.contactEmail = llmResult.ownerEmail
             result.linkedinUrl = llmResult.linkedinUrl
@@ -358,6 +412,7 @@ async function enrichLead(lead: {
             ) {
                 result.score = 90
                 result.status = "ENRICHED"
+                console.log(`[Enrich] Early exit (HIGH confidence): ${result.contactName} | ${result.contactEmail}`)
                 return result
             }
         }
@@ -368,19 +423,22 @@ async function enrichLead(lead: {
         const regexEmails = extractEmails(websiteContent)
         if (regexEmails.length > 0) {
             result.contactEmail = regexEmails[0]
+            console.log(`[Enrich L3] Regex email: ${result.contactEmail}`)
         }
     }
 
-    // Layer 4: Companies House lookup
+    // Layer 4: Companies House lookup (for name if missing)
     if (!result.contactName) {
         const chResult = await companiesHouseLookup(lead.businessName)
         if (chResult.directorName) {
             result.contactName = chResult.directorName
             result.jobTitle = result.jobTitle || "Director"
+            console.log(`[Enrich L4] CH director: ${result.contactName}`)
         }
     }
 
-    // Layer 5: Apollo people search
+    // Layer 5: Apollo people search — always try for LinkedIn
+    // Run Apollo if we're missing email OR LinkedIn (most critical for outreach)
     if (!result.contactEmail || !result.linkedinUrl) {
         const apolloResult = await apolloSearch(domain, lead.businessName)
         if (apolloResult.name && !result.contactName) {
@@ -404,6 +462,7 @@ async function enrichLead(lead: {
             const isValid = await verifyEmail(candidate)
             if (isValid) {
                 result.contactEmail = candidate
+                console.log(`[Enrich L6] Constructed email: ${result.contactEmail}`)
                 break
             }
         }
@@ -413,6 +472,7 @@ async function enrichLead(lead: {
     if (result.contactEmail) {
         const isValid = await verifyEmail(result.contactEmail)
         if (!isValid) {
+            console.log(`[Enrich L7] Email verification failed: ${result.contactEmail}`)
             result.contactEmail = null
         }
     }
@@ -424,6 +484,7 @@ async function enrichLead(lead: {
     if (result.jobTitle) result.score += 10
 
     result.status = result.score >= 30 ? "ENRICHED" : "FAILED"
+    console.log(`[Enrich] Done: "${lead.businessName}" → score=${result.score} status=${result.status} | name=${result.contactName} email=${result.contactEmail} li=${result.linkedinUrl}`)
 
     return result
 }
