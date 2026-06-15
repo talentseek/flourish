@@ -48,6 +48,7 @@ interface CampaignData {
     name: string
     status: string
     businessCategory: string | null
+    locationName: string | null
     searchPostcode: string | null
     searchRadius: number | null
     linkedinMessage: string | null
@@ -68,6 +69,7 @@ interface LeadData {
     enrichmentStatus: string | null
     enrichmentScore: number | null
     linkedinInviteSentAt: string | null
+    linkedinInviteAccepted: string | null
     linkedinMessageSentAt: string | null
     emailSentAt: string | null
     repliedAt: string | null
@@ -97,7 +99,7 @@ function computeStats(leads: LeadData[]) {
         total: leads.length,
         queued: leads.filter((l) => l.status === 'QUEUED').length,
         linkedinSent: leads.filter((l) => l.linkedinInviteSentAt).length,
-        accepted: leads.filter((l) => l.linkedinMessageSentAt).length,
+        accepted: leads.filter((l) => l.linkedinInviteAccepted).length,
         messaged: leads.filter((l) => l.linkedinMessageSentAt).length,
         emailsSent: leads.filter((l) => l.emailSentAt).length,
         replied: leads.filter((l) => l.status === 'REPLIED').length,
@@ -120,6 +122,7 @@ function getLastActivity(lead: LeadData): string {
 export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
     const router = useRouter()
     const [loading, setLoading] = useState<string | null>(null)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [enriching, setEnriching] = useState(false)
     const [enrichProgress, setEnrichProgress] = useState<{ done: number; total: number } | null>(null)
 
@@ -135,17 +138,22 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
     async function handleAction(action: string) {
         setLoading(action)
+        setErrorMsg(null)
         try {
             if (action === 'launch') await launchCampaign(campaign.id)
             if (action === 'pause') await pauseCampaign(campaign.id)
             if (action === 'delete') {
+                if (!window.confirm('Delete this campaign and all leads? This cannot be undone.')) {
+                    setLoading(null)
+                    return
+                }
                 await deleteCampaign(campaign.id)
                 router.push('/outreach')
                 return
             }
             router.refresh()
         } catch (err: any) {
-            alert(err.message ?? 'Action failed')
+            setErrorMsg(err.message ?? 'Action failed')
         } finally {
             setLoading(null)
         }
@@ -153,11 +161,12 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
     async function handleRemoveLead(leadId: string) {
         setLoading(`remove-${leadId}`)
+        setErrorMsg(null)
         try {
             await removeLeadFromCampaign(leadId)
             router.refresh()
         } catch (err: any) {
-            alert(err.message ?? 'Failed to remove lead')
+            setErrorMsg(err.message ?? 'Failed to remove lead')
         } finally {
             setLoading(null)
         }
@@ -206,6 +215,24 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
     return (
         <>
+            {/* Inline error alert */}
+            {errorMsg && (
+                <Alert variant="destructive" className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertDescription>{errorMsg}</AlertDescription>
+                    </div>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 shrink-0"
+                        onClick={() => setErrorMsg(null)}
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </Alert>
+            )}
+
             {/* Back link */}
             <Link
                 href="/outreach"
@@ -217,11 +244,16 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold tracking-tight">{campaign.name}</h1>
-                    <Badge variant={statusCfg.variant} className={statusCfg.className}>
-                        {statusCfg.label}
-                    </Badge>
+                <div>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold tracking-tight">{campaign.name}</h1>
+                        <Badge variant={statusCfg.variant} className={statusCfg.className}>
+                            {statusCfg.label}
+                        </Badge>
+                    </div>
+                    {campaign.locationName && (
+                        <p className="text-sm text-muted-foreground mt-1">{campaign.locationName}</p>
+                    )}
                 </div>
                 <div className="flex items-center gap-2">
                     {campaign.status === 'DRAFT' && (
@@ -292,6 +324,17 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                 </div>
             </div>
 
+            {/* Active campaign notice */}
+            {campaign.status === 'ACTIVE' && (
+                <Alert className="border-yellow-500/50 bg-yellow-500/10">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    <AlertTitle className="text-yellow-500">Coming Soon</AlertTitle>
+                    <AlertDescription className="text-yellow-400/80">
+                        Automated sending is coming soon. Your campaign is marked as active and will begin sending automatically once this feature is enabled.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             {/* Stats Strip */}
             <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
                 {statCards.map((stat) => (
@@ -326,7 +369,7 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm flex items-center gap-2">
                                 <Linkedin className="h-4 w-4" />
-                                LinkedIn Message
+                                LinkedIn Follow-up Message
                             </CardTitle>
                         </CardHeader>
                         <CardContent>

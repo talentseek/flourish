@@ -164,6 +164,8 @@ interface CreateCampaignData {
     businessCategory?: string
     searchPostcode?: string
     searchRadius?: number
+    locationId?: string
+    locationName?: string
     linkedinMessage?: string
     emailSubject?: string
     emailBody?: string
@@ -179,6 +181,8 @@ export async function createCampaign(data: CreateCampaignData) {
             businessCategory: data.businessCategory,
             searchPostcode: data.searchPostcode,
             searchRadius: data.searchRadius,
+            locationId: data.locationId,
+            locationName: data.locationName,
             linkedinMessage: data.linkedinMessage,
             emailSubject: data.emailSubject,
             emailBody: data.emailBody,

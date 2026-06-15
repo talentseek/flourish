@@ -1,3 +1,4 @@
+import crypto from "crypto"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
@@ -32,7 +33,9 @@ export async function GET(request: NextRequest) {
         }
 
         const origin = request.nextUrl.origin
-        const notifyUrl = `${origin}/api/outreach/connect-callback?provider=${provider}&userId=${session.user.id}`
+        const secret = process.env.CALLBACK_SECRET || "flourish-callback-default"
+        const token = crypto.createHmac("sha256", secret).update(session.user.id).digest("hex")
+        const notifyUrl = `${origin}/api/outreach/connect-callback?provider=${provider}&userId=${session.user.id}&token=${token}`
         const expiresOn = new Date(Date.now() + 60 * 60 * 1000).toISOString()
 
         const payload = {

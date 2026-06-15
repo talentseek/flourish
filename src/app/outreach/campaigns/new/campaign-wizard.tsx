@@ -283,6 +283,8 @@ export function CampaignWizard() {
                 businessCategory: category || undefined,
                 searchPostcode: postcode.trim() || undefined,
                 searchRadius: radius || undefined,
+                locationId: selectedCentreId || undefined,
+                locationName: selectedCentre?.name || undefined,
                 linkedinMessage: messages.linkedinMessage.trim() || undefined,
                 emailSubject: messages.emailSubject.trim() || undefined,
                 emailBody: messages.emailBody.trim() || undefined,
@@ -325,6 +327,7 @@ export function CampaignWizard() {
             .replace(/\{\{firstName\}\}/g, firstName)
             .replace(/\{\{businessName\}\}/g, lead.businessName)
             .replace(/\{\{contactName\}\}/g, lead.contactName || '')
+            .replace(/\{\{centreName\}\}/g, selectedCentre?.name || '')
     }
 
     return (
@@ -434,6 +437,7 @@ export function CampaignWizard() {
                     campaignName={campaignName}
                     businessCategory={categoryLabel}
                     postcode={postcode}
+                    centreName={selectedCentre?.name || ''}
                     sampleLeads={leads.slice(0, 3).map(l => ({ businessName: l.businessName, contactName: l.contactName || null }))}
                 />
             )}
@@ -441,6 +445,7 @@ export function CampaignWizard() {
                 <StepReviewLaunch
                     campaignName={campaignName}
                     categoryLabel={categoryLabel}
+                    centreName={selectedCentre?.name || ''}
                     postcode={postcode}
                     radius={radius}
                     leadCount={leads.length}
@@ -1007,6 +1012,7 @@ function StepWriteMessages({
     campaignName,
     businessCategory,
     postcode,
+    centreName,
     sampleLeads,
 }: {
     messages: Messages
@@ -1016,6 +1022,7 @@ function StepWriteMessages({
     campaignName: string
     businessCategory: string
     postcode: string
+    centreName: string
     sampleLeads: Array<{ businessName: string; contactName: string | null }>
 }) {
     const [isGenerating, setIsGenerating] = useState(false)
@@ -1034,6 +1041,7 @@ function StepWriteMessages({
                     campaignName,
                     businessCategory,
                     location: postcode,
+                    centreName,
                     sampleLeads,
                     tone: 'friendly',
                     channel: 'both',
@@ -1100,16 +1108,16 @@ function StepWriteMessages({
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                         <Linkedin className="h-5 w-5 text-primary" />
-                        LinkedIn Message
+                        LinkedIn Follow-up Message
                     </CardTitle>
                     <CardDescription>
-                        Connection request note. Use {'{{firstName}}'} and {'{{businessName}}'} for personalization.
+                        Sent after the connection request is accepted. Use {'{{firstName}}'}, {'{{businessName}}'}, and {'{{centreName}}'} for personalization.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                     <div className="space-y-1.5">
                         <Textarea
-                            placeholder={`Hi {{firstName}},\n\nI noticed {{businessName}} could be a great fit for our retail space at Arndale Centre. Would you be open to a quick chat?\n\nBest regards`}
+                            placeholder={`Hi {{firstName}},\n\nI noticed {{businessName}} could be a great fit for our retail space at {{centreName}}. Would you be open to a quick chat?\n\nBest regards`}
                             value={messages.linkedinMessage}
                             onChange={e => setMessages({ ...messages, linkedinMessage: e.target.value })}
                             rows={5}
@@ -1118,7 +1126,8 @@ function StepWriteMessages({
                         <div className="flex items-center justify-between">
                             <p className="text-xs text-muted-foreground">
                                 Variables: <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{firstName}}'}</code>{' '}
-                                <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{businessName}}'}</code>
+                                <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{businessName}}'}</code>{' '}
+                                <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{centreName}}'}</code>
                             </p>
                             <span className={`text-xs font-mono ${linkedinOverLimit ? 'text-destructive' : 'text-muted-foreground'}`}>
                                 {linkedinLength}/{LINKEDIN_MAX_CHARS}
@@ -1144,7 +1153,7 @@ function StepWriteMessages({
                         <Label htmlFor="email-subject">Subject</Label>
                         <Input
                             id="email-subject"
-                            placeholder="e.g. Retail space opportunity at Arndale Centre"
+                            placeholder={`e.g. Retail space opportunity at ${centreName || 'your centre'}`}
                             value={messages.emailSubject}
                             onChange={e => setMessages({ ...messages, emailSubject: e.target.value })}
                         />
@@ -1153,7 +1162,7 @@ function StepWriteMessages({
                         <Label htmlFor="email-body">Body</Label>
                         <Textarea
                             id="email-body"
-                            placeholder={`Dear {{firstName}},\n\nI'm reaching out regarding a retail opportunity that I think would be perfect for {{businessName}}...\n\nBest regards`}
+                            placeholder={`Dear {{firstName}},\n\nI'm reaching out regarding a retail opportunity at ${centreName || '{{centreName}}'} that I think would be perfect for {{businessName}}...\n\nBest regards`}
                             value={messages.emailBody}
                             onChange={e => setMessages({ ...messages, emailBody: e.target.value })}
                             rows={7}
@@ -1162,6 +1171,7 @@ function StepWriteMessages({
                         <p className="text-xs text-muted-foreground">
                             Variables: <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{firstName}}'}</code>{' '}
                             <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{businessName}}'}</code>{' '}
+                            <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{centreName}}'}</code>{' '}
                             <code className="text-xs bg-muted px-1 py-0.5 rounded">{'{{contactName}}'}</code>
                         </p>
                     </div>
@@ -1226,6 +1236,7 @@ function StepWriteMessages({
 function StepReviewLaunch({
     campaignName,
     categoryLabel,
+    centreName,
     postcode,
     radius,
     leadCount,
@@ -1233,13 +1244,14 @@ function StepReviewLaunch({
 }: {
     campaignName: string
     categoryLabel: string
+    centreName: string
     postcode: string
     radius: number
     leadCount: number
     messages: Messages
 }) {
     const channels: string[] = []
-    if (messages.linkedinMessage.trim()) channels.push('LinkedIn')
+    if (messages.linkedinMessage.trim()) channels.push('LinkedIn (follow-up)')
     if (messages.emailBody.trim()) channels.push('Email')
 
     return (
@@ -1257,7 +1269,8 @@ function StepReviewLaunch({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <SummaryItem label="Campaign Name" value={campaignName} />
                     <SummaryItem label="Business Category" value={categoryLabel || '—'} />
-                    <SummaryItem label="Search Area" value={`${postcode.trim().toUpperCase()} — ${radius} mile radius`} />
+                    <SummaryItem label="Centre" value={centreName ? `${centreName} (${postcode.trim().toUpperCase()})` : postcode.trim().toUpperCase()} />
+                    <SummaryItem label="Search Radius" value={`${radius} miles`} />
                     <SummaryItem label="Total Leads" value={String(leadCount)} />
                     <SummaryItem
                         label="Channels"
@@ -1269,6 +1282,13 @@ function StepReviewLaunch({
                     />
                     <SummaryItem label="Status" value="Draft — will be created as a draft campaign" />
                 </div>
+
+                {channels.length === 1 && (
+                    <div className="flex items-center gap-2 text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-3 mt-4">
+                        <AlertCircle className="h-4 w-4 shrink-0" />
+                        Only {channels[0]} is configured. Leads without a matching contact method won&apos;t be reached through the other channel.
+                    </div>
+                )}
             </CardContent>
         </Card>
     )

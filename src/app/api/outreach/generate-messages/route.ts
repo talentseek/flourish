@@ -9,6 +9,7 @@ interface GenerateRequest {
     campaignName: string
     businessCategory: string
     location: string
+    centreName?: string
     sampleLeads: Array<{
         businessName: string
         contactName?: string | null
@@ -30,7 +31,7 @@ IMPORTANT RULES:
 - Use {{firstName}} for the contact's first name (fallback: "there")
 - Use {{businessName}} for the business name
 - Do NOT use any other variables
-- LinkedIn messages MUST be under 300 characters
+- LinkedIn follow-up messages MUST be under 300 characters
 - Email subject lines should be 6-10 words
 - Email body should be 3-5 short paragraphs
 - Never use exclamation marks excessively
@@ -51,14 +52,14 @@ function buildUserPrompt(req: GenerateRequest): string {
     return `Write outreach messages for a campaign called "${req.campaignName}".
 
 Business type: ${req.businessCategory}
-Location: ${req.location}
+Location: ${req.centreName ? `${req.centreName} (${req.location})` : req.location}
 Tone: ${toneGuide[req.tone || "friendly"]}
 
 Sample businesses being contacted:
 ${leadExamples}
 
 ${req.channel === "linkedin" || req.channel === "both" ? `
-Generate a LinkedIn connection request message (MUST be under 300 characters).
+Generate a LinkedIn follow-up message (sent after the connection request is accepted, NOT as a connection note). MUST be under 300 characters.
 ` : ""}
 ${req.channel === "email" || req.channel === "both" ? `
 Generate an email with:
