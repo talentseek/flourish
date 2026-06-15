@@ -408,11 +408,19 @@ function constructEmails(
 }
 
 const PLATFORM_DOMAINS = [
+    // Social media
     "instagram.com", "facebook.com", "twitter.com", "x.com",
     "tiktok.com", "youtube.com", "linkedin.com",
+    // Website builders / hosting
     "square.site", "squarespace.com", "wix.com", "wixsite.com",
     "wordpress.com", "blogspot.com", "tumblr.com",
+    // Marketplaces
     "etsy.com", "amazon.co.uk", "amazon.com", "ebay.co.uk", "ebay.com",
+    // Directories / aggregators — not real business email domains
+    "yell.com", "mapquest.com", "yelp.com", "tripadvisor.com",
+    "google.com", "google.co.uk", "trustpilot.com",
+    "hotfrog.co.uk", "cylex-uk.co.uk", "192.com",
+    "thomsonlocal.com", "scoot.co.uk", "freeindex.co.uk",
 ]
 
 function extractDomain(website: string | null): string | null {
@@ -705,8 +713,34 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "No leads found" }, { status: 404 })
     }
 
-    // Track director names across the batch to detect holding companies
+    // Pre-seed director dedup map from already-enriched leads in the same campaign
+    // This ensures dedup works across multiple batch requests
+    const firstLead = await prisma.outreachLead.findFirst({
+        where: { id: { in: cappedIds } },
+        select: { campaignId: true },
+    })
     const directorUsageCount = new Map<string, number>()
+    if (firstLead?.campaignId) {
+        const existingDirectors = await prisma.outreachLead.findMany({
+            where: {
+                campaignId: firstLead.campaignId,
+                enrichmentStatus: "ENRICHED",
+                jobTitle: "Director",
+                contactName: { not: null },
+                id: { notIn: cappedIds }, // exclude current batch
+            },
+            select: { contactName: true },
+        })
+        for (const d of existingDirectors) {
+            if (d.contactName) {
+                const key = d.contactName.toLowerCase()
+                directorUsageCount.set(key, (directorUsageCount.get(key) || 0) + 1)
+            }
+        }
+        if (directorUsageCount.size > 0) {
+            console.log(`[Enrich] Pre-seeded director dedup with ${directorUsageCount.size} existing directors`)
+        }
+    }
 
     // Process leads sequentially (to respect API rate limits)
     const results: EnrichmentResult[] = []
