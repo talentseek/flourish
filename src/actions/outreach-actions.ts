@@ -22,6 +22,75 @@ async function verifyRMOrAdmin() {
     return dbUser
 }
 
+async function verifyAdmin() {
+    const user = await getSessionUser()
+    if (!user) throw new Error('Not authenticated')
+
+    const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { id: true, name: true, email: true, role: true },
+    })
+    if (!dbUser) throw new Error('User not found')
+    if (dbUser.role !== 'ADMIN') {
+        throw new Error('Admin access required')
+    }
+    return dbUser
+}
+
+// ─── Admin: All Campaigns Overview ─────────────────────────
+
+export async function getAllCampaignsForAdmin() {
+    await verifyAdmin()
+
+    return prisma.outreachCampaign.findMany({
+        include: {
+            user: {
+                select: { id: true, name: true, email: true, role: true },
+            },
+            location: {
+                select: { id: true, name: true, city: true },
+            },
+            _count: { select: { leads: true } },
+            leads: {
+                select: { status: true },
+            },
+        },
+        orderBy: { createdAt: 'desc' },
+    })
+}
+
+export async function getAllRMIntegrationStatus() {
+    await verifyAdmin()
+
+    const users = await prisma.user.findMany({
+        where: {
+            role: { in: ['REGIONAL_MANAGER', 'ADMIN'] },
+        },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            integrations: {
+                where: { status: 'ACTIVE' },
+                select: { provider: true, displayName: true, email: true },
+            },
+        },
+        orderBy: { name: 'asc' },
+    })
+
+    return users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        hasLinkedIn: u.integrations.some((i) => i.provider === 'LINKEDIN'),
+        hasEmail: u.integrations.some((i) => i.provider === 'MICROSOFT'),
+        linkedInName: u.integrations.find((i) => i.provider === 'LINKEDIN')?.displayName ?? null,
+        emailAddress: u.integrations.find((i) => i.provider === 'MICROSOFT')?.email ?? null,
+    }))
+}
+
 // ─── User Integrations ─────────────────────────────────────
 
 export async function getUserIntegrations() {

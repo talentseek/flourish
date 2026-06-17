@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -14,6 +14,9 @@ import {
     Circle,
     LinkIcon,
     Unlink,
+    Shield,
+    Users,
+    XCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -53,9 +56,35 @@ interface Integration {
     updatedAt: string
 }
 
+interface AdminCampaign {
+    id: string
+    name: string
+    status: string
+    leads: LeadStatus[]
+    _count: { leads: number }
+    createdAt: string
+    updatedAt: string
+    user: { id: string; name: string | null; email: string; role: string }
+    location: { id: string; name: string; city: string } | null
+    locationName: string | null
+}
+
+interface RMIntegrationStatus {
+    id: string
+    name: string | null
+    email: string
+    role: string
+    hasLinkedIn: boolean
+    hasEmail: boolean
+    linkedInName: string | null
+    emailAddress: string | null
+}
+
 interface OutreachClientProps {
     campaigns: Campaign[]
     integrations: Integration[]
+    allCampaigns?: AdminCampaign[] | null
+    rmIntegrations?: RMIntegrationStatus[] | null
 }
 
 const STATUS_BADGE: Record<string, { variant: 'outline' | 'default' | 'secondary'; className?: string }> = {
@@ -75,7 +104,11 @@ function computeStats(leads: LeadStatus[]) {
     }
 }
 
-export function OutreachClient({ campaigns, integrations }: OutreachClientProps) {
+const STATUS_OPTIONS = ['ALL', 'DRAFT', 'ACTIVE', 'PAUSED', 'COMPLETED'] as const
+
+export function OutreachClient({ campaigns, integrations, allCampaigns, rmIntegrations }: OutreachClientProps) {
+    const [statusFilter, setStatusFilter] = useState<string>('ALL')
+    const isAdmin = !!allCampaigns
     const searchParams = useSearchParams()
 
     useEffect(() => {
@@ -107,6 +140,12 @@ export function OutreachClient({ campaigns, integrations }: OutreachClientProps)
                             <span className="ml-1.5 h-2 w-2 rounded-full bg-amber-500 inline-block animate-pulse" />
                         )}
                     </TabsTrigger>
+                    {isAdmin && (
+                        <TabsTrigger value="all-campaigns">
+                            <Shield className="mr-1.5 h-4 w-4" />
+                            All Campaigns
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
                 {/* Onboarding Banner */}
@@ -351,6 +390,158 @@ export function OutreachClient({ campaigns, integrations }: OutreachClientProps)
                         </Card>
                     </div>
                 </TabsContent>
+
+                {/* ─── All Campaigns Tab (Admin Only) ────────── */}
+                {isAdmin && allCampaigns && (
+                    <TabsContent value="all-campaigns" className="space-y-6">
+                        {/* Status Filter Pills */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-medium text-muted-foreground mr-1">Filter:</span>
+                            {STATUS_OPTIONS.map((s) => {
+                                const count = s === 'ALL'
+                                    ? allCampaigns.length
+                                    : allCampaigns.filter((c) => c.status === s).length
+                                return (
+                                    <Button
+                                        key={s}
+                                        variant={statusFilter === s ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => setStatusFilter(s)}
+                                        className="text-xs"
+                                    >
+                                        {s === 'ALL' ? 'All' : s.charAt(0) + s.slice(1).toLowerCase()}
+                                        <span className="ml-1.5 text-xs opacity-70">({count})</span>
+                                    </Button>
+                                )
+                            })}
+                        </div>
+
+                        {/* All Campaigns Table */}
+                        <Card>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Campaign</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Owner</TableHead>
+                                        <TableHead>Location</TableHead>
+                                        <TableHead className="text-right">Leads</TableHead>
+                                        <TableHead className="text-right">Sent</TableHead>
+                                        <TableHead className="text-right">Replied</TableHead>
+                                        <TableHead>Created</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {allCampaigns
+                                        .filter((c) => statusFilter === 'ALL' || c.status === statusFilter)
+                                        .map((campaign) => {
+                                            const stats = computeStats(campaign.leads)
+                                            const badge = STATUS_BADGE[campaign.status] ?? STATUS_BADGE.DRAFT
+
+                                            return (
+                                                <TableRow key={campaign.id}>
+                                                    <TableCell className="font-medium">
+                                                        {campaign.name}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge
+                                                            variant={badge.variant}
+                                                            className={badge.className}
+                                                        >
+                                                            {campaign.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="text-sm">
+                                                            <span className="font-medium">
+                                                                {campaign.user.name || 'Unnamed'}
+                                                            </span>
+                                                            <span className="block text-xs text-muted-foreground">
+                                                                {campaign.user.email}
+                                                            </span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-sm text-muted-foreground">
+                                                        {campaign.location
+                                                            ? `${campaign.location.name}, ${campaign.location.city}`
+                                                            : campaign.locationName || '—'}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {stats.totalLeads}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {stats.sent}
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {stats.replied}
+                                                    </TableCell>
+                                                    <TableCell className="text-muted-foreground text-sm">
+                                                        {new Date(campaign.createdAt).toLocaleDateString()}
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        })}
+                                    {allCampaigns.filter((c) => statusFilter === 'ALL' || c.status === statusFilter).length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                                                No campaigns match the selected filter.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </Card>
+
+                        {/* RM Integration Status */}
+                        {rmIntegrations && rmIntegrations.length > 0 && (
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                                    <Users className="h-4 w-4" />
+                                    Team Integration Status
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {rmIntegrations.map((rm) => (
+                                        <Card key={rm.id} className="border-border/60">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-start justify-between">
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-sm font-medium">
+                                                            {rm.name || 'Unnamed User'}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {rm.email}
+                                                        </p>
+                                                        <Badge variant="outline" className="mt-1 text-[10px] px-1.5 py-0">
+                                                            {rm.role === 'ADMIN' ? 'Admin' : 'Regional Manager'}
+                                                        </Badge>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1.5 items-end">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Linkedin className="h-3.5 w-3.5 text-[#0A66C2]" />
+                                                            {rm.hasLinkedIn ? (
+                                                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                                                            ) : (
+                                                                <XCircle className="h-3.5 w-3.5 text-muted-foreground/40" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Mail className="h-3.5 w-3.5 text-[#0078D4]" />
+                                                            {rm.hasEmail ? (
+                                                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                                                            ) : (
+                                                                <XCircle className="h-3.5 w-3.5 text-muted-foreground/40" />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </TabsContent>
+                )}
             </Tabs>
         </>
     )

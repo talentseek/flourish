@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/db'
 import { getSessionUser } from '@/lib/auth'
-import { getCampaigns, getUserIntegrations } from '@/actions/outreach-actions'
+import { getCampaigns, getUserIntegrations, getAllCampaignsForAdmin, getAllRMIntegrationStatus } from '@/actions/outreach-actions'
 import { AppSidebar } from '@/components/app-sidebar'
 import { SiteHeader } from '@/components/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
@@ -23,9 +23,13 @@ export default async function OutreachPage() {
         redirect('/dashboard')
     }
 
-    const [campaigns, integrations] = await Promise.all([
+    const isAdmin = dbUser.role === 'ADMIN'
+
+    const [campaigns, integrations, allCampaigns, rmIntegrations] = await Promise.all([
         getCampaigns(),
         getUserIntegrations(),
+        isAdmin ? getAllCampaignsForAdmin() : Promise.resolve(null),
+        isAdmin ? getAllRMIntegrationStatus() : Promise.resolve(null),
     ])
 
     // Serialize Decimal fields to plain numbers for client component
@@ -42,6 +46,14 @@ export default async function OutreachPage() {
         updatedAt: i.updatedAt.toISOString(),
     }))
 
+    const serializedAllCampaigns = allCampaigns?.map((c) => ({
+        ...c,
+        leads: c.leads.map((l) => ({ status: l.status })),
+        createdAt: c.createdAt.toISOString(),
+        updatedAt: c.updatedAt.toISOString(),
+        location: c.location ? { id: c.location.id, name: c.location.name, city: c.location.city } : null,
+    })) ?? null
+
     return (
         <SidebarProvider>
             <AppSidebar variant="inset" userRole={dbUser.role} />
@@ -52,6 +64,8 @@ export default async function OutreachPage() {
                         <OutreachClient
                             campaigns={serializedCampaigns}
                             integrations={serializedIntegrations}
+                            allCampaigns={serializedAllCampaigns}
+                            rmIntegrations={rmIntegrations}
                         />
                     </div>
                 </div>
