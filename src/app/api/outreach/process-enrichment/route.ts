@@ -118,6 +118,31 @@ const COMPANIES_HOUSE_API_KEY = process.env.COMPANIES_HOUSE_API_KEY || ''
 const APOLLO_API_KEY = process.env.APOLLO_API_KEY || ''
 const REOON_API_KEY = process.env.REOON_API_KEY || ''
 
+// Third-party platforms whose emails appear on scraped websites but don't belong to the business
+const BLOCKED_DOMAINS = new Set([
+    'fresha.com', 'booksy.com', 'godaddy.com', 'wix.com', 'squarespace.com',
+    'wordpress.com', 'shopify.com', 'petsathome.com', 'jollyes.com', 'pata.pet',
+    'wanderboat.ai', 'tracxn.com', 'visiteastleigh.co.uk', 'morphmarket.com',
+    'vets4pets.com', 'yell.com', 'facebook.com', 'instagram.com', 'twitter.com',
+    'linkedin.com', 'google.com', 'trustpilot.com', 'tripadvisor.com',
+    'yelp.com', 'uber.com', 'deliveroo.com', 'justeat.com', 'salonspy.com',
+    'treatwell.co.uk', 'freeindex.co.uk', 'cylex.co.uk', 'hotfrog.co.uk',
+    'bark.com', 'checkatrade.com', 'mybuilder.com', 'ratedpeople.com',
+    'wahanda.com', 'genbook.com', 'appointy.com', 'setmore.com',
+    'calendly.com', 'acuityscheduling.com', 'timely.com', 'mailchimp.com',
+    'sendinblue.com', 'hubspot.com', 'zoho.com', 'zendesk.com',
+])
+
+const GENERIC_PREFIXES = /^(info|hello|contact|enquir|admin|sales|support|office|mail|team|bookings?|reception|no-?reply|webmaster|postmaster)@/i
+
+function isBlockedEmail(email: string): boolean {
+    const domain = email.split('@')[1]?.toLowerCase()
+    if (!domain) return true
+    if (BLOCKED_DOMAINS.has(domain)) return true
+    if (GENERIC_PREFIXES.test(email)) return true
+    return false
+}
+
 interface LeadInput {
     id: string
     businessName: string
@@ -159,7 +184,7 @@ async function enrichSingleLead(lead: LeadInput): Promise<EnrichmentResult> {
         const extraction = await extractWithLLM(websiteContent, lead.businessName)
         if (extraction) {
             contactName = extraction.ownerName
-            contactEmail = extraction.ownerEmail
+            contactEmail = extraction.ownerEmail && !isBlockedEmail(extraction.ownerEmail) ? extraction.ownerEmail : null
             jobTitle = extraction.ownerRole
             if (contactName) score += 20
             if (contactEmail) score += 25
@@ -168,14 +193,15 @@ async function enrichSingleLead(lead: LeadInput): Promise<EnrichmentResult> {
 
     // Layer 3: Regex fallback for emails
     if (!contactEmail && websiteContent) {
-        const emailMatch = websiteContent.match(
-            /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/
-        )
-        if (emailMatch) {
-            const email = emailMatch[0].toLowerCase()
-            if (!email.includes('example') && !email.includes('noreply') && !email.includes('info@')) {
+        const allEmails = websiteContent.match(
+            /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
+        ) || []
+        for (const raw of allEmails) {
+            const email = raw.toLowerCase()
+            if (!email.includes('example') && !isBlockedEmail(email)) {
                 contactEmail = email
                 score += 15
+                break
             }
         }
     }
@@ -195,7 +221,7 @@ async function enrichSingleLead(lead: LeadInput): Promise<EnrichmentResult> {
         const apollo = await searchApollo(lead.businessName, lead.address)
         if (apollo) {
             if (!contactName && apollo.name) { contactName = apollo.name; score += 10 }
-            if (!contactEmail && apollo.email) { contactEmail = apollo.email; score += 20 }
+            if (!contactEmail && apollo.email && !isBlockedEmail(apollo.email)) { contactEmail = apollo.email; score += 20 }
             if (!linkedinUrl && apollo.linkedinUrl) { linkedinUrl = apollo.linkedinUrl; score += 10 }
             if (!jobTitle && apollo.title) jobTitle = apollo.title
         }

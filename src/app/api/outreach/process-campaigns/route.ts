@@ -31,6 +31,45 @@ const OPT_OUT_KEYWORDS = [
     'do not contact',
 ]
 
+const REOON_API_KEY = process.env.REOON_API_KEY || ''
+
+// Third-party platforms — emails from these domains are never real business contacts
+const BLOCKED_DOMAINS = new Set([
+    'fresha.com', 'booksy.com', 'godaddy.com', 'wix.com', 'squarespace.com',
+    'wordpress.com', 'shopify.com', 'petsathome.com', 'jollyes.com', 'pata.pet',
+    'wanderboat.ai', 'tracxn.com', 'visiteastleigh.co.uk', 'morphmarket.com',
+    'vets4pets.com', 'yell.com', 'facebook.com', 'instagram.com', 'twitter.com',
+    'linkedin.com', 'google.com', 'trustpilot.com', 'tripadvisor.com',
+    'yelp.com', 'uber.com', 'deliveroo.com', 'justeat.com', 'salonspy.com',
+    'treatwell.co.uk', 'freeindex.co.uk', 'cylex.co.uk', 'hotfrog.co.uk',
+    'bark.com', 'checkatrade.com', 'mybuilder.com', 'ratedpeople.com',
+    'wahanda.com', 'genbook.com', 'appointy.com', 'setmore.com',
+    'calendly.com', 'acuityscheduling.com', 'timely.com', 'mailchimp.com',
+    'sendinblue.com', 'hubspot.com', 'zoho.com', 'zendesk.com',
+])
+
+const GENERIC_PREFIXES = /^(info|hello|contact|enquir|admin|sales|support|office|mail|team|bookings?|reception|no-?reply|webmaster|postmaster)@/i
+
+function isBlockedEmail(email: string): boolean {
+    const domain = email.split('@')[1]?.toLowerCase()
+    if (!domain) return true
+    if (BLOCKED_DOMAINS.has(domain)) return true
+    if (GENERIC_PREFIXES.test(email)) return true
+    return false
+}
+
+async function verifyEmailWithReoon(email: string): Promise<boolean> {
+    if (!REOON_API_KEY) return true // Skip if no key
+    try {
+        const res = await fetch(
+            `https://emailverifier.reoon.com/api/v1/verify?email=${encodeURIComponent(email)}&key=${REOON_API_KEY}&mode=quick`
+        )
+        if (!res.ok) return true // Assume valid on API error
+        const data = (await res.json()) as { status?: string }
+        return data.status !== 'invalid'
+    } catch { return true }
+}
+
 // ─── Helpers ────────────────────────────────────────────────
 
 function isBusinessHours(): boolean {
@@ -476,6 +515,33 @@ async function handleStep3(ctx: PipelineContext): Promise<void> {
             where: { id: lead.id },
             data: { currentStep: 4, status: 'COMPLETED', nextStepAt: null },
         })
+        return
+    }
+
+    // Pre-send: block third-party platform emails
+    if (isBlockedEmail(lead.contactEmail)) {
+        console.log(
+            `[Pipeline] Blocked email domain for lead ${lead.id}: ${lead.contactEmail}`
+        )
+        await prisma.outreachLead.update({
+            where: { id: lead.id },
+            data: { contactEmail: null, currentStep: 4, status: 'FAILED', nextStepAt: null },
+        })
+        ctx.stats.errors++
+        return
+    }
+
+    // Pre-send: Reoon verification
+    const emailValid = await verifyEmailWithReoon(lead.contactEmail)
+    if (!emailValid) {
+        console.log(
+            `[Pipeline] Reoon rejected email for lead ${lead.id}: ${lead.contactEmail}`
+        )
+        await prisma.outreachLead.update({
+            where: { id: lead.id },
+            data: { contactEmail: null, currentStep: 4, status: 'FAILED', nextStepAt: null },
+        })
+        ctx.stats.errors++
         return
     }
 
