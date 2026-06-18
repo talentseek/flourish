@@ -5,7 +5,7 @@ import { enrichLeadsByCampaignId } from '@/lib/enrich-pipeline'
 export const maxDuration = 60
 
 const CRON_SECRET = process.env.CRON_SECRET || ''
-const BATCH_SIZE = 10 // Max leads to enrich per campaign per tick
+const BATCH_SIZE = 3 // Max leads to enrich per campaign per tick (power mode verification is slow)
 
 /**
  * POST /api/outreach/process-enrichment
@@ -368,13 +368,29 @@ async function searchApollo(businessName: string, address: string | null): Promi
 }
 
 async function verifyEmail(email: string): Promise<boolean> {
-    if (!REOON_API_KEY) return true // Skip verification if no key
+    if (!REOON_API_KEY) return false // No key = reject (conservative)
     try {
         const res = await fetch(
-            `https://emailverifier.reoon.com/api/v1/verify?email=${encodeURIComponent(email)}&key=${REOON_API_KEY}&mode=quick`
+            `https://emailverifier.reoon.com/api/v1/verify?email=${encodeURIComponent(email)}&key=${REOON_API_KEY}&mode=power`,
+            { signal: AbortSignal.timeout(30000) } // 30s timeout for power mode
         )
-        if (!res.ok) return true // Assume valid on API error
-        const data = (await res.json()) as { status?: string }
-        return data.status !== 'invalid'
-    } catch { return true }
+        if (!res.ok) return false // API error = reject
+        const data = (await res.json()) as {
+            status?: string
+            is_safe_to_send?: boolean
+            is_deliverable?: boolean
+            is_disposable?: boolean
+            is_catch_all?: boolean
+            is_role_account?: boolean
+        }
+        // Only allow if Reoon explicitly says it's safe
+        if (data.is_safe_to_send === true && data.is_deliverable === true) return true
+        // Also allow catch-all domains IF deliverable (many small businesses use catch-all)
+        if (data.is_catch_all === true && data.status !== 'invalid' && data.status !== 'disabled') return true
+        console.log(`[Reoon] Rejected ${email}: status=${data.status} safe=${data.is_safe_to_send} deliverable=${data.is_deliverable}`)
+        return false
+    } catch (err) {
+        console.log(`[Reoon] Verification failed for ${email}:`, err)
+        return false // Timeout/error = reject
+    }
 }
