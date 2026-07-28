@@ -11,8 +11,6 @@ interface SlugPageProps {
   }
 }
 
-import locationManagers from "@/data/location-managers.json"
-
 // Map of Regional Manager names to their image paths
 const rmImages: Record<string, string> = {
   "Amanda Bishop": "/amandanew.webp",
@@ -26,37 +24,14 @@ const rmImages: Record<string, string> = {
   "Suki": "/sukinew.webp"
 }
 
-// Multi-strategy Regional Manager matching
-function findRegionalManager(location: { name: string; postcode: string }) {
-  // Helper to normalize strings for comparison
-  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
-  const normalizePostcode = (s: string) => s.replace(/\s/g, '').toLowerCase()
-
-  // 1. Try postcode match first (most reliable)
-  let match = locationManagers.find((m: any) =>
-    m.Postcode && location.postcode &&
-    normalizePostcode(m.Postcode) === normalizePostcode(location.postcode)
-  )
-
-  // 2. Try normalized name match (handles case/punctuation differences)
-  if (!match) {
-    match = locationManagers.find((m: any) =>
-      normalize(m.Location) === normalize(location.name)
-    )
-  }
-
-  // 3. Try fuzzy containment (significant words from JSON must appear in DB name)
-  if (!match) {
-    match = locationManagers.find((m: any) => {
-      const jsonWords = m.Location.toLowerCase()
-        .split(/[\s,]+/)
-        .filter((w: string) => w.length > 3 && !['shopping', 'centre', 'center', 'retail', 'park'].includes(w))
-      const dbName = location.name.toLowerCase()
-      return jsonWords.length > 0 && jsonWords.every((word: string) => dbName.includes(word))
-    })
-  }
-
-  return match
+// Map of Regional Manager names to their phone numbers
+const rmPhones: Record<string, string> = {
+  "Amanda Bishop": "07341 917362",
+  "Callum Clifford": "07768 573282",
+  "Paula Muers": "07464 226938",
+  "Giorgia Shepherd": "07920 017850",
+  "Michelle Clark": "07768 573282",
+  "Sharon O'Rourke": "07768 573282",
 }
 
 export default async function LocationPage({ params }: SlugPageProps) {
@@ -89,22 +64,23 @@ export default async function LocationPage({ params }: SlugPageProps) {
     notFound()
   }
 
-  // Find Regional Manager for this location using multi-strategy matching
-  const managerData = findRegionalManager({
-    name: location.name,
-    postcode: location.postcode
-  })
-
+  // Find Regional Manager from the database (single source of truth)
   let regionalManager = undefined
-  if (managerData && managerData["Regional Manager"]) {
-    const name = managerData["Regional Manager"]
-    const imageSrc = rmImages[name] || rmImages[name.split(' ')[0]] // Try full name, then first name
+  if (location.regionalManager) {
+    const rmName = location.regionalManager
+    const imageSrc = rmImages[rmName] || rmImages[rmName.split(' ')[0]]
 
     if (imageSrc) {
+      // Look up the user's email from the database
+      const rmUser = await prisma.user.findFirst({
+        where: { name: rmName },
+        select: { email: true }
+      })
+
       regionalManager = {
-        name,
-        email: managerData["RM Email"] || undefined,
-        phone: managerData["RM Telephone"] ? String(managerData["RM Telephone"]) : (managerData["RM Tel:"] ? String(managerData["RM Tel:"]) : undefined),
+        name: rmName,
+        email: rmUser?.email || undefined,
+        phone: rmPhones[rmName] || undefined,
         imageSrc
       }
     }
