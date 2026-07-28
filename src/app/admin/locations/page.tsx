@@ -42,6 +42,7 @@ type RegionalManager = {
     id: string
     name: string | null
     email: string
+    role: string
 }
 
 export default function LocationsPage() {
@@ -213,6 +214,9 @@ export default function LocationsPage() {
                                                             {managers.map((manager) => (
                                                                 <SelectItem key={manager.id} value={manager.name || manager.email}>
                                                                     {manager.name || manager.email}
+                                                                    {manager.role === 'ADMIN' && (
+                                                                        <span className="ml-1.5 text-xs text-muted-foreground">(Admin)</span>
+                                                                    )}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>

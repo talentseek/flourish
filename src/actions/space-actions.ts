@@ -205,6 +205,7 @@ export async function getBookingsForRegionalManager() {
     const user = await verifyRMOrAdmin()
     if (!user.name) return []
 
+    // Both ADMIN and REGIONAL_MANAGER see bookings for their assigned locations
     const locations = await prisma.location.findMany({
         where: { regionalManager: user.name, isManaged: true },
         select: { id: true, name: true }
@@ -464,10 +465,21 @@ export async function searchBookings(
 
     const where: Record<string, unknown> = {}
 
-    if (user.role === 'REGIONAL_MANAGER' && user.name) {
-        where.space = {
-            location: { regionalManager: user.name, isManaged: true },
-            isActive: true
+    // Both ADMIN and REGIONAL_MANAGER with assigned sites: scope to their locations
+    if (user.name) {
+        const assignedLocations = await prisma.location.findMany({
+            where: { regionalManager: user.name, isManaged: true },
+            select: { id: true }
+        })
+        if (assignedLocations.length > 0) {
+            where.space = {
+                locationId: filters?.locationId
+                    ? filters.locationId
+                    : { in: assignedLocations.map((l: { id: string }) => l.id) },
+                isActive: true
+            }
+        } else if (filters?.locationId) {
+            where.space = { locationId: filters.locationId, isActive: true }
         }
     } else if (filters?.locationId) {
         where.space = { locationId: filters.locationId, isActive: true }

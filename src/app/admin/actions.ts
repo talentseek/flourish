@@ -131,11 +131,12 @@ export async function getRegionalManagers() {
     await verifyAdmin()
 
     return prisma.user.findMany({
-        where: { role: 'REGIONAL_MANAGER' },
+        where: { role: { in: ['REGIONAL_MANAGER', 'ADMIN'] } },
         select: {
             id: true,
             name: true,
-            email: true
+            email: true,
+            role: true,
         },
         orderBy: { name: 'asc' }
     })

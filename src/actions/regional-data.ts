@@ -24,6 +24,7 @@ export async function getRegionalLocations() {
         return [];
     }
 
+    // Both ADMIN and REGIONAL_MANAGER see locations assigned to their name
     const locations = await prisma.location.findMany({
         where: {
             isManaged: true,
