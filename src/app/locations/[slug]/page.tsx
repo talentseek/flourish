@@ -20,6 +20,7 @@ const rmImages: Record<string, string> = {
   "Jemma Mills": "/jemmanew.webp",
   "Michelle Clark": "/michellenew.webp",
   "Sharon O'Rourke": "/sharonnew.webp",
+  "Sophie Sterland": "/SophieSterland.png",
   "Paul": "/paulnew.webp",
   "Suki": "/sukinew.webp"
 }
@@ -33,6 +34,9 @@ const rmPhones: Record<string, string> = {
   "Michelle Clark": "07768 573282",
   "Sharon O'Rourke": "07768 573282",
 }
+
+// Fallback image for RMs not yet in the map
+const DEFAULT_RM_IMAGE = "/flourishlogonew.png"
 
 export default async function LocationPage({ params }: SlugPageProps) {
   // No authentication required - this is a public route
@@ -68,21 +72,19 @@ export default async function LocationPage({ params }: SlugPageProps) {
   let regionalManager = undefined
   if (location.regionalManager) {
     const rmName = location.regionalManager
-    const imageSrc = rmImages[rmName] || rmImages[rmName.split(' ')[0]]
+    const imageSrc = rmImages[rmName] || rmImages[rmName.split(' ')[0]] || DEFAULT_RM_IMAGE
 
-    if (imageSrc) {
-      // Look up the user's email from the database
-      const rmUser = await prisma.user.findFirst({
-        where: { name: rmName },
-        select: { email: true }
-      })
+    // Look up the user's email from the database
+    const rmUser = await prisma.user.findFirst({
+      where: { name: rmName },
+      select: { email: true }
+    })
 
-      regionalManager = {
-        name: rmName,
-        email: rmUser?.email || undefined,
-        phone: rmPhones[rmName] || undefined,
-        imageSrc
-      }
+    regionalManager = {
+      name: rmName,
+      email: rmUser?.email || undefined,
+      phone: rmPhones[rmName] || undefined,
+      imageSrc
     }
   }
 
