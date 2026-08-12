@@ -254,7 +254,7 @@ export function V2ContactSection() {
               size="lg"
               className="border-[#4D4A46] bg-[#4D4A46] text-white hover:bg-[#4D4A46]/90 text-lg px-8 py-6"
             >
-              <a href="mailto:info@flourish.com?subject=Book a Call">Book a Call</a>
+              <a href="mailto:hello@thisisflourish.co.uk?subject=Book a Call">Book a Call</a>
             </Button>
           </div>
         </div>
