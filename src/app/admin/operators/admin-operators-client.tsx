@@ -27,6 +27,7 @@ import {
     updateOperator,
     deleteOperator,
     addLicense,
+    updateLicense,
     removeLicense,
     checkCompaniesHouse,
 } from '@/actions/operator-actions'
@@ -46,6 +47,8 @@ import {
     Paperclip,
     Download,
     User,
+    Upload,
+    Loader2,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -139,11 +142,13 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     const [licenseDialogOpen, setLicenseDialogOpen] = useState(false)
     const [editingOperator, setEditingOperator] = useState<OperatorData | null>(null)
     const [licenseForOperator, setLicenseForOperator] = useState<string | null>(null)
+    const [selectedOperatorName, setSelectedOperatorName] = useState<string>('')
+    const [licenseFile, setLicenseFile] = useState<File | null>(null)
+    const [uploadingLicenseId, setUploadingLicenseId] = useState<string | null>(null)
     const [expandedId, setExpandedId] = useState<string | null>(null)
     const [selectedTypes, setSelectedTypes] = useState<OperatorType[]>([])
     const [loading, setLoading] = useState(false)
     const [search, setSearch] = useState('')
-    const [licenseFile, setLicenseFile] = useState<File | null>(null)
     const [selectedEntityType, setSelectedEntityType] = useState<string>('LIMITED_COMPANY')
     const [selectedLicenseType, setSelectedLicenseType] = useState<string>('PUBLIC_LIABILITY_INSURANCE')
 
@@ -249,6 +254,23 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
             alert(err instanceof Error ? err.message : 'Failed to add license')
         } finally {
             setLoading(false)
+        }
+    }
+
+    async function handleUploadLicenseDoc(licenseId: string, operatorId: string, file: File) {
+        setUploadingLicenseId(licenseId)
+        try {
+            const uploadData = new FormData()
+            uploadData.set('file', file)
+            uploadData.set('type', 'pli')
+            uploadData.set('entityId', operatorId)
+            const docUrl = await uploadComplianceDoc(uploadData)
+            await updateLicense(licenseId, { documentUrl: docUrl })
+            router.refresh()
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Failed to upload document')
+        } finally {
+            setUploadingLicenseId(null)
         }
     }
 
@@ -528,19 +550,57 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                         {formatDate(lic.startDate)} — {formatDate(lic.endDate)}
                                                                     </span>
                                                                     <ExpiryBadge endDate={lic.endDate} />
-                                                                    {lic.documentUrl && (
-                                                                        <a
-                                                                            href={lic.documentUrl}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="inline-flex items-center gap-1 text-primary hover:underline text-xs"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        >
-                                                                            <Paperclip className="h-3 w-3" />
-                                                                            <Download className="h-3 w-3" />
-                                                                            Document
-                                                                        </a>
-                                                                    )}
+                                                                    {lic.documentUrl ? (
+                                                                         <div className="flex items-center gap-2">
+                                                                             <a
+                                                                                 href={lic.documentUrl}
+                                                                                 target="_blank"
+                                                                                 rel="noopener noreferrer"
+                                                                                 className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-medium"
+                                                                                 onClick={(e) => e.stopPropagation()}
+                                                                             >
+                                                                                 <Paperclip className="h-3.5 w-3.5" />
+                                                                                 <Download className="h-3.5 w-3.5" />
+                                                                                 View Document
+                                                                             </a>
+                                                                             <label className="cursor-pointer text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors">
+                                                                                 <Upload className="h-3 w-3" />
+                                                                                 Replace
+                                                                                 <input
+                                                                                     type="file"
+                                                                                     className="hidden"
+                                                                                     disabled={uploadingLicenseId === lic.id}
+                                                                                     onChange={(e) => {
+                                                                                         const f = e.target.files?.[0]
+                                                                                         if (f) handleUploadLicenseDoc(lic.id, op.id, f)
+                                                                                     }}
+                                                                                 />
+                                                                             </label>
+                                                                         </div>
+                                                                     ) : (
+                                                                         <label className="cursor-pointer text-xs bg-muted hover:bg-muted/80 text-foreground px-2 py-1 rounded inline-flex items-center gap-1 transition-colors border">
+                                                                             {uploadingLicenseId === lic.id ? (
+                                                                                 <>
+                                                                                     <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                                                                                     Uploading...
+                                                                                 </>
+                                                                             ) : (
+                                                                                 <>
+                                                                                     <Upload className="h-3 w-3 text-primary" />
+                                                                                     Attach Document
+                                                                                 </>
+                                                                             )}
+                                                                             <input
+                                                                                 type="file"
+                                                                                 className="hidden"
+                                                                                 disabled={uploadingLicenseId === lic.id}
+                                                                                 onChange={(e) => {
+                                                                                     const f = e.target.files?.[0]
+                                                                                     if (f) handleUploadLicenseDoc(lic.id, op.id, f)
+                                                                                 }}
+                                                                             />
+                                                                         </label>
+                                                                     )}
                                                                 </div>
                                                                 <Button
                                                                     variant="ghost"
@@ -685,6 +745,7 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                 setLicenseDialogOpen(open)
                 if (!open) {
                     setLicenseForOperator(null)
+                    setLicenseFile(null)
                     setSelectedLicenseType('PUBLIC_LIABILITY_INSURANCE')
                 }
             }}>
