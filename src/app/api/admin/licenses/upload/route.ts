@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { put } from '@vercel/blob'
 import { LicenseCategory } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
@@ -53,24 +52,35 @@ export async function POST(req: NextRequest) {
             const timestamp = Date.now()
             const path = `compliance/pli/${operatorId || 'general'}/${timestamp}-${safeName}`
             const buffer = Buffer.from(await file.arrayBuffer())
+            const contentType = ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream'
 
-            const blob = await put(path, buffer, {
-                access: 'public',
-                token,
-                contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
-                addRandomSuffix: true,
+            const uploadRes = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(path)}`, {
+                method: 'PUT',
+                headers: {
+                    'authorization': `Bearer ${token}`,
+                    'x-content-type': contentType,
+                    'x-add-random-suffix': '1',
+                },
+                body: buffer,
             })
+
+            if (!uploadRes.ok) {
+                const errText = await uploadRes.text()
+                return NextResponse.json({ error: `Upload to storage failed: ${errText}` }, { status: 500 })
+            }
+
+            const uploadResult = await uploadRes.json() as { url: string }
 
             const updated = await prisma.operatorLicense.update({
                 where: { id: licenseId },
-                data: { documentUrl: blob.url }
+                data: { documentUrl: uploadResult.url }
             })
 
             revalidatePath('/admin/operators')
 
             return NextResponse.json({
                 success: true,
-                documentUrl: blob.url,
+                documentUrl: uploadResult.url,
                 license: {
                     ...updated,
                     coverValue: updated.coverValue ? updated.coverValue.toString() : null,
@@ -104,14 +114,22 @@ export async function POST(req: NextRequest) {
             const timestamp = Date.now()
             const path = `compliance/pli/${operatorId}/${timestamp}-${safeName}`
             const buffer = Buffer.from(await file.arrayBuffer())
+            const contentType = ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream'
 
-            const blob = await put(path, buffer, {
-                access: 'public',
-                token,
-                contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
-                addRandomSuffix: true,
+            const uploadRes = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(path)}`, {
+                method: 'PUT',
+                headers: {
+                    'authorization': `Bearer ${token}`,
+                    'x-content-type': contentType,
+                    'x-add-random-suffix': '1',
+                },
+                body: buffer,
             })
-            documentUrl = blob.url
+
+            if (uploadRes.ok) {
+                const uploadResult = await uploadRes.json() as { url: string }
+                documentUrl = uploadResult.url
+            }
         }
 
         const license = await prisma.operatorLicense.create({

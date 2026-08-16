@@ -10,7 +10,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', '@vercel/blob'],
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   async headers() {
     return [

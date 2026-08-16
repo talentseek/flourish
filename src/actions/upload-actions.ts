@@ -2,7 +2,6 @@
 
 import { getSessionUser } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { put, del } from '@vercel/blob'
 
 async function verifyAdminOrRM() {
     const sessionUser = await getSessionUser()
@@ -31,15 +30,25 @@ export async function uploadFile(formData: FormData): Promise<string> {
     const fileName = ('name' in file && typeof file.name === 'string' && file.name) ? file.name : 'upload'
     const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
     const buffer = Buffer.from(await file.arrayBuffer())
+    const contentType = ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream'
 
-    const blob = await put(safeName, buffer, {
-        access: 'public',
-        token,
-        contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
-        addRandomSuffix: true,
+    const res = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(safeName)}`, {
+        method: 'PUT',
+        headers: {
+            'authorization': `Bearer ${token}`,
+            'x-content-type': contentType,
+            'x-add-random-suffix': '1',
+        },
+        body: buffer,
     })
 
-    return blob.url
+    if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`Upload failed: ${errText}`)
+    }
+
+    const json = await res.json() as { url: string }
+    return json.url
 }
 
 /**
@@ -65,17 +74,26 @@ export async function uploadComplianceDoc(formData: FormData): Promise<string> {
     const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
     const timestamp = Date.now()
     const path = `compliance/${type}/${entityId}/${timestamp}-${safeName}`
-
     const buffer = Buffer.from(await file.arrayBuffer())
+    const contentType = ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream'
 
-    const blob = await put(path, buffer, {
-        access: 'public',
-        token,
-        contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
-        addRandomSuffix: true,
+    const res = await fetch(`https://blob.vercel-storage.com/${encodeURIComponent(path)}`, {
+        method: 'PUT',
+        headers: {
+            'authorization': `Bearer ${token}`,
+            'x-content-type': contentType,
+            'x-add-random-suffix': '1',
+        },
+        body: buffer,
     })
 
-    return blob.url
+    if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`Upload failed: ${errText}`)
+    }
+
+    const json = await res.json() as { url: string }
+    return json.url
 }
 
 export async function deleteFile(url: string): Promise<void> {
@@ -85,10 +103,18 @@ export async function deleteFile(url: string): Promise<void> {
     if (!token || !url.startsWith('http')) return
 
     try {
-        await del(url, { token })
+        await fetch('https://blob.vercel-storage.com/delete', {
+            method: 'POST',
+            headers: {
+                'authorization': `Bearer ${token}`,
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ urls: [url] }),
+        })
     } catch {
         // File may already be deleted
     }
 }
+
 
 
