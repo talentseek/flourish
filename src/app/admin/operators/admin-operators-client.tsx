@@ -262,15 +262,54 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         return file
     }
 
+    async function uploadFileDirect(rawFile: File, operatorId: string): Promise<string> {
+        const file = await prepareFileForUpload(rawFile)
+
+        // 1. Get signed client token from our backend
+        const tokenRes = await fetch('/api/admin/licenses/upload-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fileName: file.name,
+                operatorId,
+                type: 'pli',
+            }),
+        })
+
+        if (!tokenRes.ok) {
+            const err = await tokenRes.json().catch(() => ({ error: 'Authorization failed' }))
+            throw new Error(err.error || 'Failed to get upload authorization')
+        }
+
+        const { clientToken, uploadUrl } = await tokenRes.json()
+
+        // 2. Direct browser PUT to Vercel Blob Storage with signed client token (CORS allowed, no 4.5MB limit)
+        const uploadRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+                'authorization': `Bearer ${clientToken}`,
+                'x-content-type': file.type || 'application/octet-stream',
+            },
+            body: file,
+        })
+
+        if (!uploadRes.ok) {
+            const errText = await uploadRes.text().catch(() => 'Upload failed')
+            throw new Error(`Upload to storage failed: ${errText}`)
+        }
+
+        const result = await uploadRes.json() as { url: string }
+        return result.url
+    }
+
     async function handleAddLicense(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         if (!licenseForOperator) return
         setLoading(true)
         const form = new FormData(e.currentTarget)
-        form.set('action', 'create')
-        form.set('operatorId', licenseForOperator)
 
         try {
+            let docUrl: string | undefined
             const formFile = form.get('file') as (File | null)
             const chosenFile = (licenseFile && licenseFile.size > 0)
                 ? licenseFile
@@ -279,38 +318,39 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                     : null
 
             if (chosenFile) {
-                const file = await prepareFileForUpload(chosenFile)
-                form.set('file', file)
+                docUrl = await uploadFileDirect(chosenFile, licenseForOperator)
             }
 
-            const res = await fetch('/api/admin/licenses/upload', {
-                method: 'POST',
-                body: form,
+            const res = await addLicense({
+                operatorId: licenseForOperator,
+                type: form.get('type') as LicenseCategory,
+                reference: (form.get('reference') as string) || undefined,
+                startDate: form.get('startDate') as string,
+                endDate: form.get('endDate') as string,
+                coverValue: form.get('coverValue')
+                    ? parseFloat(form.get('coverValue') as string)
+                    : undefined,
+                notes: (form.get('notes') as string) || undefined,
+                documentUrl: docUrl,
             })
 
-            if (!res.ok) {
-                const errText = await res.text()
-                let errorMsg = 'Failed to add license'
-                try {
-                    const json = JSON.parse(errText)
-                    if (json.error) errorMsg = json.error
-                } catch {
-                    if (errText.includes('Entity Too Large') || res.status === 413) {
-                        errorMsg = 'File is too large (exceeds 4.5MB). Please upload a smaller PDF or image.'
-                    } else {
-                        errorMsg = errText || `Error ${res.status}`
-                    }
+            if (res.success && res.license) {
+                const newLic: LicenseData = {
+                    id: res.license.id,
+                    type: res.license.type,
+                    reference: res.license.reference,
+                    startDate: res.license.startDate.toISOString ? res.license.startDate.toISOString() : new Date(res.license.startDate).toISOString(),
+                    endDate: res.license.endDate.toISOString ? res.license.endDate.toISOString() : new Date(res.license.endDate).toISOString(),
+                    isVerified: res.license.isVerified,
+                    coverValue: res.license.coverValue ? res.license.coverValue.toString() : null,
+                    documentUrl: res.license.documentUrl,
+                    notes: res.license.notes,
                 }
-                throw new Error(errorMsg)
-            }
-
-            const data = await res.json()
-            if (data.success && data.license) {
                 setOperatorList(prev => prev.map(op => {
                     if (op.id !== licenseForOperator) return op
                     return {
                         ...op,
-                        licenses: [...op.licenses, data.license]
+                        licenses: [...op.licenses, newLic]
                     }
                 }))
             }
@@ -329,44 +369,15 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     async function handleUploadLicenseDoc(licenseId: string, operatorId: string, rawFile: File) {
         setUploadingLicenseId(licenseId)
         try {
-            const file = await prepareFileForUpload(rawFile)
-            const form = new FormData()
-            form.set('action', 'attach')
-            form.set('licenseId', licenseId)
-            form.set('operatorId', operatorId)
-            form.set('file', file)
-
-            const res = await fetch('/api/admin/licenses/upload', {
-                method: 'POST',
-                body: form,
-            })
-
-            if (!res.ok) {
-                const errText = await res.text()
-                let errorMsg = 'Failed to upload document'
-                try {
-                    const json = JSON.parse(errText)
-                    if (json.error) errorMsg = json.error
-                } catch {
-                    if (errText.includes('Entity Too Large') || res.status === 413) {
-                        errorMsg = 'File is too large (exceeds 4.5MB). Please upload a smaller PDF or image.'
-                    } else {
-                        errorMsg = errText || `Error ${res.status}`
-                    }
+            const docUrl = await uploadFileDirect(rawFile, operatorId)
+            await updateLicense(licenseId, { documentUrl: docUrl })
+            setOperatorList(prev => prev.map(op => {
+                if (op.id !== operatorId) return op
+                return {
+                    ...op,
+                    licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: docUrl } : lic)
                 }
-                throw new Error(errorMsg)
-            }
-
-            const data = await res.json()
-            if (data.success && data.documentUrl) {
-                setOperatorList(prev => prev.map(op => {
-                    if (op.id !== operatorId) return op
-                    return {
-                        ...op,
-                        licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: data.documentUrl } : lic)
-                    }
-                }))
-            }
+            }))
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to upload document')
