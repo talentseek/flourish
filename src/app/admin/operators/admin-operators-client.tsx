@@ -22,7 +22,6 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
-import { upload } from '@vercel/blob/client'
 import {
     createOperator,
     updateOperator,
@@ -223,13 +222,42 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     }
 
     async function uploadFileDirect(file: File, operatorId: string): Promise<string> {
-        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-        const pathname = `compliance/pli/${operatorId}/${Date.now()}-${safeName}`
-        const blob = await upload(pathname, file, {
-            access: 'public',
-            handleUploadUrl: '/api/admin/licenses/upload-token',
+        // 1. Get authorization & path from backend
+        const tokenRes = await fetch('/api/admin/licenses/upload-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fileName: file.name,
+                operatorId,
+                type: 'pli',
+            }),
         })
-        return blob.url
+
+        if (!tokenRes.ok) {
+            const err = await tokenRes.json().catch(() => ({ error: 'Authorization failed' }))
+            throw new Error(err.error || 'Failed to get upload authorization')
+        }
+
+        const { token, uploadUrl } = await tokenRes.json()
+
+        // 2. Direct browser upload to Vercel Blob storage (zero payload limit)
+        const uploadRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+                'authorization': `Bearer ${token}`,
+                'x-content-type': file.type || 'application/octet-stream',
+                'x-add-random-suffix': '1',
+            },
+            body: file,
+        })
+
+        if (!uploadRes.ok) {
+            const errText = await uploadRes.text().catch(() => 'Upload failed')
+            throw new Error(`Upload to storage failed: ${errText}`)
+        }
+
+        const result = await uploadRes.json() as { url: string }
+        return result.url
     }
 
     async function handleAddLicense(e: React.FormEvent<HTMLFormElement>) {
