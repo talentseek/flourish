@@ -227,55 +227,28 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         if (!licenseForOperator) return
         setLoading(true)
         const form = new FormData(e.currentTarget)
+        form.set('action', 'create')
+        form.set('operatorId', licenseForOperator)
+        if (licenseFile && (!form.get('file') || (form.get('file') as File).size === 0)) {
+            form.set('file', licenseFile)
+        }
 
         try {
-            // Upload document if selected
-            let docUrl: string | undefined
-            const formFile = form.get('file') as (File | null)
-            const fileToUpload = (licenseFile && licenseFile.size > 0)
-                ? licenseFile
-                : (formFile && formFile.size > 0)
-                    ? formFile
-                    : null
-
-            if (fileToUpload) {
-                const uploadData = new FormData()
-                uploadData.set('file', fileToUpload)
-                uploadData.set('type', 'pli')
-                uploadData.set('entityId', licenseForOperator)
-                docUrl = await uploadComplianceDoc(uploadData)
+            const res = await fetch('/api/admin/licenses/upload', {
+                method: 'POST',
+                body: form,
+            })
+            const data = await res.json()
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to add license')
             }
 
-            const res = await addLicense({
-                operatorId: licenseForOperator,
-                type: form.get('type') as LicenseCategory,
-                reference: (form.get('reference') as string) || undefined,
-                startDate: form.get('startDate') as string,
-                endDate: form.get('endDate') as string,
-                coverValue: form.get('coverValue')
-                    ? parseFloat(form.get('coverValue') as string)
-                    : undefined,
-                notes: (form.get('notes') as string) || undefined,
-                documentUrl: docUrl,
-            })
-
-            if (res.success && res.license) {
-                const newLic: LicenseData = {
-                    id: res.license.id,
-                    type: res.license.type,
-                    reference: res.license.reference,
-                    startDate: res.license.startDate.toISOString ? res.license.startDate.toISOString() : new Date(res.license.startDate).toISOString(),
-                    endDate: res.license.endDate.toISOString ? res.license.endDate.toISOString() : new Date(res.license.endDate).toISOString(),
-                    isVerified: res.license.isVerified,
-                    coverValue: res.license.coverValue ? res.license.coverValue.toString() : null,
-                    documentUrl: res.license.documentUrl,
-                    notes: res.license.notes,
-                }
+            if (data.success && data.license) {
                 setOperatorList(prev => prev.map(op => {
                     if (op.id !== licenseForOperator) return op
                     return {
                         ...op,
-                        licenses: [...op.licenses, newLic]
+                        licenses: [...op.licenses, data.license]
                     }
                 }))
             }
@@ -294,19 +267,30 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     async function handleUploadLicenseDoc(licenseId: string, operatorId: string, file: File) {
         setUploadingLicenseId(licenseId)
         try {
-            const uploadData = new FormData()
-            uploadData.set('file', file)
-            uploadData.set('type', 'pli')
-            uploadData.set('entityId', operatorId)
-            const docUrl = await uploadComplianceDoc(uploadData)
-            await updateLicense(licenseId, { documentUrl: docUrl })
-            setOperatorList(prev => prev.map(op => {
-                if (op.id !== operatorId) return op
-                return {
-                    ...op,
-                    licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: docUrl } : lic)
-                }
-            }))
+            const form = new FormData()
+            form.set('action', 'attach')
+            form.set('licenseId', licenseId)
+            form.set('operatorId', operatorId)
+            form.set('file', file)
+
+            const res = await fetch('/api/admin/licenses/upload', {
+                method: 'POST',
+                body: form,
+            })
+            const data = await res.json()
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to upload document')
+            }
+
+            if (data.success && data.documentUrl) {
+                setOperatorList(prev => prev.map(op => {
+                    if (op.id !== operatorId) return op
+                    return {
+                        ...op,
+                        licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: data.documentUrl } : lic)
+                    }
+                }))
+            }
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to upload document')
@@ -595,58 +579,72 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                         {formatDate(lic.startDate)} — {formatDate(lic.endDate)}
                                                                     </span>
                                                                     <ExpiryBadge endDate={lic.endDate} />
-                                                                    {lic.documentUrl ? (
-                                                                         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                                                             <a
-                                                                                 href={lic.documentUrl}
-                                                                                 target="_blank"
-                                                                                 rel="noopener noreferrer"
-                                                                                 className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-semibold bg-primary/10 px-2.5 py-1 rounded border border-primary/20"
-                                                                             >
-                                                                                 <Paperclip className="h-3.5 w-3.5" />
-                                                                                 <Download className="h-3.5 w-3.5" />
-                                                                                 View Document
-                                                                             </a>
-                                                                             <label className="cursor-pointer text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors hover:underline px-1.5 py-1">
-                                                                                 <Upload className="h-3 w-3" />
-                                                                                 Replace
-                                                                                 <input
-                                                                                     type="file"
-                                                                                     className="hidden"
-                                                                                     disabled={uploadingLicenseId === lic.id}
-                                                                                     onChange={(e) => {
-                                                                                         const f = e.target.files?.[0]
-                                                                                         if (f) handleUploadLicenseDoc(lic.id, op.id, f)
-                                                                                     }}
-                                                                                 />
-                                                                             </label>
-                                                                         </div>
-                                                                     ) : (
-                                                                         <div onClick={(e) => e.stopPropagation()}>
-                                                                             <label className="cursor-pointer text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded inline-flex items-center gap-1.5 transition-colors font-medium shadow-sm">
-                                                                                 {uploadingLicenseId === lic.id ? (
-                                                                                     <>
-                                                                                         <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-700" />
-                                                                                         Uploading...
-                                                                                     </>
-                                                                                 ) : (
-                                                                                     <>
-                                                                                         <Upload className="h-3.5 w-3.5 text-amber-700" />
-                                                                                         Attach Document
-                                                                                     </>
-                                                                                 )}
-                                                                                 <input
-                                                                                     type="file"
-                                                                                     className="hidden"
-                                                                                     disabled={uploadingLicenseId === lic.id}
-                                                                                     onChange={(e) => {
-                                                                                         const f = e.target.files?.[0]
-                                                                                         if (f) handleUploadLicenseDoc(lic.id, op.id, f)
-                                                                                     }}
-                                                                                 />
-                                                                             </label>
-                                                                         </div>
-                                                                     )}
+                                                                    <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                                                                        <input
+                                                                            id={`lic-file-input-${lic.id}`}
+                                                                            type="file"
+                                                                            className="hidden"
+                                                                            disabled={uploadingLicenseId === lic.id}
+                                                                            onChange={(e) => {
+                                                                                const f = e.target.files?.[0]
+                                                                                if (f) handleUploadLicenseDoc(lic.id, op.id, f)
+                                                                            }}
+                                                                        />
+                                                                        {lic.documentUrl ? (
+                                                                            <>
+                                                                                <a
+                                                                                    href={lic.documentUrl}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-semibold bg-primary/10 px-2.5 py-1 rounded border border-primary/20"
+                                                                                >
+                                                                                    <Paperclip className="h-3.5 w-3.5" />
+                                                                                    <Download className="h-3.5 w-3.5" />
+                                                                                    View Document
+                                                                                </a>
+                                                                                <Button
+                                                                                    type="button"
+                                                                                    size="sm"
+                                                                                    variant="ghost"
+                                                                                    className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
+                                                                                    disabled={uploadingLicenseId === lic.id}
+                                                                                    onClick={() => document.getElementById(`lic-file-input-${lic.id}`)?.click()}
+                                                                                >
+                                                                                    {uploadingLicenseId === lic.id ? (
+                                                                                        <>
+                                                                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                                                                            Uploading...
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <>
+                                                                                            <Upload className="h-3 w-3" />
+                                                                                            Replace
+                                                                                        </>
+                                                                                    )}
+                                                                                </Button>
+                                                                            </>
+                                                                        ) : (
+                                                                            <Button
+                                                                                type="button"
+                                                                                size="sm"
+                                                                                className="h-7 text-xs px-2.5 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-medium shadow-sm"
+                                                                                disabled={uploadingLicenseId === lic.id}
+                                                                                onClick={() => document.getElementById(`lic-file-input-${lic.id}`)?.click()}
+                                                                            >
+                                                                                {uploadingLicenseId === lic.id ? (
+                                                                                    <>
+                                                                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                                                        Uploading...
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <Upload className="h-3.5 w-3.5" />
+                                                                                        Attach Document
+                                                                                    </>
+                                                                                )}
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                                 <Button
                                                                     variant="ghost"
