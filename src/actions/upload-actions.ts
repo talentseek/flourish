@@ -17,31 +17,25 @@ async function verifyAdminOrRM() {
     return dbUser
 }
 
-async function verifyAdmin() {
-    const sessionUser = await getSessionUser()
-    if (!sessionUser) throw new Error('Unauthorized')
-    const dbUser = await prisma.user.findUnique({
-        where: { id: sessionUser.id },
-        select: { role: true }
-    })
-    if (!dbUser || dbUser.role !== 'ADMIN') throw new Error('Unauthorized: Admin access required')
-    return dbUser
-}
-
 export async function uploadFile(formData: FormData): Promise<string> {
-    await verifyAdmin()
+    await verifyAdminOrRM()
 
-    const file = formData.get('file') as File
-    if (!file || !(file instanceof File) || file.size === 0) {
-        throw new Error('No file provided')
+    const file = formData.get('file') as (File | Blob | null)
+    if (!file || typeof file === 'string' || !('size' in file) || file.size === 0) {
+        throw new Error('No valid file provided')
     }
 
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')
 
-    const blob = await put(file.name, file, {
+    const fileName = ('name' in file && typeof file.name === 'string' && file.name) ? file.name : 'upload'
+    const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    const blob = await put(safeName, buffer, {
         access: 'public',
         token,
+        contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
         addRandomSuffix: true,
     })
 
@@ -55,25 +49,29 @@ export async function uploadFile(formData: FormData): Promise<string> {
 export async function uploadComplianceDoc(formData: FormData): Promise<string> {
     await verifyAdminOrRM()
 
-    const file = formData.get('file') as File
+    const file = formData.get('file') as (File | Blob | null)
     const type = formData.get('type') as string
     const entityId = formData.get('entityId') as string
 
-    if (!file || !(file instanceof File) || file.size === 0) {
-        throw new Error('No file provided')
+    if (!file || typeof file === 'string' || !('size' in file) || file.size === 0) {
+        throw new Error('No valid file provided')
     }
     if (!type || !entityId) throw new Error('Missing type or entityId')
 
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token) throw new Error('BLOB_READ_WRITE_TOKEN not configured')
 
+    const fileName = ('name' in file && typeof file.name === 'string' && file.name) ? file.name : 'document.pdf'
+    const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_')
     const timestamp = Date.now()
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
     const path = `compliance/${type}/${entityId}/${timestamp}-${safeName}`
 
-    const blob = await put(path, file, {
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    const blob = await put(path, buffer, {
         access: 'public',
         token,
+        contentType: ('type' in file && typeof file.type === 'string' && file.type) ? file.type : 'application/octet-stream',
         addRandomSuffix: true,
     })
 
@@ -81,7 +79,7 @@ export async function uploadComplianceDoc(formData: FormData): Promise<string> {
 }
 
 export async function deleteFile(url: string): Promise<void> {
-    await verifyAdmin()
+    await verifyAdminOrRM()
 
     const token = process.env.BLOB_READ_WRITE_TOKEN
     if (!token || !url.startsWith('http')) return
@@ -92,4 +90,5 @@ export async function deleteFile(url: string): Promise<void> {
         // File may already be deleted
     }
 }
+
 

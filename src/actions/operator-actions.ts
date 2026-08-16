@@ -251,7 +251,7 @@ interface AddLicenseData {
 }
 
 export async function addLicense(data: AddLicenseData) {
-    await verifyAdmin()
+    await verifyRMOrAdmin()
 
     const license = await prisma.operatorLicense.create({
         data: {
@@ -282,7 +282,7 @@ interface UpdateLicenseData {
 }
 
 export async function updateLicense(id: string, data: UpdateLicenseData) {
-    await verifyAdmin()
+    await verifyRMOrAdmin()
 
     const updateData: Record<string, unknown> = { ...data }
     if (data.startDate) updateData.startDate = new Date(data.startDate)
@@ -298,7 +298,7 @@ export async function updateLicense(id: string, data: UpdateLicenseData) {
 }
 
 export async function removeLicense(id: string) {
-    await verifyAdmin()
+    await verifyRMOrAdmin()
 
     await prisma.operatorLicense.delete({
         where: { id }

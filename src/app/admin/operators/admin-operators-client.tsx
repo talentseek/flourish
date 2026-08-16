@@ -231,12 +231,14 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         try {
             // Upload document if selected
             let docUrl: string | undefined
-            const formFile = form.get('file') as File | null
-            const fileToUpload = (formFile && formFile instanceof File && formFile.size > 0)
-                ? formFile
-                : licenseFile
+            const formFile = form.get('file') as (File | null)
+            const fileToUpload = (licenseFile && licenseFile.size > 0)
+                ? licenseFile
+                : (formFile && formFile.size > 0)
+                    ? formFile
+                    : null
 
-            if (fileToUpload && fileToUpload.size > 0) {
+            if (fileToUpload) {
                 const uploadData = new FormData()
                 uploadData.set('file', fileToUpload)
                 uploadData.set('type', 'pli')
@@ -594,19 +596,18 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                     </span>
                                                                     <ExpiryBadge endDate={lic.endDate} />
                                                                     {lic.documentUrl ? (
-                                                                         <div className="flex items-center gap-2">
+                                                                         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                                                                              <a
                                                                                  href={lic.documentUrl}
                                                                                  target="_blank"
                                                                                  rel="noopener noreferrer"
-                                                                                 className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-medium"
-                                                                                 onClick={(e) => e.stopPropagation()}
+                                                                                 className="inline-flex items-center gap-1 text-primary hover:underline text-xs font-semibold bg-primary/10 px-2.5 py-1 rounded border border-primary/20"
                                                                              >
                                                                                  <Paperclip className="h-3.5 w-3.5" />
                                                                                  <Download className="h-3.5 w-3.5" />
                                                                                  View Document
                                                                              </a>
-                                                                             <label className="cursor-pointer text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors">
+                                                                             <label className="cursor-pointer text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors hover:underline px-1.5 py-1">
                                                                                  <Upload className="h-3 w-3" />
                                                                                  Replace
                                                                                  <input
@@ -621,28 +622,30 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                                                                              </label>
                                                                          </div>
                                                                      ) : (
-                                                                         <label className="cursor-pointer text-xs bg-muted hover:bg-muted/80 text-foreground px-2 py-1 rounded inline-flex items-center gap-1 transition-colors border">
-                                                                             {uploadingLicenseId === lic.id ? (
-                                                                                 <>
-                                                                                     <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                                                                                     Uploading...
-                                                                                 </>
-                                                                             ) : (
-                                                                                 <>
-                                                                                     <Upload className="h-3 w-3 text-primary" />
-                                                                                     Attach Document
-                                                                                 </>
-                                                                             )}
-                                                                             <input
-                                                                                 type="file"
-                                                                                 className="hidden"
-                                                                                 disabled={uploadingLicenseId === lic.id}
-                                                                                 onChange={(e) => {
-                                                                                     const f = e.target.files?.[0]
-                                                                                     if (f) handleUploadLicenseDoc(lic.id, op.id, f)
-                                                                                 }}
-                                                                             />
-                                                                         </label>
+                                                                         <div onClick={(e) => e.stopPropagation()}>
+                                                                             <label className="cursor-pointer text-xs bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded inline-flex items-center gap-1.5 transition-colors font-medium shadow-sm">
+                                                                                 {uploadingLicenseId === lic.id ? (
+                                                                                     <>
+                                                                                         <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-700" />
+                                                                                         Uploading...
+                                                                                     </>
+                                                                                 ) : (
+                                                                                     <>
+                                                                                         <Upload className="h-3.5 w-3.5 text-amber-700" />
+                                                                                         Attach Document
+                                                                                     </>
+                                                                                 )}
+                                                                                 <input
+                                                                                     type="file"
+                                                                                     className="hidden"
+                                                                                     disabled={uploadingLicenseId === lic.id}
+                                                                                     onChange={(e) => {
+                                                                                         const f = e.target.files?.[0]
+                                                                                         if (f) handleUploadLicenseDoc(lic.id, op.id, f)
+                                                                                     }}
+                                                                                 />
+                                                                             </label>
+                                                                         </div>
                                                                      )}
                                                                 </div>
                                                                 <Button
