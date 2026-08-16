@@ -10,10 +10,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
-    serverActions: {
-      bodySizeLimit: '10mb',
-    },
+    serverComponentsExternalPackages: ['@prisma/client', '@vercel/blob'],
   },
   async headers() {
     return [
