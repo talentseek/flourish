@@ -22,6 +22,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { upload } from '@vercel/blob/client'
 import {
     createOperator,
     updateOperator,
@@ -31,7 +32,6 @@ import {
     removeLicense,
     checkCompaniesHouse,
 } from '@/actions/operator-actions'
-import { uploadComplianceDoc } from '@/actions/upload-actions'
 import { OperatorType, LicenseCategory, ComplianceStatus } from '@prisma/client'
 import {
     Plus,
@@ -222,33 +222,65 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         }
     }
 
+    async function uploadFileDirect(file: File, operatorId: string): Promise<string> {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+        const pathname = `compliance/pli/${operatorId}/${Date.now()}-${safeName}`
+        const blob = await upload(pathname, file, {
+            access: 'public',
+            handleUploadUrl: '/api/admin/licenses/upload-token',
+        })
+        return blob.url
+    }
+
     async function handleAddLicense(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         if (!licenseForOperator) return
         setLoading(true)
         const form = new FormData(e.currentTarget)
-        form.set('action', 'create')
-        form.set('operatorId', licenseForOperator)
-        if (licenseFile && (!form.get('file') || (form.get('file') as File).size === 0)) {
-            form.set('file', licenseFile)
-        }
 
         try {
-            const res = await fetch('/api/admin/licenses/upload', {
-                method: 'POST',
-                body: form,
-            })
-            const data = await res.json()
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to add license')
+            let docUrl: string | undefined
+            const formFile = form.get('file') as (File | null)
+            const fileToUpload = (licenseFile && licenseFile.size > 0)
+                ? licenseFile
+                : (formFile && formFile.size > 0)
+                    ? formFile
+                    : null
+
+            if (fileToUpload) {
+                docUrl = await uploadFileDirect(fileToUpload, licenseForOperator)
             }
 
-            if (data.success && data.license) {
+            const res = await addLicense({
+                operatorId: licenseForOperator,
+                type: form.get('type') as LicenseCategory,
+                reference: (form.get('reference') as string) || undefined,
+                startDate: form.get('startDate') as string,
+                endDate: form.get('endDate') as string,
+                coverValue: form.get('coverValue')
+                    ? parseFloat(form.get('coverValue') as string)
+                    : undefined,
+                notes: (form.get('notes') as string) || undefined,
+                documentUrl: docUrl,
+            })
+
+            if (res.success && res.license) {
+                const newLic: LicenseData = {
+                    id: res.license.id,
+                    type: res.license.type,
+                    reference: res.license.reference,
+                    startDate: res.license.startDate.toISOString ? res.license.startDate.toISOString() : new Date(res.license.startDate).toISOString(),
+                    endDate: res.license.endDate.toISOString ? res.license.endDate.toISOString() : new Date(res.license.endDate).toISOString(),
+                    isVerified: res.license.isVerified,
+                    coverValue: res.license.coverValue ? res.license.coverValue.toString() : null,
+                    documentUrl: res.license.documentUrl,
+                    notes: res.license.notes,
+                }
                 setOperatorList(prev => prev.map(op => {
                     if (op.id !== licenseForOperator) return op
                     return {
                         ...op,
-                        licenses: [...op.licenses, data.license]
+                        licenses: [...op.licenses, newLic]
                     }
                 }))
             }
@@ -267,30 +299,15 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     async function handleUploadLicenseDoc(licenseId: string, operatorId: string, file: File) {
         setUploadingLicenseId(licenseId)
         try {
-            const form = new FormData()
-            form.set('action', 'attach')
-            form.set('licenseId', licenseId)
-            form.set('operatorId', operatorId)
-            form.set('file', file)
-
-            const res = await fetch('/api/admin/licenses/upload', {
-                method: 'POST',
-                body: form,
-            })
-            const data = await res.json()
-            if (!res.ok) {
-                throw new Error(data.error || 'Failed to upload document')
-            }
-
-            if (data.success && data.documentUrl) {
-                setOperatorList(prev => prev.map(op => {
-                    if (op.id !== operatorId) return op
-                    return {
-                        ...op,
-                        licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: data.documentUrl } : lic)
-                    }
-                }))
-            }
+            const docUrl = await uploadFileDirect(file, operatorId)
+            await updateLicense(licenseId, { documentUrl: docUrl })
+            setOperatorList(prev => prev.map(op => {
+                if (op.id !== operatorId) return op
+                return {
+                    ...op,
+                    licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: docUrl } : lic)
+                }
+            }))
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to upload document')
