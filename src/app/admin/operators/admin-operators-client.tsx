@@ -225,9 +225,14 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         try {
             // Upload document if selected
             let docUrl: string | undefined
-            if (licenseFile) {
+            const formFile = form.get('file') as File | null
+            const fileToUpload = (formFile && formFile instanceof File && formFile.size > 0)
+                ? formFile
+                : licenseFile
+
+            if (fileToUpload && fileToUpload.size > 0) {
                 const uploadData = new FormData()
-                uploadData.set('file', licenseFile)
+                uploadData.set('file', fileToUpload)
                 uploadData.set('type', 'pli')
                 uploadData.set('entityId', licenseForOperator)
                 docUrl = await uploadComplianceDoc(uploadData)
@@ -840,25 +845,49 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Supporting Document</Label>
+                            <Label htmlFor="licFile">Supporting Document</Label>
                             <Input
+                                id="licFile"
+                                name="file"
                                 type="file"
                                 className="text-xs"
                                 onChange={(e) => setLicenseFile(e.target.files?.[0] || null)}
                             />
                             {licenseFile && (
-                                <p className="text-xs text-muted-foreground">
-                                    📎 {licenseFile.name}
-                                </p>
+                                <div className="flex items-center justify-between text-xs bg-muted/60 p-2 rounded border">
+                                    <div className="flex items-center gap-1.5 overflow-hidden">
+                                        <Paperclip className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+                                        <span className="font-medium text-foreground truncate">{licenseFile.name}</span>
+                                        <span className="text-muted-foreground flex-shrink-0">({(licenseFile.size / 1024).toFixed(1)} KB)</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-xs text-red-500 hover:underline flex-shrink-0 ml-2"
+                                        onClick={() => {
+                                            setLicenseFile(null)
+                                            const input = document.getElementById('licFile') as HTMLInputElement
+                                            if (input) input.value = ''
+                                        }}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
                             )}
                             <p className="text-xs text-muted-foreground">
-                                Upload a copy of the certificate or insurance policy.
+                                Upload a copy of the certificate or insurance policy (PDF, JPG, PNG).
                             </p>
                         </div>
 
                         <DialogFooter>
                             <Button type="submit" disabled={loading}>
-                                {loading ? 'Adding...' : 'Add License'}
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Uploading & Adding...
+                                    </>
+                                ) : (
+                                    'Add License'
+                                )}
                             </Button>
                         </DialogFooter>
                     </form>
