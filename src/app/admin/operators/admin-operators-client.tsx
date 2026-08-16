@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -138,6 +138,12 @@ function ComplianceBadge({ status }: { status: ComplianceStatus }) {
 
 export function AdminOperatorsClient({ operators }: { operators: OperatorData[] }) {
     const router = useRouter()
+    const [operatorList, setOperatorList] = useState<OperatorData[]>(operators)
+
+    useEffect(() => {
+        setOperatorList(operators)
+    }, [operators])
+
     const [operatorDialogOpen, setOperatorDialogOpen] = useState(false)
     const [licenseDialogOpen, setLicenseDialogOpen] = useState(false)
     const [editingOperator, setEditingOperator] = useState<OperatorData | null>(null)
@@ -152,7 +158,7 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
     const [selectedEntityType, setSelectedEntityType] = useState<string>('LIMITED_COMPANY')
     const [selectedLicenseType, setSelectedLicenseType] = useState<string>('PUBLIC_LIABILITY_INSURANCE')
 
-    const filtered = operators.filter(op =>
+    const filtered = operatorList.filter(op =>
         op.companyName.toLowerCase().includes(search.toLowerCase()) ||
         (op.tradingName && op.tradingName.toLowerCase().includes(search.toLowerCase()))
     )
@@ -238,7 +244,7 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                 docUrl = await uploadComplianceDoc(uploadData)
             }
 
-            await addLicense({
+            const res = await addLicense({
                 operatorId: licenseForOperator,
                 type: form.get('type') as LicenseCategory,
                 reference: (form.get('reference') as string) || undefined,
@@ -250,6 +256,27 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
                 notes: (form.get('notes') as string) || undefined,
                 documentUrl: docUrl,
             })
+
+            if (res.success && res.license) {
+                const newLic: LicenseData = {
+                    id: res.license.id,
+                    type: res.license.type,
+                    reference: res.license.reference,
+                    startDate: res.license.startDate.toISOString ? res.license.startDate.toISOString() : new Date(res.license.startDate).toISOString(),
+                    endDate: res.license.endDate.toISOString ? res.license.endDate.toISOString() : new Date(res.license.endDate).toISOString(),
+                    isVerified: res.license.isVerified,
+                    coverValue: res.license.coverValue ? res.license.coverValue.toString() : null,
+                    documentUrl: res.license.documentUrl,
+                    notes: res.license.notes,
+                }
+                setOperatorList(prev => prev.map(op => {
+                    if (op.id !== licenseForOperator) return op
+                    return {
+                        ...op,
+                        licenses: [...op.licenses, newLic]
+                    }
+                }))
+            }
 
             setLicenseDialogOpen(false)
             setLicenseForOperator(null)
@@ -271,6 +298,13 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
             uploadData.set('entityId', operatorId)
             const docUrl = await uploadComplianceDoc(uploadData)
             await updateLicense(licenseId, { documentUrl: docUrl })
+            setOperatorList(prev => prev.map(op => {
+                if (op.id !== operatorId) return op
+                return {
+                    ...op,
+                    licenses: op.licenses.map(lic => lic.id === licenseId ? { ...lic, documentUrl: docUrl } : lic)
+                }
+            }))
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to upload document')
@@ -283,6 +317,10 @@ export function AdminOperatorsClient({ operators }: { operators: OperatorData[] 
         if (!confirm('Remove this license?')) return
         try {
             await removeLicense(id)
+            setOperatorList(prev => prev.map(op => ({
+                ...op,
+                licenses: op.licenses.filter(lic => lic.id !== id)
+            })))
             router.refresh()
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Failed to remove')

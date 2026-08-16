@@ -5,6 +5,8 @@ import { headers } from 'next/headers'
 import { AdminOperatorsClient } from './admin-operators-client'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function AdminOperatorsPage() {
     const session = await auth.api.getSession({
