@@ -17,11 +17,15 @@ import {
     Shield,
     Users,
     XCircle,
+    Flame,
+    Lock,
+    AlertTriangle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { MailboxWarmupDashboard } from '@/components/outreach/mailbox-warmup-dashboard'
 import {
     Table,
     TableBody,
@@ -124,15 +128,48 @@ export function OutreachClient({ campaigns, integrations, allCampaigns, rmIntegr
 
     return (
         <>
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight">Outreach</h1>
-                <p className="text-muted-foreground">
-                    Find and reach potential tenants for your locations
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Outreach</h1>
+                    <p className="text-muted-foreground">
+                        Regional tenant discovery, automated campaigns, and deliverability infrastructure
+                    </p>
+                </div>
+                <Badge variant="outline" className="border-amber-500/40 text-amber-700 dark:text-amber-300 bg-amber-500/10 gap-1.5 py-1 px-2.5 self-start sm:self-auto">
+                    <Flame className="h-3.5 w-3.5 text-amber-500" />
+                    Mailbox Warmup: 28% Complete
+                </Badge>
             </div>
 
-            <Tabs defaultValue={(!linkedin && !microsoft) ? 'accounts' : 'campaigns'} className="space-y-4">
+            {/* Persistent Outreach Paused Alert Banner */}
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center gap-3">
+                    <div className="p-1.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0">
+                        <Lock className="h-4 w-4" />
+                    </div>
+                    <div>
+                        <span className="text-sm font-semibold text-foreground">
+                            Outreach Campaigns &amp; Outbound Sending Paused
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Our pool of 14 secondary domain mailboxes across 7 domains is currently undergoing deliverability warmup (28%). Active campaign creation and cold emailing are temporarily paused to protect domain reputation.
+                        </p>
+                    </div>
+                </div>
+                <div className="text-xs font-medium text-amber-700 dark:text-amber-300 shrink-0 self-end sm:self-auto">
+                    Phase 2: Day 6 of 21
+                </div>
+            </div>
+
+            <Tabs defaultValue="mailboxes" className="space-y-4">
                 <TabsList>
+                    <TabsTrigger value="mailboxes" className="gap-2 font-medium">
+                        <Flame className="h-4 w-4 text-amber-500" />
+                        Mailbox Pool &amp; Warmup
+                        <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                            28%
+                        </Badge>
+                    </TabsTrigger>
                     <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
                     <TabsTrigger value="accounts">
                         Connected Accounts
@@ -148,39 +185,21 @@ export function OutreachClient({ campaigns, integrations, allCampaigns, rmIntegr
                     )}
                 </TabsList>
 
-                {/* Onboarding Banner */}
-                {!linkedin && !microsoft && campaigns.length === 0 && (
-                    <Card className="border-primary/30 bg-primary/5">
-                        <CardContent className="py-4">
-                            <div className="flex items-start gap-3">
-                                <Megaphone className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Get started with Outreach</p>
-                                    <div className="space-y-1 text-sm text-muted-foreground">
-                                        <div className="flex items-center gap-2">
-                                            <Circle className="h-3.5 w-3.5 text-amber-500" />
-                                            <span><strong>Step 1:</strong> Connect your LinkedIn account in the <em>Connected Accounts</em> tab</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Circle className="h-3.5 w-3.5 text-muted-foreground/40" />
-                                            <span><strong>Step 2:</strong> Create your first campaign to discover and reach leads</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                {/* ─── Mailbox Pool & Warmup Tab ───────────────── */}
+                <TabsContent value="mailboxes" className="space-y-4">
+                    <MailboxWarmupDashboard />
+                </TabsContent>
 
                 {/* ─── Campaigns Tab ─────────────────────────── */}
                 <TabsContent value="campaigns" className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <div />
-                        <Button asChild>
-                            <Link href="/outreach/campaigns/new">
-                                <Plus className="mr-2 h-4 w-4" />
-                                New Campaign
-                            </Link>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                            <Lock className="h-3.5 w-3.5 text-amber-500" />
+                            <span>Campaign creation &amp; outbound sending disabled during deliverability warmup (28%)</span>
+                        </div>
+                        <Button disabled className="opacity-60 cursor-not-allowed" title="Campaign creation is paused while secondary mailboxes warm up">
+                            <Lock className="mr-2 h-4 w-4" />
+                            New Campaign (Paused)
                         </Button>
                     </div>
 
@@ -190,14 +209,11 @@ export function OutreachClient({ campaigns, integrations, allCampaigns, rmIntegr
                                 <Megaphone className="h-12 w-12 text-muted-foreground/50 mb-4" />
                                 <h3 className="text-lg font-semibold mb-1">No campaigns yet</h3>
                                 <p className="text-muted-foreground text-sm max-w-sm mb-4">
-                                    Create your first outreach campaign to start finding and
-                                    contacting potential tenants.
+                                    Campaign creation is currently paused while the 14 secondary domain mailboxes undergo deliverability warmup to ensure optimal inbox placement.
                                 </p>
-                                <Button asChild>
-                                    <Link href="/outreach/campaigns/new">
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Create Campaign
-                                    </Link>
+                                <Button disabled className="opacity-60 cursor-not-allowed">
+                                    <Lock className="mr-2 h-4 w-4" />
+                                    Campaign Creation Paused (28% Warmup)
                                 </Button>
                             </CardContent>
                         </Card>

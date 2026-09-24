@@ -1,0 +1,370 @@
+{
+    "title": "Flourish V2 UI & Global Data Enrichment",
+    "summary": "This knowledge item tracks the v2 architectural evolution, data saturation, and portfolio integrity of the Flourish platform. It documents the systematic remediation of the UK retail market, the Feb 2026 color contrast remediation, and the rollout of the database-driven Admin Panel (/admin). This transition replaces legacy JSON management with real-time Prisma-backed CRUD for managed portfolios, user roles, and advanced filtering capabilities (e.g., Regional Manager filtering for locations). It also covers core auth discoveries regarding 'additionalFields' for custom roles in sessions, alongside architectural lessons on shadcn/ui component dependencies and Next.js dynamic rendering requirements.",
+    "references": [
+        {
+            "type": "conversation_id",
+            "value": "feb-05-leicester-cluster-saturation"
+        },
+        {
+            "type": "conversation_id",
+            "value": "feb-01-v2-revisions-and-cleanup"
+        },
+        {
+            "type": "file",
+            "value": "src/components/v2-contact-section.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/components/v2-video-hero.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/layout.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/page.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/api/contact/route.ts"
+        },
+        {
+            "type": "file",
+            "value": "scripts/fix-managed.js"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-104409c2-7f36-4517-ba0a-42d5edd55476"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-c34b34d6-9a0c-4bc3-ab91-a11b0206c8d6"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-e913ffc9-4971-4668-8128-b11593d3df03"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-82ab1961-4da2-4277-8642-6da983260db5"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-90562173-88df-4fa2-a097-97f1f452f6c5"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-6a7d9915-acaf-4a93-8b87-974db95f0a76"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-527902ac-00f0-418d-bbc1-435062e903c3"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-0b421e93-7565-44ac-b4ad-646776ab46af"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-cc7f3df5-48e3-482d-bb1f-c1b3fa7098dc"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-5509c77b-f4b3-490f-9ef3-6d454f666334"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-9499720a-c965-4260-b43a-f90c5ff9e251"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-c29ccf89-a99d-4d15-b980-073e4de369b2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-c68e1471-11d2-43bb-81cb-631d8583c713"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-3d32078b-aa13-47fc-b99e-1ba71084931a"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-723c3a17-3f0a-4ed5-b2f0-9f3a6ce08380"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-140c8227-8973-4556-913a-78486938a101"
+        },
+        {
+            "type": "conversation_id",
+            "value": "current-conversation-jan-26"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-02136e17-a9ac-418a-a432-7b53b3c444d2"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-26-duplicate-merge-validation"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-user-management-discovery"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-brainstorm"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-skill-planning"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-skill-creation"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-migration-planning"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-phase-1-execution"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-schema-generation-monitoring"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-better-auth-cli-failure-fallback"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-priority-enrichment"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-managed-portfolio-saturation"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-managed-audit-execution"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-27-homepage-managed-locations-audit"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-pentagon-footfall-update"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-georgia-portfolio-refinement"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-planning"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-execution"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-execution-v6-fixes"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-improvements"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-final-stability-fixes"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-rm-dashboard-portfolio-context-fix"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-video-gallery-removal"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-homepage-content-update"
+        },
+        {
+            "type": "conversation_id",
+            "value": "jan-28-regional-dashboard-navigation-links"
+        },
+        {
+            "type": "file",
+            "value": "src/components/v2-trader-stories-section.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/dashboard/regional/page.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/api/chat/route.ts"
+        },
+        {
+            "type": "file",
+            "value": "docs/PLAN-video-gallery-removal.md"
+        },
+        {
+            "type": "file",
+            "value": "docs/PLAN-regional-dashboard.md"
+        },
+        {
+            "type": "file",
+            "value": "docs/PLAN-production-readiness.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-feb-02-team-discrepancy"
+        },
+        {
+            "type": "file",
+            "value": "src/components/v2-team-section.tsx"
+        },
+        {
+            "type": "file",
+            "value": "scripts/add-amanda-rm.ts"
+        },
+        {
+            "type": "file",
+            "value": "docs/PLAN-add-amanda-regional-manager.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bot-feb-03-rm-provisioning-and-coord-fixes"
+        },
+        {
+            "type": "conversation_id",
+            "value": "feb-05-podcast-section-integration"
+        },
+        {
+            "type": "file",
+            "value": "src/components/v2-podcast-section.tsx"
+        },
+        {
+            "type": "conversation_id",
+            "value": "feb-05-highcross-data-audit"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/maintenance/property_drift_management.md"
+        },
+        {
+            "type": "file",
+            "value": "src/components/dashboard2/location-commercial-kpis.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/components/dashboard2/location-metrics-grid.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/components/dashboard2/location-compact-cards.tsx"
+        },
+        {
+            "type": "file",
+            "value": "scripts/sync-location-stats.ts"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/frontend/podcast_integration.md"
+        },
+        {
+            "type": "file",
+            "value": "src/components/dashboard2/location-tenants-section.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/components/dashboard2/location-demographics-section.tsx"
+        },
+        {
+            "type": "file",
+            "value": "scripts/firecrawl-tenant-enrichment.ts"
+        },
+        {
+            "type": "conversation_id",
+            "value": "3bce9fe9-4b74-4b56-944f-0a9332b99986"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/data_enrichment/firecrawl_tenant_extraction.md"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/discovery/leicester_retail_landscape.md"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/data_enrichment/regional_cluster_saturation_workflow.md"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/data_enrichment/leicester_cluster_enrichment_report.md"
+        },
+        {
+            "type": "file",
+            "value": "scripts/enrich-leicester-area.ts"
+        },
+        {
+            "type": "conversation_id",
+            "value": "feb-05-color-contrast-and-rendering-audit"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/frontend/design_audit_feb_2026.md"
+        },
+        {
+            "type": "file",
+            "value": "artifacts/implementation/color_contrast_remediation.md"
+        },
+        {
+            "type": "conversation_id",
+            "value": "bfa64b92-2538-471e-8478-9f36502b8ce8"
+        },
+        {
+            "type": "file",
+            "value": "scripts/add-callum-rm.ts"
+        },
+        {
+            "type": "file",
+            "value": "docs/PLAN-add-callum-regional-manager.md"
+        },
+        {
+            "type": "file",
+            "value": "src/app/admin/layout.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/admin/page.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/admin/actions.ts"
+        },
+        {
+            "type": "file",
+            "value": "src/app/admin/locations/page.tsx"
+        },
+        {
+            "type": "file",
+            "value": "src/app/admin/users/page.tsx"
+        },
+        {
+            "type": "conversation_id",
+            "value": "fixing-admin-role-access-feb-2026"
+        }
+    ]
+}

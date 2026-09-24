@@ -41,6 +41,7 @@ import {
     ChevronUp,
     Pencil,
     Save,
+    Lock,
 } from 'lucide-react'
 import {
     launchCampaign,
@@ -364,6 +365,19 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                 Back to Outreach
             </Link>
 
+            {/* Outreach Warmup Paused Alert */}
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5">
+                    <Lock className="h-4 w-4 text-amber-500 shrink-0" />
+                    <span className="text-muted-foreground">
+                        <strong className="text-foreground">Outreach Sending Paused:</strong> Campaign execution is temporarily held while our 14 secondary domain mailboxes undergo deliverability warmup (28%).
+                    </span>
+                </div>
+                <Badge variant="outline" className="border-amber-500/40 text-amber-700 dark:text-amber-300 bg-amber-500/10 shrink-0 self-end sm:self-auto text-[11px]">
+                    Warmup 28% • Phase 2
+                </Badge>
+            </div>
+
             {/* Header */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -378,14 +392,15 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                     )}
                 </div>
                 <div className="flex items-center gap-2">
-                    {campaign.status === 'DRAFT' && (
+                    {(campaign.status === 'DRAFT' || campaign.status === 'PAUSED') && (
                         <Button
                             size="sm"
-                            onClick={() => handleAction('launch')}
-                            disabled={loading === 'launch'}
+                            disabled
+                            className="opacity-60 cursor-not-allowed"
+                            title="Sending is paused while secondary mailboxes are warming up (28%)"
                         >
-                            <Play className="h-4 w-4 mr-1" />
-                            {loading === 'launch' ? 'Launching…' : 'Launch'}
+                            <Lock className="h-4 w-4 mr-1" />
+                            Launch Paused (28%)
                         </Button>
                     )}
                     {campaign.status === 'ACTIVE' && (
@@ -397,16 +412,6 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
                         >
                             <Pause className="h-4 w-4 mr-1" />
                             {loading === 'pause' ? 'Pausing…' : 'Pause'}
-                        </Button>
-                    )}
-                    {campaign.status === 'PAUSED' && (
-                        <Button
-                            size="sm"
-                            onClick={() => handleAction('launch')}
-                            disabled={loading === 'launch'}
-                        >
-                            <Play className="h-4 w-4 mr-1" />
-                            {loading === 'launch' ? 'Resuming…' : 'Resume'}
                         </Button>
                     )}
                     {campaign.status !== 'ACTIVE' && (
@@ -927,31 +932,26 @@ export function CampaignDetailClient({ campaign }: { campaign: CampaignData }) {
 
             {/* Launch CTA for DRAFT campaigns */}
             {campaign.status === 'DRAFT' && campaign.leads.length > 0 && !hasUnenrichedLeads && (
-                <Card className="border-primary/50 bg-primary/5">
-                    <CardContent className="flex items-center justify-between py-5">
+                <Card className="border-amber-500/30 bg-amber-500/5">
+                    <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-5">
                         <div className="space-y-1">
-                            <p className="text-sm font-medium">Ready to launch?</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium">Campaign Launch Paused</p>
+                                <Badge variant="outline" className="border-amber-500/40 text-amber-700 dark:text-amber-300 bg-amber-500/10 text-[10px] py-0">
+                                    Warmup 28%
+                                </Badge>
+                            </div>
                             <p className="text-xs text-muted-foreground">
-                                {campaign.leads.length} lead{campaign.leads.length !== 1 ? 's' : ''} will be contacted via LinkedIn and email over the coming days.
+                                Sending is on hold while secondary domain mailboxes complete deliverability warmup. All {campaign.leads.length} lead{campaign.leads.length !== 1 ? 's' : ''} are queued and ready to send once warmup finishes.
                             </p>
                         </div>
                         <Button
                             size="lg"
-                            onClick={() => handleAction('launch')}
-                            disabled={loading === 'launch'}
-                            className="gap-2"
+                            disabled
+                            className="gap-2 opacity-60 cursor-not-allowed shrink-0"
                         >
-                            {loading === 'launch' ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Launching…
-                                </>
-                            ) : (
-                                <>
-                                    <Play className="h-4 w-4" />
-                                    Launch Campaign
-                                </>
-                            )}
+                            <Lock className="h-4 w-4" />
+                            Launch Paused (28% Warmup)
                         </Button>
                     </CardContent>
                 </Card>

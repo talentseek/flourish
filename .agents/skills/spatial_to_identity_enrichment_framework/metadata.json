@@ -1,0 +1,22 @@
+{
+    "title": "Spatial-to-Identity Enrichment Framework",
+    "summary": "A multi-layered, chain-aware business enrichment pipeline for bridging Google Places (spatial) data with business owner/manager identities. Integrates website scraping, LLM extraction, Companies House, Apollo people search, and verified chain-specific email pattern fallback strategies.",
+    "references": [
+        {
+            "type": "file",
+            "value": "parkbunny/src/lib/enrichment/pipeline.ts"
+        },
+        {
+            "type": "file",
+            "value": "parkbunny/src/lib/enrichment/websiteScraper.ts"
+        },
+        {
+            "type": "file",
+            "value": "parkbunny/src/lib/enrichment/chainClassifier.ts"
+        },
+        {
+            "type": "conversation_id",
+            "value": "ParkBunny Enrichment UI Debugging"
+        }
+    ]
+}
