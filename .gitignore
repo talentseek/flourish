@@ -37,3 +37,10 @@ coverage
 # Misc
 *.tgz
 *.tar.gz
+scratch/
+*.tsbuildinfo
+
+# Video media assets
+video/public/*.mp4
+video/public/*.mp3
+

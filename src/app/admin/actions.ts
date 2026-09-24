@@ -84,6 +84,7 @@ export async function getLocationsForAdmin(page = 1, pageSize = 20, search = "",
             OR: [
                 { name: { contains: search, mode: 'insensitive' as const } },
                 { city: { contains: search, mode: 'insensitive' as const } },
+                { county: { contains: search, mode: 'insensitive' as const } },
                 { postcode: { contains: search, mode: 'insensitive' as const } }
             ]
         })
